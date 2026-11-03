@@ -144,7 +144,8 @@ class CompanhiaController:
                     self.commits_comemorados += 1
                     if hasattr(self.app, "registrar_conquista"):
                         self.app.registrar_conquista("commits", 1)
-                    self.app.emotion.force("feliz", 2.5, now, 90)
+                    if not self.app.asleep:
+                        self.app.emotion.force("feliz", 2.5, now, 90)
                     if self.app._pode_soltar_fogo():
                         self.app.festa.fogos.launch(int(self.app.pet.body.x), int(self.app.pet.body.y - 60))
                     self._entregar_recado_gentil("🚀 Commit novo detectado! Mandou muito bem!")

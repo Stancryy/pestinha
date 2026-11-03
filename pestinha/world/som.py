@@ -8,6 +8,7 @@ import math
 import os
 import struct
 import sys
+import threading
 import wave
 
 # Sequências de notas (frequência Hz, duração s) por evento
@@ -57,10 +58,13 @@ class SoundFX:
         if os.environ.get("QT_QPA_PLATFORM") == "offscreen":
             return True
         if sys.platform == "win32":
-            try:
-                import winsound
-                winsound.PlaySound(wav_bytes, winsound.SND_MEMORY | winsound.SND_ASYNC | winsound.SND_NODEFAULT)
-            except Exception:
-                pass
+            # O winsound não toca da memória em modo assíncrono (RuntimeError): toca síncrono numa thread.
+            def _tocar():
+                try:
+                    import winsound
+                    winsound.PlaySound(wav_bytes, winsound.SND_MEMORY | winsound.SND_NODEFAULT)
+                except Exception:
+                    pass
+            threading.Thread(target=_tocar, daemon=True).start()
         return True
 

@@ -12,11 +12,11 @@ from ..log import log
 import time
 from PySide6.QtWidgets import QApplication, QSystemTrayIcon
 from .. import config, plataforma
-
-APPS_REUNIAO = ("zoom", "teams", "ms-teams", "webex", "skype")
 from ..body.desenho_rosto import aplicar_skin_sazonal
 from ..ui.diario_panel import DiarioPanel
 from ..ui.ui import SettingsDialog
+
+APPS_REUNIAO = ("zoom", "teams", "ms-teams", "webex", "skype")
 
 
 class SessaoMixin:
@@ -153,7 +153,6 @@ class SessaoMixin:
             except OSError:
                 pass
         return novas
-        self.settings.show()
 
     def toggle_floating(self):
         """Mostra ou esconde os painéis de teste."""
@@ -191,10 +190,6 @@ class SessaoMixin:
     def toggle_dnd(self):
         """Liga ou desliga o modo Não Perturbe manual pela bandeja."""
         self.dnd_manual = not getattr(self, "dnd_manual", False)
-        self.update_visibility()
-        return
-        """Esconde ou mostra o pet."""
-        self.hidden = not self.hidden
         self.update_visibility()
 
     def clear_things(self):

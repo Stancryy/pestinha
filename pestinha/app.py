@@ -146,7 +146,6 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self._active_app_name = ""
         self.dnd_manual = False
         self.fator_ciclo = 1.0
-        self.dnd_manual = False
         self.idle_seconds = 0.0
         self.fullscreen = False
         self.platforms = []
@@ -262,12 +261,12 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         if self.aviso_migracao:
             problems.append(self.aviso_migracao)
         if not self.hotkey.ok:
-            problems.append(f"atalho de pânico {config.PANIC_HOTKEY_TEXT} já está em uso por outro programa")
+            problems.append(f"atalho de pânico {atalho_cfg} já está em uso por outro programa")
         if problems:
             self.tray.icon.showMessage(config.APP_NOME,"\n".join(problems), QSystemTrayIcon.Warning, 6000)
         if self.perms["ativo"]:
             self.tray.icon.showMessage(
-                self.nome, f"Estou aqui. Pânico: {config.PANIC_HOTKEY_TEXT}",
+                self.nome, f"Estou aqui. Pânico: {atalho_cfg}",
                 QSystemTrayIcon.Information, 3000,
             )
 
@@ -333,16 +332,12 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
                 return l / dpr, t / dpr, r / dpr, b / dpr
         dpr = infos[0][1] if infos else 1.0
         return l / dpr, t / dpr, r / dpr, b / dpr
-        g = QGuiApplication.primaryScreen().availableGeometry()
-        return g.x(), g.y(), g.x() + g.width(), g.y() + g.height()
 
     def scan_windows(self):
         """Barras de título onde ele pode pousar, em coordenadas lógicas do Qt."""
         if not self.perms["pousar_janelas"] or not self.pet.isVisible():
             self.platforms = []
             return
-        screen = QGuiApplication.primaryScreen()
-        dpr = screen.devicePixelRatio()
         infos = self._screens_info()
         dpr = infos[0][1] if infos else 1.0
         geometrias = [g for g, _ in infos]
@@ -393,7 +388,10 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.idle_seconds = senses.get_idle_seconds()
         app = senses.get_active_app()
         self._active_app_name = (app or "").lower()
-        self.fator_ciclo = fator_ciclo_rotina(self.paths.timeline) if self.perms.get("rotina", True) else 1.0
+        agora_s = time.monotonic()
+        if agora_s - getattr(self, "_fator_ciclo_em", -1e9) >= 600.0:      # relê a rotina a cada 10 min, não a cada 0,5 s
+            self._fator_ciclo_em = agora_s
+            self.fator_ciclo = fator_ciclo_rotina(self.paths.timeline) if self.perms.get("rotina", True) else 1.0
         if self.perms.get("reagir_hardware", False):
             cpu_pct, ram_pct = senses.get_hardware_usage()
             self.pet_state.suando = cpu_pct >= ajustes.LIMIAR_CPU_ALTA
@@ -402,7 +400,9 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
             self.pet_state.suando = False
             self.pet_state.apertado = False
         if self.perms.get("reagir_musica", False) and not self.asleep and not self.em_nao_perturbe:
-            self.pet_state.dancando = bool(senses.is_media_playing(self._active_app_name))
+            if agora_s - getattr(self, "_musica_em", -1e9) >= 5.0:          # lista de processos só a cada 5 s
+                self._musica_em = agora_s
+                self.pet_state.dancando = bool(senses.is_media_playing(self._active_app_name))
         else:
             self.pet_state.dancando = False
         self.activity = senses.detect_activity(app, self.idle_seconds, self.prof["away_after"])
@@ -643,6 +643,10 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         )
         objetos_parados = all(t.resting and not t.carried for t in self.mischief.things)
         pet_parado = body.grounded and not body.held and abs(body.vx) < 2.0 and abs(body.vy) < 2.0 and not self.behavior.mission
+        janela2 = self.segundo_pet.janela if hasattr(self, "segundo_pet") else None
+        if janela2 is not None and janela2.isVisible():
+            b2 = janela2.body
+            pet_parado = pet_parado and b2.grounded and abs(b2.vx) < 2.0 and abs(b2.vy) < 2.0 and self.segundo_pet.alvo_x is None
         if self.asleep and pet_parado and bola_parada and objetos_parados:
             alvo = INTERVALO_QUADRO_DORMINDO_MS
         elif pet_parado and bola_parada and objetos_parados and self.protest.stage < 4:

@@ -129,6 +129,20 @@ class MischiefEngine(QObject):
         self._add(thing)
         return True
 
+    def spawn_note(self, x, y, texto, chao=None):
+        """Recado gentil (Pomodoro, lembrete, commit): post-it parado na tela. Fechar não ensina nada ao pet."""
+        if not texto:
+            return None
+        thing = NoteThing(texto, small=False)
+        thing.gentil = True
+        thing.clicked.connect(self._on_click)
+        x = max(thing.width() / 2, float(x))
+        y = float(y) if chao is None else min(float(y), float(chao) - thing.height() / 2)
+        thing.place(x, y)
+        thing.resting = True
+        self._add(thing)
+        return thing
+
     def attach(self, thing, x, y):
         """Você pegou o objeto: ele segue o mouse até você soltar."""
         thing.carried = True
@@ -169,6 +183,8 @@ class MischiefEngine(QObject):
         """Clicaram no objeto: ele some e o tempo até o clique é registrado."""
         elapsed = time.monotonic() - thing.born
         self._remove(thing)
+        if getattr(thing, "gentil", False):
+            return                                   # recado gentil: fechar não é dispensa nem castigo
         self.dismissed.emit(thing, elapsed)
 
     def _remove(self, thing):

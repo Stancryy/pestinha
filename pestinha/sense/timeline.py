@@ -184,11 +184,3 @@ def fator_ciclo_rotina(path, hora_atual=None):
         return 1.15
     return 1.0
 
-
-def _ignorar_count_rows(path):
-    """Quantas linhas (minutos) já estão gravadas na rotina."""
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            return max(0, sum(1 for _ in f) - 1)
-    except OSError:
-        return 0
