@@ -39,6 +39,7 @@ app inteiro usam um relógio virtual: avançam o tempo sem esperar.
 | `test_log_crash.py` | Testes de rotação de log por tamanho e relatório local de travamento (crash report). |
 | `test_mesa.py` | Notebook: sentar e levantar pelo disparo do neurônio SENTAR. |
 | `test_migracao.py` | Etapa 1 do multipet: memória por pet (memory/pets/<pet>/) e a migração da versão antiga. |
+| `test_multimonitor.py` | Testes de suporte a múltiplos monitores (3 telas) e escalas de DPI mistas (100%, 125%, 150%). |
 | `test_nucleo.py` | Testes dos módulos puros: nada de Qt, nada de Windows. |
 | `test_paineis.py` | Painéis do menu (monitor neural e painel de protesto): abrir à mão deve manter o painel na tela. |
 | `test_pedido.py` | Pedir para trabalhar: o neurônio SENTAR decide. |

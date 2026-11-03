@@ -19,6 +19,11 @@
 - Otimização de `LIFBrain.step` com linhas esparsas ativas e `np.add.reduceat` (~1,7x mais rápido e 100% equivalente matematicamente).
 - FPS adaptativo em `PestinhaApp`: ~60 fps em movimento (`16 ms`), ~20 fps parado (`50 ms`), ~5 fps dormindo (`200 ms`).
 
+### Suporte aprimorado a 3 monitores e DPI > 100% (Etapa 4)
+- `scan_windows()` e `sense()` agora mapeiam coordenadas físicas para lógicas considerando o `devicePixelRatio` individual de cada monitor conectado (`_screens_info` e `_retangulo_logico`).
+- Pouso em barras de título habilitado em todos os monitores (não apenas na tela primária).
+- Jogo ou vídeo em tela cheia num monitor não esconde o pet quando ele está em outro monitor livre.
+
 ## Suporte a macOS e Linux
 
 - Toda a leitura do sistema (programa em primeiro plano, tempo ocioso, janelas, tela cheia, foco e o atalho

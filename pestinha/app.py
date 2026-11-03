@@ -277,6 +277,28 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         g = QGuiApplication.primaryScreen().availableGeometry()
         return g.x(), g.y(), g.x() + g.width(), g.y() + g.height()
 
+    def _screens_info(self):
+        """Lista [((left, top, right, bottom), dpr)] de todos os monitores conectados."""
+        out = []
+        for s in QGuiApplication.screens():
+            g = s.geometry()
+            out.append(((g.x(), g.y(), g.x() + g.width(), g.y() + g.height()), s.devicePixelRatio() or 1.0))
+        return out
+
+    def _retangulo_logico(self, rect):
+        """Converte (l, t, r, b) físicos em coordenadas lógicas usando o DPI do monitor da janela."""
+        l, t, r, b = rect
+        mx, my = (l + r) / 2, (t + b) / 2
+        infos = self._screens_info()
+        for (gl, gt, gr, gb), dpr in infos:
+            lx, ly = mx / dpr, my / dpr
+            if gl <= lx < gr and gt <= ly < gb:
+                return l / dpr, t / dpr, r / dpr, b / dpr
+        dpr = infos[0][1] if infos else 1.0
+        return l / dpr, t / dpr, r / dpr, b / dpr
+        g = QGuiApplication.primaryScreen().availableGeometry()
+        return g.x(), g.y(), g.x() + g.width(), g.y() + g.height()
+
     def scan_windows(self):
         """Barras de título onde ele pode pousar, em coordenadas lógicas do Qt."""
         if not self.perms["pousar_janelas"] or not self.pet.isVisible():
@@ -284,7 +306,9 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
             return
         screen = QGuiApplication.primaryScreen()
         dpr = screen.devicePixelRatio()
-        g = screen.geometry()
+        infos = self._screens_info()
+        dpr = infos[0][1] if infos else 1.0
+        geometrias = [g for g, _ in infos]
         exclude = {int(self.pet.winId())} | {int(t.winId()) for t in self.mischief.things}
         exclude |= self.floats.visible_handles()
         exclude |= {int(w.winId()) for w in self.revolucao.janelas()}
@@ -295,13 +319,13 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         above = []
         platforms = []
         for hwnd, (l, t, r, b), maximized in senses.list_windows(exclude, dpr):
-            l, t, r, b = l / dpr, t / dpr, r / dpr, b / dpr
+            l, t, r, b = self._retangulo_logico((l, t, r, b))
             mid = (l + r) / 2
             covered = any(al <= mid <= ar and at <= t + 2 <= ab for al, at, ar, ab in above)
             above.append((l, t, r, b))
             if maximized or covered:
                 continue
-            if not (g.left() <= mid <= g.right() and g.top() + 40 <= t <= g.bottom() - 100):
+            if not any(gl <= mid <= gr and gt + 40 <= t <= gb - 100 for gl, gt, gr, gb in geometrias):
                 continue
             platforms.append((hwnd, l + 10, r - 10, t))
         self.platforms = platforms
@@ -330,9 +354,20 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
             dpr = QGuiApplication.primaryScreen().devicePixelRatio()
             rect = senses.foreground_rect(dpr)
             if rect:
-                self.behavior.look_at((rect[0] + rect[2]) / 2 / dpr, (rect[1] + rect[3]) / 2 / dpr,
-                                      time.monotonic())
+                lx, ly, lr, lb = self._retangulo_logico(rect)
+                self.behavior.look_at((lx + lr) / 2, (ly + lb) / 2, time.monotonic())
+
+
         fullscreen = senses.is_fullscreen()
+        if fullscreen:
+            areas = self.screen_bounds()
+            if len(areas) > 1:
+                rect_fs = senses.foreground_rect(1.0)
+                if rect_fs:
+                    lx, ly, lr, lb = self._retangulo_logico(rect_fs)
+                    fs_bounds = self._bounds_at(areas, (lx + lr) / 2, (ly + lb) / 2)
+                    if self.bounds() != fs_bounds:
+                        fullscreen = False
         if fullscreen != self.fullscreen:
             self.fullscreen = fullscreen
             self.update_visibility()
