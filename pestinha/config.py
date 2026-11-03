@@ -58,7 +58,7 @@ DEFAULT_PERMISSIONS = {
     "lembretes_saude": False,  # opt-in: lembretes leves de água e postura
     "comemorar_commits": False, # opt-in: comemora commits locais do Git (só mtime)
     "git_repo_path": "",       # pasta do repositório Git monitorado (vazio = pasta atual)
-    "skins_sazonais": True,    # gorro de Natal, chifrinhos no Halloween e chapéu no aniversário
+    "skins_sazonais": False,    # gorro de Natal, chifrinhos no Halloween e chapéu no aniversário
     "efeitos_sonoros": False,  # opt-in: efeitos sonoros retrô sintetizados localmente
     "volume_som": 40,          # volume dos efeitos sonoros (0..100)
     "llm_local": False,        # opt-in: frases geradas por LLM local (Ollama/LM Studio em 127.0.0.1)

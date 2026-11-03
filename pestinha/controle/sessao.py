@@ -55,7 +55,7 @@ class SessaoMixin:
         st.allow_drag = self.perms["arrastar"]
         st.allow_poke = self.perms["cutucar"]
         if hasattr(self, "_aparencia_base"):
-            self.pet.aparencia = aplicar_skin_sazonal(self._aparencia_base, bool(self.perms.get("skins_sazonais", True)))
+            self.pet.aparencia = aplicar_skin_sazonal(self._aparencia_base, bool(self.perms.get("skins_sazonais", False)))
         self.update_visibility()
 
     def floats_allowed(self):

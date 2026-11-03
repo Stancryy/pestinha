@@ -159,7 +159,7 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         left, top, right, _bottom = self.bounds()
         self.pet = PetWindow(right - 220, top + 120, self.pet_state)
         self._aparencia_base = aparencia_de(pet_def.get("aparencia"))
-        self.pet.aparencia = aplicar_skin_sazonal(self._aparencia_base, bool(self.perms.get("skins_sazonais", True)))
+        self.pet.aparencia = aplicar_skin_sazonal(self._aparencia_base, bool(self.perms.get("skins_sazonais", False)))
         self.pet.poked.connect(self.on_poke)
         self.pet.drag_started.connect(self.on_drag_started)
         self.pet.drag_ended.connect(lambda: self.senses.set_dragging(False))

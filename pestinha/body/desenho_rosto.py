@@ -190,7 +190,7 @@ def _draw_anime_pixel(p: QPainter, shape: dict, gaze, blink: float, emotion: str
         chave_sp = "suando"
     elif carinho:
         chave_sp = "carinho"
-    elif emotion == "dormindo" or blink < 0.25:
+    elif emotion == "dormindo":
         chave_sp = "dormindo"
     else:
         chave_sp = emotion
@@ -211,9 +211,6 @@ def _draw_anime_pixel(p: QPainter, shape: dict, gaze, blink: float, emotion: str
             cor_hs = acessorios_dict["headset"]
             p.fillRect(QRectF(-34 + dx, 18 + dy, 2, 3), cor_hs)
             p.fillRect(QRectF(32 + dx, 18 + dy, 2, 3), cor_hs)
-        for nome in ("oculos", "gravata", "bone", "gorro_natal", "chapeu_festa"):
-            if nome in acessorios_dict:
-                _DESENHAR_ACESSORIO[nome](p, acessorios_dict[nome])
         p.restore()
         return
 
@@ -618,7 +615,7 @@ def draw_zzz(p, cx, cy, now, cor=EYE):
         p.restore()
 
 
-def acessorio_sazonal(data=None, aniversario=(11, 3)):
+def acessorio_sazonal(data=None, aniversario=None):
     """Devolve `(nome_acessorio, cor_hex)` para Natal, Halloween ou aniversário do pet, ou None."""
     from datetime import date
     hoje = data if data is not None else date.today()
@@ -632,7 +629,7 @@ def acessorio_sazonal(data=None, aniversario=(11, 3)):
     return None
 
 
-def aplicar_skin_sazonal(aparencia, ativo=True, data=None, aniversario=(11, 3)):
+def aplicar_skin_sazonal(aparencia, ativo=True, data=None, aniversario=None):
     """Adiciona o acessório sazonal à `Aparencia` quando `ativo=True` e a data é festiva."""
     if not ativo:
         return aparencia
