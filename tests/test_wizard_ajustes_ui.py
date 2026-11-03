@@ -45,7 +45,7 @@ def test_ajustes_persistencia_limites_e_dados_invalidos(tmp_path):
         assert isinstance(atuais, dict)
     finally:
         ajustes.restaurar_padroes(paths.ajustes)
-    assert ajustes.GRAVIDADE == ajustes.VALORES_PADRAO["GRAVIDADE"]
+    assert ajustes.GRAVIDADE == ajustes._VALORES_PADRAO["GRAVIDADE"]
     assert not paths.ajustes.exists()
 
 
@@ -64,7 +64,7 @@ def test_dialogo_ajustes_filtra_salva_e_restaura(tmp_path):
         assert ajustes.GRAVIDADE == 2500.0
 
         dlg._restaurar()
-        assert ajustes.GRAVIDADE == ajustes.VALORES_PADRAO["GRAVIDADE"]
+        assert ajustes.GRAVIDADE == ajustes._VALORES_PADRAO["GRAVIDADE"]
     finally:
         ajustes.restaurar_padroes(paths.ajustes)
 

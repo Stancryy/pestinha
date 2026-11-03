@@ -59,6 +59,9 @@
 - Suporte opcional a um 2º pet simultâneo na tela (`SegundoPetController` em `pestinha/mind/segundo_pet.py` e permissão `segundo_pet_ativo`), que passeia, persegue a bolinha e interage com a Mia (brincam juntos quando calmos ou brigam/trombam em protesto) quando outro personagem é criado pelo assistente.
 - Geração opcional e 100% offline de frases de post-it por LLM local (`GeradorLLMLocal` em `pestinha/mind/llm_local.py`, suportando Ollama em `127.0.0.1:11434` e LM Studio / OpenAI local em `127.0.0.1:1234`), validando estritamente endereços de loopback (`127.0.0.1`, `localhost`, `::1`) e caindo imediatamente para os arquivos `.txt` quando desligado ou indisponível.
 
+### Build `--onedir` com ícone da Mia e metadados de versão (Etapa 13 / Fase 4)
+- Script `ferramentas/empacotar.py` que converte `pets/mia/sprites/feliz.webp` em `assets/comum/icone_mia.ico` multi-resolução (`16x16` a `256x256`), gera metadados de versão `0.8.0.0` do Windows e compila `executáveis/Pestinha/Pestinha.exe` no modo `--onedir` com cópia integrada de `assets/` e `pets/`.
+
 ## Suporte a macOS e Linux
 
 - Toda a leitura do sistema (programa em primeiro plano, tempo ocioso, janelas, tela cheia, foco e o atalho
