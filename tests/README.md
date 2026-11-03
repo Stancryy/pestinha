@@ -34,6 +34,7 @@ app inteiro usam um relógio virtual: avançam o tempo sem esperar.
 | `test_companhia.py` | Testes da Etapa 10: Pomodoro no notebook, lembretes gentis de água/postura e comemoração de commits Git. |
 | `test_condicionamento.py` | Testes do condicionamento: aprender a reagir antes, extinguir, e persistir. |
 | `test_conteudo.py` | Etapa 2 do multipet: conteúdo por pet (frases, cartazes, memes, imagens). |
+| `test_diario_conquistas_som.py` | Testes da Etapa 11: acessórios sazonais, efeitos sonoros retrô, conquistas e Diário do Pet. |
 | `test_escolha_pet.py` | Etapa 3 do multipet: escolha do personagem nas configurações e o nome certo em cada texto. |
 | `test_festa.py` | Fogos de artifício ligados à rede e brincadeira mais animada quando feliz. |
 | `test_fps_cache.py` | Testes para cache de QPixmap, resolução de imagens WebP/PNG e FPS adaptativo. |

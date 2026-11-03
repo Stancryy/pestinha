@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QPushButton,
     QScrollArea,
+    QSpinBox,
     QSystemTrayIcon,
     QWidget,
     QVBoxLayout,
@@ -187,6 +188,15 @@ class SettingsDialog(QDialog):
         btn_ajustes.clicked.connect(self._abrir_ajustes)
         ferramentas_row.addWidget(btn_ajustes)
         root.addLayout(ferramentas_row)
+        vol_row = QHBoxLayout()
+        vol_row.addWidget(QLabel("Volume dos efeitos sonoros (%):"))
+        self.vol_spin = QSpinBox()
+        self.vol_spin.setRange(0, 100)
+        self.vol_spin.setValue(int(perms.get("volume_som", 40)))
+        self.vol_spin.setStyleSheet("background: #17201a; color: #dfffe6; border: 1px solid #2c5236; padding: 3px 6px;")
+        self.vol_spin.valueChanged.connect(lambda val: self._set("volume_som", int(val)))
+        vol_row.addWidget(self.vol_spin)
+        root.addLayout(vol_row)
         git_row = QHBoxLayout()
         git_row.addWidget(QLabel("Repositório Git (commits):"))
         self.git_edit = QLineEdit(perms.get("git_repo_path", ""))
@@ -332,6 +342,8 @@ class SettingsDialog(QDialog):
 class Tray(QObject):
     """Ícone da bandeja do sistema, com o menu de controle do pet."""
     open_settings = Signal()
+    open_diary = Signal()
+    open_monitor = Signal()
     open_monitor = Signal()
     open_panel = Signal()
     toggle_floating = Signal()
@@ -353,6 +365,8 @@ class Tray(QObject):
         self.actions = {}
         for key, text, signal in [
             ("settings", "Configurações...", self.open_settings),
+            ("diary", "Diário e conquistas...", self.open_diary),
+            ("monitor", "Monitor neural", self.open_monitor),
             ("monitor", "Monitor neural", self.open_monitor),
             ("panel", "Painel de protesto", self.open_panel),
             ("floating", "Esconder painéis de teste", self.toggle_floating),

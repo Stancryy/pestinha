@@ -97,6 +97,8 @@ class CompanhiaController:
             self.app.mesa.em_pedido = not self.app.mesa.sentado
             if now >= self.pomodoro_fim:
                 self.pomodoros_concluidos += 1
+                if hasattr(self.app, "registrar_conquista"):
+                    self.app.registrar_conquista("pomodoros", 1)
                 self.pomodoro_fase = "pausa"
                 self.pomodoro_fim = now + self.pausa_s
                 minutos_pausa = max(1, int(round(self.pausa_s / 60.0)))
@@ -140,6 +142,8 @@ class CompanhiaController:
                 elif mtime > self._git_mtime:
                     self._git_mtime = mtime
                     self.commits_comemorados += 1
+                    if hasattr(self.app, "registrar_conquista"):
+                        self.app.registrar_conquista("commits", 1)
                     self.app.emotion.force("feliz", 2.5, now, 90)
                     if self.app._pode_soltar_fogo():
                         self.app.festa.fogos.launch(int(self.app.pet.body.x), int(self.app.pet.body.y - 60))

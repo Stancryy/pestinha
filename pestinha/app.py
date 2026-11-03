@@ -50,13 +50,14 @@ from .ajustes import (
 from .body.behavior import Behavior
 from .body.bolinha import Ball, load_sprite
 from .body.brincadeira import Play
-from .body.desenho_rosto import aparencia_de
+from .body.desenho_rosto import aparencia_de, aplicar_skin_sazonal
 from .body.pet import PetWindow, cursor_pos
 from .body.pet_state import PetState
 from .body.toy import ToyTracker, bounce_off, push_from_cursor
 from .controle.interacao import InteracaoMixin
 from .controle.sessao import SessaoMixin
 from .core.conditioning import Conditioning
+from .core.conquistas import Conquistas
 from .core.emotion import PRIORITY, EmotionState
 from .core.episodic import EpisodicMemory
 from .core.homeostasis import Drives
@@ -77,6 +78,7 @@ from .sense.timeline import TimelineRecorder, fator_ciclo_rotina
 from .ui.float_manager import FloatManager
 from .ui.ui import PanicHotkey, Tray
 from .world.mischief import MischiefEngine
+from .world.som import SoundFX
 
 MAX_DT = 2.0          # s: um atraso maior que isso (suspensão) não vira tempo de rede
 
@@ -127,6 +129,9 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.pet_state = PetState()
         self.conditioning = Conditioning(self.pet_paths.conditioning, self.prof["cond_rate"])
         self.conditioning.load()
+        self.conquistas = Conquistas(self.pet_paths.achievements)
+        self.som = SoundFX()
+        self._carinho_acum_s = 0.0
         self.prev_pet_dist = None
         self.protest = Protesto(self.conteudo.signs, self.pet_paths.protest)
         self.protest.load(self.prof)
@@ -151,7 +156,8 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         # ----- corpo e travessuras -----
         left, top, right, _bottom = self.bounds()
         self.pet = PetWindow(right - 220, top + 120, self.pet_state)
-        self.pet.aparencia = aparencia_de(pet_def.get("aparencia"))
+        self._aparencia_base = aparencia_de(pet_def.get("aparencia"))
+        self.pet.aparencia = aplicar_skin_sazonal(self._aparencia_base, bool(self.perms.get("skins_sazonais", True)))
         self.pet.poked.connect(self.on_poke)
         self.pet.drag_started.connect(self.on_drag_started)
         self.pet.drag_ended.connect(lambda: self.senses.set_dragging(False))
@@ -201,6 +207,7 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.settings = None
         self.tray = Tray(self.nome)
         self.tray.open_settings.connect(self.open_settings)
+        self.tray.open_diary.connect(self.open_diary)
         self.tray.open_monitor.connect(lambda: self.floats.open("neural"))
         self.tray.open_panel.connect(lambda: self.floats.open("greve"))
         self.tray.toggle_floating.connect(self.toggle_floating)
@@ -447,6 +454,11 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
             self.drives.stimulate("caress", dt)
             self.drives.touched("caress", dt)
             self.memory.on_interaction()
+            self._carinho_acum_s += dt
+            if self._carinho_acum_s >= 1.0:
+                self._carinho_acum_s -= 1.0
+                self.registrar_conquista("carinhos", 1)
+                self.tocar_som("carinho")
 
         intensities = self.senses.update(self.activity, idle, self.drives.channels(), caressing, mouse_moving)
         if getattr(self.pet_state, "dancando", False):
@@ -486,6 +498,9 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         change = self.protest_ctl.tick(dt, st.tone, self.prof, caressing, now)
         if change:
             self.protest_ctl.on_stage(*change)
+            if change[1] == 4:
+                self.registrar_conquista("revolucoes", 1)
+                self.tocar_som("protesto")
         sad_change = self.sad_ctl.tick(dt, st.tone, self.prof, caressing, now,
                                        self.drives.channels()["LONELY"])
         if sad_change:

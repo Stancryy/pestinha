@@ -58,6 +58,9 @@ DEFAULT_PERMISSIONS = {
     "lembretes_saude": False,  # opt-in: lembretes leves de água e postura
     "comemorar_commits": False, # opt-in: comemora commits locais do Git (só mtime)
     "git_repo_path": "",       # pasta do repositório Git monitorado (vazio = pasta atual)
+    "skins_sazonais": True,    # gorro de Natal, chifrinhos no Halloween e chapéu no aniversário
+    "efeitos_sonoros": False,  # opt-in: efeitos sonoros retrô sintetizados localmente
+    "volume_som": 40,          # volume dos efeitos sonoros (0..100)
 }
 
 # (chave, rótulo, descrição) na ordem da tela inicial
@@ -102,6 +105,10 @@ PERMISSION_GROUPS = [
     ("Brincadeira", [
         ("fogos", "Fogos de artifício", "Quando ele fica muito feliz, a alegria da rede pode soltar um fogo."),
         ("bolinha", "Bolinha", "Uma bolinha para ele brincar. Se você levar para longe, ele reage (pode ficar triste, bravo ou ir atrás)."),
+        ("skins_sazonais", "Acessórios sazonais (Natal, Halloween, aniversário)",
+         "Coloca gorro de Natal em dezembro, chifrinhos no Halloween e chapéu de festa no aniversário do pet."),
+        ("efeitos_sonoros", "Efeitos sonoros opcionais",
+         "Sons curtos retrô em pulos, carinhos, fogos e conquistas. Desligado por padrão."),
     ]),
     ("Teste", [
         ("modo_teste", "Modo teste", "Tempos curtos: travessuras e emoções acontecem em segundos."),

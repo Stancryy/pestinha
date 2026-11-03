@@ -49,6 +49,12 @@
 - Lembretes opcionais de água e postura (`lembretes_saude`, desligado por padrão), com mensagens gentis e sem pressão.
 - Comemoração opcional de commits locais do Git (`comemorar_commits`, desligado por padrão, e `git_repo_path` configurável), lendo apenas o `st_mtime` de `.git/logs/HEAD` sem nunca abrir nem ler o conteúdo.
 
+### Skins Sazonais, Efeitos Sonoros, Conquistas e Diário do Pet (Etapa 11)
+- Acessórios sazonais automáticos (`acessorio_sazonal` e `aplicar_skin_sazonal` em `pestinha/body/desenho_rosto.py`): gorro de Natal em dezembro, chifrinhos no Halloween e chapéu de festa no aniversário do pet.
+- Efeitos sonoros retrô 8-bit opcionais (`SoundFX` em `pestinha/world/som.py`, desligados por padrão) sintetizados em memória, com controle de volume (`0..100%`) e respeito ao modo Não Perturbe.
+- Sistema de conquistas (`Conquistas` em `pestinha/core/conquistas.py`, salvo em `memory/pets/<id>/achievements.json`).
+- Painel local **"Diário do Pet"** (`DiarioPanel` em `pestinha/ui/diario_panel.py`), acessível pela bandeja e pelo menu da Mia, exibindo distribuição de humor e progresso das conquistas.
+
 ## Suporte a macOS e Linux
 
 - Toda a leitura do sistema (programa em primeiro plano, tempo ocioso, janelas, tela cheia, foco e o atalho

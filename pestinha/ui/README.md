@@ -8,6 +8,7 @@ Janelas de interface: tela de permissões, bandeja, passo a passo, monitor neura
 
 | Arquivo | O que faz |
 |---|---|
+| `diario_panel.py` | Painel local com o histórico de humor (lido de `timeline.csv` + sessão atual) e a vitrine de conquistas (`Conquistas`). |
 | `ferramentas_ui.py` | Diálogos de Ajustes Finos (`ajustes.py`), Editor de Programas (`ACTIVITY_APPS`) e Assistente (Wizard) de Criação de Personagem. |
 | `float_manager.py` | Os painéis flutuantes (monitor neural e painel de protesto). |
 | `monitor.py` | O que a rede está fazendo agora, sincronizado com o corpo. |

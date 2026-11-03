@@ -9,6 +9,7 @@ Cérebro e regras puras: rede neural, emoção, homeostase, memória, condiciona
 | Arquivo | O que faz |
 |---|---|
 | `conditioning.py` | Ele aprende a reagir ANTES do que costuma acontecer com ele. |
+| `conquistas.py` | Contadores e conquistas locais do pet, salvos em `memory/pets/<id>/achievements.json`. |
 | `emotion.py` | Da atividade dos neurônios motores para UMA emoção. |
 | `episodic.py` | O que aconteceu de verdade, e o que fazer da próxima vez. |
 | `homeostasis.py` | Variáveis internas que o pet tenta manter em equilíbrio. |

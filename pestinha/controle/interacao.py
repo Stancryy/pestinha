@@ -33,6 +33,7 @@ class InteracaoMixin:
         self.last_poke = now
         self.conditioning.outcome(now)
         self.senses.poke()
+        self.tocar_som("pulo")
         self.timeline.note_interaction()
         self.drives.stimulate("poke")
         self.drives.touched("poke")
@@ -137,6 +138,7 @@ class InteracaoMixin:
         item("Cantinho do castigo", lambda: self.castigo.toggle(self.bounds()))
         item("Painel de protesto", lambda: self.floats.toggle("greve"))
         item("Monitor neural", lambda: self.floats.toggle("neural"))
+        item("Diário e conquistas...", self.open_diary)
         item("Configurações...", self.open_settings)
         menu.addSeparator()
         item("Esconder (volta pela bandeja)", self.toggle_hidden)
@@ -153,6 +155,8 @@ class InteracaoMixin:
         if self._congelado():
             return
         self.pet_state.mark_caress()
+        self.registrar_conquista("carinhos", 1)
+        self.tocar_som("carinho")
         self.drives.touched("caress")
         self.memory.on_interaction()
         self.timeline.note_interaction()

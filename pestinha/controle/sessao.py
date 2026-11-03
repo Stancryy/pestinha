@@ -14,6 +14,8 @@ from PySide6.QtWidgets import QApplication, QSystemTrayIcon
 from .. import config, plataforma
 
 APPS_REUNIAO = ("zoom", "teams", "ms-teams", "webex", "skype")
+from ..body.desenho_rosto import aplicar_skin_sazonal
+from ..ui.diario_panel import DiarioPanel
 from ..ui.ui import SettingsDialog
 
 
@@ -52,6 +54,8 @@ class SessaoMixin:
         st.show_label = self.perms["modo_teste"] and self.perms["mostrar_emocao"]
         st.allow_drag = self.perms["arrastar"]
         st.allow_poke = self.perms["cutucar"]
+        if hasattr(self, "_aparencia_base"):
+            self.pet.aparencia = aplicar_skin_sazonal(self._aparencia_base, bool(self.perms.get("skins_sazonais", True)))
         self.update_visibility()
 
     def floats_allowed(self):
@@ -108,6 +112,40 @@ class SessaoMixin:
         self.settings.changed.connect(self.apply_perms)
         self.settings.wipe_all.connect(self.wipe_all_data)
         self.settings.history_wiped.connect(self.timeline.discard)
+        self.settings.show()
+
+    def open_diary(self):
+        """Abre o painel local do Diário do Pet (histórico de humor e conquistas)."""
+        if getattr(self, "diario_dlg", None) and self.diario_dlg.isVisible():
+            self.diario_dlg.raise_()
+            return
+        self.diario_dlg = DiarioPanel(
+            self.nome, self.paths.timeline, self.conquistas, dict(self.timeline.emotion)
+        )
+        self.diario_dlg.show()
+
+    def tocar_som(self, evento):
+        """Toca um efeito sonoro opcional se habilitado e fora do modo Não Perturbe."""
+        if hasattr(self, "som"):
+            self.som.tocar(
+                evento,
+                ativo=bool(self.perms.get("efeitos_sonoros", False)),
+                volume=int(self.perms.get("volume_som", 40)),
+                nao_perturbe=self.em_nao_perturbe,
+            )
+
+    def registrar_conquista(self, chave, quantidade=1):
+        """Incrementa o contador `chave` e comemora se desbloquear alguma conquista."""
+        if not hasattr(self, "conquistas"):
+            return []
+        novas = self.conquistas.registrar(chave, quantidade)
+        if novas:
+            self.tocar_som("conquista")
+            try:
+                self.conquistas.save()
+            except OSError:
+                pass
+        return novas
         self.settings.show()
 
     def toggle_floating(self):
@@ -202,6 +240,11 @@ class SessaoMixin:
         except OSError as error:
             log(f"[app] não salvou a homeostase: {error}")
         self.memory.save()
+        if hasattr(self, "conquistas"):
+            try:
+                self.conquistas.save()
+            except OSError as error:
+                log(f"[app] não salvou conquistas: {error}")
         self.castigo.salvar()
         try:
             self.conditioning.save()

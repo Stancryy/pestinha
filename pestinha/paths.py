@@ -80,6 +80,11 @@ class PetPaths:
         return self.base / "castigo.json"
 
     @property
+    def achievements(self):
+        """Conquistas desbloqueadas e contadores do personagem (achievements.json)."""
+        return self.base / "achievements.json"
+
+    @property
     def marcador(self):
         """Existe só depois que a migração deste pet foi validada e concluída."""
         return self.base / ".migrado"

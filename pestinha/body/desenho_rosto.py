@@ -616,3 +616,33 @@ def draw_zzz(p, cx, cy, now, cor=EYE):
         p.setFont(QFont("Consolas", int(size), QFont.Bold))
         p.drawText(QRectF(-20, -20, 40, 40), Qt.AlignCenter, "Z")
         p.restore()
+
+
+def acessorio_sazonal(data=None, aniversario=(11, 3)):
+    """Devolve `(nome_acessorio, cor_hex)` para Natal, Halloween ou aniversário do pet, ou None."""
+    from datetime import date
+    hoje = data if data is not None else date.today()
+    mes, dia = int(hoje.month), int(hoje.day)
+    if aniversario and (mes, dia) == tuple(aniversario):
+        return ("chapeu_festa", COR_PADRAO_ACESSORIO["chapeu_festa"])
+    if mes == 12 and 15 <= dia <= 31:
+        return ("gorro_natal", COR_PADRAO_ACESSORIO["gorro_natal"])
+    if mes == 10 and 24 <= dia <= 31:
+        return ("chifrinhos", "#ff5400")
+    return None
+
+
+def aplicar_skin_sazonal(aparencia, ativo=True, data=None, aniversario=(11, 3)):
+    """Adiciona o acessório sazonal à `Aparencia` quando `ativo=True` e a data é festiva."""
+    if not ativo:
+        return aparencia
+    sazonal = acessorio_sazonal(data=data, aniversario=aniversario)
+    if sazonal is None:
+        return aparencia
+    nome_saz, cor_hex = sazonal
+    atuais = dict(aparencia.acessorios)
+    if nome_saz in atuais:
+        return aparencia
+    novos = list(aparencia.acessorios) + [(nome_saz, QColor(cor_hex))]
+    from dataclasses import replace
+    return replace(aparencia, acessorios=tuple(novos))

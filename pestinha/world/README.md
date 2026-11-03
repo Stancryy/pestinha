@@ -14,3 +14,4 @@ Objetos que aparecem na tela: post-its, memes, cartazes, notebook, fogos e a jan
 | `mischief.py` | Memes, fotos e bilhetes que o pet espalha pela tela. |
 | `notebook.py` | O notebook do pet (só o desenho e o arrastar). |
 | `objetos.py` | Os post-its, memes e fotos que o pet traz, como janelas na tela. |
+| `som.py` | Efeitos sonoros retrô 8-bit sintetizados em memória (sem arquivos externos), opcionais e com controle de volume próprio (0..100%). |
