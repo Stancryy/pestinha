@@ -64,6 +64,7 @@ from .core.nervous_system import LIFBrain
 from .core.protesto import Protesto
 from .log import log
 from .mind.castigo_ctl import CastigoController
+from .mind.companhia import CompanhiaController
 from .mind.festa import FestaController
 from .mind.mesa import MesaController, pull
 from .mind.mischief_ctl import MischiefController
@@ -184,6 +185,7 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.mischief_ctl.postit_weight = Play(self.play_weights).weight("postit")
         self.festa = FestaController(self.debugging)
         self.mesa = MesaController(self.debugging, self)
+        self.companhia = CompanhiaController(self)
         self.castigo = CastigoController(self, self.debugging)
         paper = load_sprite(self.conteudo.bolinha_papel)
         self.revolucao = RevolucaoController(self.behavior.play, self.debugging, sprite=paper)
@@ -535,6 +537,7 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.timeline.note_emotion(emotion, dt)
         self.festa.tick(now, motor, emotion, self.pet.body, self._pode_soltar_fogo(), dt)
         self._atualizar_mesa(now)
+        self.companhia.tick(now, dt)
         self.memory.tick(now, self.prof["episode_ok"], self.prof["episode_window"])
         st.emotion = emotion
         self.behavior.on_emotion(emotion, time.monotonic())

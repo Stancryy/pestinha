@@ -55,6 +55,9 @@ DEFAULT_PERMISSIONS = {
     "pousar_barra_tarefas": True,
     "reagir_hardware": False,  # opt-in: reage a CPU/RAM altas (suando/apertado)
     "reagir_musica": False,    # opt-in: dança quando há música/mídia tocando
+    "lembretes_saude": False,  # opt-in: lembretes leves de água e postura
+    "comemorar_commits": False, # opt-in: comemora commits locais do Git (só mtime)
+    "git_repo_path": "",       # pasta do repositório Git monitorado (vazio = pasta atual)
 }
 
 # (chave, rótulo, descrição) na ordem da tela inicial
@@ -86,6 +89,10 @@ PERMISSION_GROUPS = [
          "CPU alta faz o pet suar; RAM cheia deixa ele apertado. Desligado por padrão."),
         ("reagir_musica", "Dançar com música tocando (opcional)",
          "Reage apenas ao estado tocando/pausado de players de música, sem nunca ler títulos. Desligado por padrão."),
+        ("lembretes_saude", "Lembretes leves de água e postura (opcional)",
+         "Sugere beber água e relaxar os ombros sem culpar nem pressionar. Desligado por padrão."),
+        ("comemorar_commits", "Comemorar commits do Git (opcional)",
+         "Comemora quando a data de .git/logs/HEAD muda (nunca lê código nem mensagem de commit). Desligado por padrão."),
     ]),
     ("Rotina", [
         ("rotina", "Aprender minha rotina",

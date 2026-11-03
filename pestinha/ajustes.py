@@ -136,6 +136,9 @@ INTERVALO_QUADRO_PARADO_MS = 50 # ms entre quadros parado em repouso (~20 fps)
 INTERVALO_QUADRO_DORMINDO_MS = 200  # ms entre quadros dormindo (~5 fps)
 LIMIAR_CPU_ALTA = 85.0          # % de CPU a partir do qual o pet sua (quando reagir_hardware ligado)
 LIMIAR_RAM_ALTA = 88.0          # % de RAM a partir do qual o pet fica apertado (quando reagir_hardware ligado)
+POMODORO_FOCO_MIN = 25          # minutos do ciclo de foco do Pomodoro
+POMODORO_PAUSA_MIN = 5          # minutos de pausa sugerida após o Pomodoro
+INTERVALO_LEMBRETE_MIN = 45     # minutos entre lembretes opcionais de água e postura
 
 # ---------------------------------------------------------------------------
 # Validação
@@ -220,6 +223,9 @@ _LIMITES = {
     "INTERVALO_QUADRO_DORMINDO_MS": (int, 50, 1000),
     "LIMIAR_CPU_ALTA": (float, 10.0, 100.0),
     "LIMIAR_RAM_ALTA": (float, 10.0, 100.0),
+    "POMODORO_FOCO_MIN": (int, 1, 180),
+    "POMODORO_PAUSA_MIN": (int, 1, 60),
+    "INTERVALO_LEMBRETE_MIN": (int, 5, 240),
 }
 
 

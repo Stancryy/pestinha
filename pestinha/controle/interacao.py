@@ -128,6 +128,8 @@ class InteracaoMixin:
         menu.addSeparator()
         item("Pedir para dormir", self.menu_sleep, not self.asleep)
         item("Pedir para trabalhar", self.menu_pedir_trabalho)
+        item("Encerrar Pomodoro" if getattr(self, "companhia", None) and self.companhia.pomodoro_fase else "Iniciar Pomodoro (foco junto)",
+             self.menu_pomodoro)
         item("Mostrar o notebook" if self.mesa.escondido else "Esconder o notebook",
              self.menu_alternar_notebook)
         item("Fazer uma travessura agora", self.menu_mischief, perms["travessuras"])
@@ -188,3 +190,12 @@ class InteracaoMixin:
     def menu_pedir_trabalho(self):
         """Menu: 'Pedir para trabalhar' (ele pode aceitar, ou recusar com frustração)."""
         self.mesa.pedir(time.monotonic())
+
+    def menu_pomodoro(self):
+        """Menu: inicia ou encerra um ciclo de Pomodoro junto com o pet."""
+        if self._congelado():
+            return
+        if self.companhia.pomodoro_fase:
+            self.companhia.parar_pomodoro()
+        else:
+            self.companhia.iniciar_pomodoro(time.monotonic())

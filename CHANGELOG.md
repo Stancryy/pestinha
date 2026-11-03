@@ -44,6 +44,11 @@
 - Reação opcional (`reagir_musica`, desligada por padrão) à música tocando, fazendo a Mia dançar no ritmo e exibindo notas musicais (`♪ ♫`) sem nunca ler títulos de mídia.
 - Suporte explícito a andar e pousar na borda da barra de tarefas (`pousar_barra_tarefas`).
 
+### Companhia de Programação: Pomodoro, Lembretes e Commits Git (Etapa 10)
+- Modo Pomodoro/Foco (`CompanhiaController` em `pestinha/mind/companhia.py` e opção no menu do pet): a Mia trabalha junto no notebook e sugere pausas leves ao fim do ciclo.
+- Lembretes opcionais de água e postura (`lembretes_saude`, desligado por padrão), com mensagens gentis e sem pressão.
+- Comemoração opcional de commits locais do Git (`comemorar_commits`, desligado por padrão, e `git_repo_path` configurável), lendo apenas o `st_mtime` de `.git/logs/HEAD` sem nunca abrir nem ler o conteúdo.
+
 ## Suporte a macOS e Linux
 
 - Toda a leitura do sistema (programa em primeiro plano, tempo ocioso, janelas, tela cheia, foco e o atalho

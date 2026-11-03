@@ -9,6 +9,7 @@ Controladores de decisão: ligam o que a rede decide à cena (sono, mesa, protes
 | Arquivo | O que faz |
 |---|---|
 | `castigo_ctl.py` | Uma plaquinha de cartoon que você arrasta para onde quiser. |
+| `companhia.py` | Funções de companhia para quem programa: Pomodoro no notebook, lembretes gentis de água/postura e comemoração de commits locais do Git. |
 | `festa.py` | O fogo de artifício do pet feliz: a alegria da rede enche a euforia. |
 | `mesa.py` | O computadorzinho do pet: sentar e levantar do notebook. |
 | `mischief_ctl.py` | Quando e como ele apronta, e o que a dispensa causa. |
