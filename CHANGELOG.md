@@ -27,6 +27,12 @@
 - Suporte a sprites de rosto pixel-art por emoção em `pestinha/body/desenho_rosto.py` (`sprites/<emocao>.webp`, renderizados com `SmoothPixmapTransform=False` para manter os pixels nítidos) e 15 expressões completas recortadas da folha de referência da Mia (`observando`, `feliz`, `carinho`, `suando`, `trabalhando`, `triste`, `chorando_1`, `chorando_2`, `dramatico`, `curioso`, `assustado`, `chocado`, `contente`, `dormindo`, `bravo`).
 - Textos personalizados (`recadinhos.txt`, `recadinhos_tristes.txt`, `cartazes.txt`), `bolinha_papel.webp` e 27 memes em `.webp` distribuídos em 9 pastas de emoção.
 
+### Instância única, Iniciar com o Windows, Atalhos e Não Perturbe (Etapa 7)
+- Trava de instância única (`memory/pestinha.lock`) com recuperação automática se o processo anterior não existir mais.
+- Opção opcional `"Iniciar junto com o Windows"` que cria/remove `Pestinha.vbs` na pasta `Startup` do usuário abrindo com `--direto`.
+- Atalho global de pânico configurável (`atalho_panico`) na tela de configurações.
+- Modo `"Não Perturbe"` automático (em jogos `GAMING`, tela cheia ou reuniões como Zoom/Teams) e manual pelo menu da bandeja, pausando travessuras e escondendo a bolinha.
+
 ## Suporte a macOS e Linux
 
 - Toda a leitura do sistema (programa em primeiro plano, tempo ocioso, janelas, tela cheia, foco e o atalho

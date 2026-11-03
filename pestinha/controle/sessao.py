@@ -11,7 +11,9 @@ from .. import log as log_module
 from ..log import log
 import time
 from PySide6.QtWidgets import QApplication, QSystemTrayIcon
-from .. import config
+from .. import config, plataforma
+
+APPS_REUNIAO = ("zoom", "teams", "ms-teams", "webex", "skype")
 from ..ui.ui import SettingsDialog
 
 
@@ -21,10 +23,23 @@ class SessaoMixin:
         """Pausado, desligado (pânico) ou apagando os dados: nada de rede, sentidos ou decisões."""
         return self.paused or not self.perms["ativo"] or self.wiping
 
+    @property
+    def em_nao_perturbe(self):
+        """Modo Não Perturbe ativo (manual pelo menu ou automático em jogo, tela cheia ou reunião)."""
+        if getattr(self, "dnd_manual", False):
+            return True
+        if not self.perms.get("nao_perturbe_auto", True):
+            return False
+        app_atual = getattr(self, "_active_app_name", "")
+        em_reuniao = any(nome in app_atual for nome in APPS_REUNIAO)
+        return bool(self.fullscreen or self.activity == "GAMING" or em_reuniao)
+
     def apply_perms(self, new):
         """Chamado pela tela de configurações: aplica e grava na hora."""
         was_routine = self.perms["rotina"]
         self.store.update(new)
+        if "iniciar_windows" in new:
+            plataforma.configurar_iniciar_com_windows(bool(self.perms.get("iniciar_windows", False)))
         if was_routine and not self.perms["rotina"]:
             self.timeline.close()      # grava o minuto em andamento e para
         self.prof = config.profile(self.perms)
@@ -73,13 +88,16 @@ class SessaoMixin:
         self.sad_ctl.set_visible(visible, self.asleep)
         if not visible:
             self.castigo.pausar(self.pet_state)
-        bola_visivel = visible and self.perms["bolinha"] and not self.ball_stored
+        bola_visivel = visible and self.perms["bolinha"] and not self.ball_stored and not self.em_nao_perturbe
         if not bola_visivel:
             self.ball.cancel_drag()                  # guardada ou escondida na mão: larga
         self.ball.setVisible(bola_visivel)
         if not visible or not self.perms["fogos"]:
             self.festa.fogos.recolher()
-        self.tray.set_state(self.paused, self.hidden, self.perms["modo_teste"])
+        try:
+            self.tray.set_state(self.paused, self.hidden, self.perms["modo_teste"], self.em_nao_perturbe)
+        except TypeError:
+            self.tray.set_state(self.paused, self.hidden, self.perms["modo_teste"])
 
     def open_settings(self):
         """Abre a tela de configurações (ou traz para frente se já estiver aberta)."""
@@ -120,6 +138,15 @@ class SessaoMixin:
         self.update_visibility()
 
     def toggle_hidden(self):
+        """Esconde ou mostra o pet."""
+        self.hidden = not self.hidden
+        self.update_visibility()
+
+    def toggle_dnd(self):
+        """Liga ou desliga o modo Não Perturbe manual pela bandeja."""
+        self.dnd_manual = not getattr(self, "dnd_manual", False)
+        self.update_visibility()
+        return
         """Esconde ou mostra o pet."""
         self.hidden = not self.hidden
         self.update_visibility()
@@ -207,5 +234,6 @@ class SessaoMixin:
         if self.perms["rotina"]:
             self.timeline.close()
         self.mischief.clear()
+        plataforma.liberar_trava_instancia(self.paths.lock)
         self.tray.icon.hide()
         QApplication.quit()

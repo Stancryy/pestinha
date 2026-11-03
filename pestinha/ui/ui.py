@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
     QLabel,
+    QLineEdit,
     QMenu,
     QMessageBox,
     QPushButton,
@@ -174,7 +175,14 @@ class SettingsDialog(QDialog):
                 self._update_history_label()
             root.addWidget(group)
 
-        panic = QLabel(f"Pânico (desliga tudo e fica desligado): {config.PANIC_HOTKEY_TEXT}")
+        hotkey_row = QHBoxLayout()
+        hotkey_row.addWidget(QLabel("Atalho de pânico:"))
+        self.hotkey_edit = QLineEdit(perms.get("atalho_panico", config.PANIC_HOTKEY_TEXT))
+        self.hotkey_edit.setStyleSheet("background: #17201a; color: #dfffe6; border: 1px solid #2c5236; padding: 3px 6px;")
+        self.hotkey_edit.editingFinished.connect(lambda: self._set("atalho_panico", plataforma.formatar_atalho(self.hotkey_edit.text())))
+        hotkey_row.addWidget(self.hotkey_edit, 1)
+        root.addLayout(hotkey_row)
+        panic = QLabel(f"Pânico (desliga tudo e fica desligado): {perms.get('atalho_panico', config.PANIC_HOTKEY_TEXT)}")
         panic.setObjectName("hint")
         root.addWidget(panic)
 
@@ -283,6 +291,8 @@ class Tray(QObject):
     open_panel = Signal()
     toggle_floating = Signal()
     toggle_pause = Signal()
+    toggle_dnd = Signal()
+    toggle_hidden = Signal()
     toggle_hidden = Signal()
     clear_things = Signal()
     panic = Signal()
@@ -302,6 +312,8 @@ class Tray(QObject):
             ("panel", "Painel de protesto", self.open_panel),
             ("floating", "Esconder painéis de teste", self.toggle_floating),
             ("pause", "Pausar", self.toggle_pause),
+            ("dnd", "Modo Não Perturbe", self.toggle_dnd),
+            ("hide", "Esconder", self.toggle_hidden),
             ("hide", "Esconder", self.toggle_hidden),
             ("clear", "Limpar travessuras", self.clear_things),
             ("panic", f"Pânico ({config.PANIC_HOTKEY_TEXT})", self.panic),
@@ -320,9 +332,11 @@ class Tray(QObject):
         )
         self.icon.show()
 
-    def set_state(self, paused, hidden, test_mode):
+    def set_state(self, paused, hidden, test_mode, dnd=False):
         """Atualiza os textos do menu e a dica do ícone conforme o estado (pausado, escondido, modo de teste)."""
         self.actions["pause"].setText("Continuar" if paused else "Pausar")
+        if "dnd" in self.actions:
+            self.actions["dnd"].setText("Sair do Não Perturbe" if dnd else "Modo Não Perturbe")
         self.actions["hide"].setText("Mostrar" if hidden else "Esconder")
         self.icon.setToolTip(self.titulo + ("  [MODO TESTE]" if test_mode else ""))
 
@@ -337,7 +351,16 @@ class PanicHotkey(QObject):
 
     pressed = Signal()
 
-    def __init__(self):
+    def __init__(self, atalho=None):
+
+
         """Registra o atalho de pânico pela plataforma; `ok` diz se o sistema aceitou o atalho."""
         super().__init__()
-        self.ok = plataforma.iniciar_atalho(self.pressed.emit)
+
+        if atalho and atalho != config.PANIC_HOTKEY_TEXT:
+            try:
+                self.ok = plataforma.iniciar_atalho(self.pressed.emit, atalho=atalho)
+            except TypeError:
+                self.ok = plataforma.iniciar_atalho(self.pressed.emit)
+        else:
+            self.ok = plataforma.iniciar_atalho(self.pressed.emit)

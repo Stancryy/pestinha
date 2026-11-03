@@ -229,6 +229,11 @@ class Paths:
         return self.memory / "activities.json"
 
     @property
+    def lock(self):
+        """Trava de instância única (memory/pestinha.lock) com o PID do processo ativo."""
+        return self.memory / "pestinha.lock"
+
+    @property
     def log(self):
         """Log do programa (sem conteúdo de janelas)."""
         return self.memory / "logs" / "pestinha.log"

@@ -49,6 +49,9 @@ DEFAULT_PERMISSIONS = {
     "mostrar_emocao": False,   # só vale com modo_teste ligado
     "bolinha": True,           # a bolinha para ele brincar
     "fogos": True,             # fogo de artifício quando ele fica feliz de verdade (rede)
+    "nao_perturbe_auto": True, # pausa travessuras e bolinha em jogos, tela cheia ou reuniões
+    "iniciar_windows": False,  # cria/remove atalho na pasta Inicializar do Windows
+    "atalho_panico": PANIC_HOTKEY_TEXT,
 }
 
 # (chave, rótulo, descrição) na ordem da tela inicial
@@ -70,6 +73,10 @@ PERMISSION_GROUPS = [
     ("Contexto", [
         ("tela_cheia", "Aparecer em tela cheia (experimental)",
          "Por padrão ele some em jogos, vídeos e apresentações."),
+        ("nao_perturbe_auto", "Modo Não Perturbe automático",
+         "Em jogos, tela cheia ou reuniões (Zoom, Teams, Meet), pausa travessuras e esconde a bolinha."),
+        ("iniciar_windows", "Iniciar junto com o Windows",
+         "Cria um atalho silencioso na pasta Inicializar do usuário (abre direto na bandeja)."),
     ]),
     ("Rotina", [
         ("rotina", "Aprender minha rotina",

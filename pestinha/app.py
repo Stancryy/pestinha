@@ -133,6 +133,8 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.senses = senses.ComputerSenses()
         self.tracker = senses.ActivityTracker()
         self.activity = "IDLE"
+        self._active_app_name = ""
+        self.dnd_manual = False
         self.idle_seconds = 0.0
         self.fullscreen = False
         self.platforms = []
@@ -197,11 +199,19 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.tray.open_panel.connect(lambda: self.floats.open("greve"))
         self.tray.toggle_floating.connect(self.toggle_floating)
         self.tray.toggle_pause.connect(self.toggle_pause)
+        self.tray.toggle_dnd.connect(self.toggle_dnd)
         self.tray.toggle_hidden.connect(self.toggle_hidden)
         self.tray.clear_things.connect(self.clear_things)
         self.tray.panic.connect(self.panic)
         self.tray.quit.connect(self.quit)
-        self.hotkey = PanicHotkey()
+        atalho_cfg = self.perms.get("atalho_panico", config.PANIC_HOTKEY_TEXT)
+        if atalho_cfg != config.PANIC_HOTKEY_TEXT:
+            try:
+                self.hotkey = PanicHotkey(atalho_cfg)
+            except TypeError:
+                self.hotkey = PanicHotkey()
+        else:
+            self.hotkey = PanicHotkey()
         self.hotkey.pressed.connect(self.panic)
         self.wiping = False         # True depois de "apagar tudo": não grava mais nada ao sair
         self.paused = False
@@ -337,8 +347,10 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         """Leitura de 500 em 500 ms: programa em primeiro plano, ocioso, janelas e tela cheia."""
         if self._congelado():
             return
+        dnd_antes = self.em_nao_perturbe
         self.idle_seconds = senses.get_idle_seconds()
         app = senses.get_active_app()
+        self._active_app_name = (app or "").lower()
         self.activity = senses.detect_activity(app, self.idle_seconds, self.prof["away_after"])
         events = self.tracker.observe(app, self.activity)
         self.senses.on_events(events)
@@ -369,7 +381,7 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
                     fs_bounds = self._bounds_at(areas, (lx + lr) / 2, (ly + lb) / 2)
                     if self.bounds() != fs_bounds:
                         fullscreen = False
-        if fullscreen != self.fullscreen:
+        if fullscreen != self.fullscreen or self.em_nao_perturbe != dnd_antes:
             self.fullscreen = fullscreen
             self.update_visibility()
 
@@ -597,7 +609,7 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
 
     def maybe_mischief(self, now, dt, bounds, cursor, motores):
         """Decide se vai aprontar uma travessura agora (não aprontar de castigo nem dormindo)."""
-        if self.castigo.dentro:                      # de castigo não apronta (e não deixa objeto solto)
+        if self.castigo.dentro or self.em_nao_perturbe:  # de castigo ou em Não Perturbe não apronta
             return
         self.mischief_ctl.maybe_act(
             now, dt, bounds, cursor, self.pet.body, motores=motores,

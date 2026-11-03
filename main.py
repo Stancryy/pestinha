@@ -16,7 +16,7 @@ import sys
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication, QDialog, QMessageBox
 
-from pestinha import config, log as log_module
+from pestinha import config, log as log_module, plataforma
 from pestinha.paths import Paths
 from pestinha.settings_store import SettingsStore
 from pestinha.app import PestinhaApp
@@ -47,6 +47,13 @@ def main():
     app.setWindowIcon(face_icon())
 
     paths = Paths()
+    if not plataforma.adquirir_trava_instancia(paths.lock):
+        if args.sair_em <= 0:
+            QMessageBox.information(
+                None, config.APP_NOME,
+                f"O {config.APP_NOME} já está aberto em segundo plano (veja o ícone na bandeja do sistema).",
+            )
+        return 0
     log_module.setup(paths.log, paths.crash_log)
     log_module.instalar_crash_handler()
     store = SettingsStore(paths)
@@ -80,7 +87,10 @@ def main():
     pet_app = PestinhaApp(store, paths)
     if args.sair_em > 0:
         QTimer.singleShot(int(args.sair_em * 1000), pet_app.quit)
-    return app.exec()
+    try:
+        return app.exec()
+    finally:
+        plataforma.liberar_trava_instancia(paths.lock)
 
 
 if __name__ == "__main__":

@@ -15,6 +15,16 @@ escolhe o certo na importação. Os retângulos são em pixels físicos (o app d
 
 import sys
 
+from ._comum import (
+    adquirir_trava_instancia,
+    caminho_atalho_inicializar,
+    configurar_iniciar_com_windows,
+    formatar_atalho,
+    iniciar_com_windows_ativo,
+    liberar_trava_instancia,
+    parse_atalho,
+)
+
 if sys.platform == "win32":
     from . import windows as _backend
 elif sys.platform == "darwin":
@@ -31,3 +41,21 @@ tela_cheia = _backend.tela_cheia
 janelas_visiveis = _backend.janelas_visiveis
 sem_foco_nativo = _backend.sem_foco_nativo
 iniciar_atalho = _backend.iniciar_atalho
+
+__all__ = [
+    "NOME_DO_SISTEMA",
+    "adquirir_trava_instancia",
+    "caminho_atalho_inicializar",
+    "configurar_iniciar_com_windows",
+    "formatar_atalho",
+    "iniciar_atalho",
+    "iniciar_com_windows_ativo",
+    "janelas_visiveis",
+    "liberar_trava_instancia",
+    "ocioso_segundos",
+    "parse_atalho",
+    "processo_ativo",
+    "retangulo_ativo",
+    "sem_foco_nativo",
+    "tela_cheia",
+]

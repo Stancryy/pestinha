@@ -12,6 +12,7 @@ import win32gui
 import win32process
 
 from ..log import log
+from ._comum import parse_atalho
 
 SHELL_CLASSES = {"Progman", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd"}
 
@@ -145,7 +146,18 @@ def sem_foco_nativo(janela_id):
         pass    # sem janela nativa (ex.: teste offscreen)
 
 
-def iniciar_atalho(callback):
+def _vk_de_tecla(tecla):
+    """Código virtual (VK) do Windows para letra/número ou tecla de função F1..F12."""
+    if len(tecla) == 1 and tecla.isalnum():
+        return ord(tecla.upper())
+    if tecla.startswith("F") and tecla[1:].isdigit():
+        indice = int(tecla[1:])
+        if 1 <= indice <= 12:
+            return 0x70 + indice - 1
+    return ord("B")
+
+
+def iniciar_atalho(callback, atalho="Ctrl+Alt+Shift+B"):
     """RegisterHotKey numa thread com fila de mensagens própria. Devolve True se conseguiu."""
     pronto = threading.Event()
     resultado = {"ok": False}
@@ -154,7 +166,7 @@ def iniciar_atalho(callback):
         """Laço da thread que registra o atalho e recebe as teclas do sistema."""
         user32 = ctypes.windll.user32
         resultado["ok"] = bool(user32.RegisterHotKey(
-            None, HOTKEY_ID, MOD_CONTROL | MOD_ALT | MOD_SHIFT | MOD_NOREPEAT, ord("B")
+            None, HOTKEY_ID, (MOD_NOREPEAT | (MOD_CONTROL if "CTRL" in parse_atalho(atalho)[0] else 0) | (MOD_ALT if "ALT" in parse_atalho(atalho)[0] else 0) | (MOD_SHIFT if "SHIFT" in parse_atalho(atalho)[0] else 0)), _vk_de_tecla(parse_atalho(atalho)[1])
         ))
         pronto.set()
         if not resultado["ok"]:
