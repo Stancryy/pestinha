@@ -14,7 +14,10 @@ import win32process
 from ..log import log
 from ._comum import parse_atalho
 
-SHELL_CLASSES = {"Progman", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd"}
+SHELL_CLASSES = {
+    "Progman", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd",
+    "Windows.UI.Core.CoreWindow", "XamlExplorerHostIslandWindow", "DV2ControlHost", "ImmersiveLauncher",
+}
 
 MOD_ALT, MOD_CONTROL, MOD_SHIFT, MOD_NOREPEAT = 0x1, 0x2, 0x4, 0x4000
 WM_HOTKEY = 0x0312
@@ -57,7 +60,12 @@ def tela_cheia():
     try:
         if win32gui.GetClassName(hwnd) in SHELL_CLASSES:
             return False
-        left, top, right, bottom = win32gui.GetWindowRect(hwnd)
+        if ctypes.windll.user32.IsZoomed(hwnd):
+            return False                            # janela comum maximizada (mesmo com barra de tarefas oculta) não é tela cheia
+        estilo = win32gui.GetWindowLong(hwnd, win32con.GWL_STYLE)
+        if estilo & win32con.WS_CAPTION:
+            return False                            # janela com barra de título padrão não é jogo/vídeo em tela cheia
+        left, top, right, bottom = _frame_rect(hwnd)
         monitor = win32api.MonitorFromWindow(hwnd, win32con.MONITOR_DEFAULTTONEAREST)
         m_left, m_top, m_right, m_bottom = win32api.GetMonitorInfo(monitor)["Monitor"]
     except Exception:
@@ -141,7 +149,12 @@ def sem_foco_nativo(janela_id):
     try:
         style = win32gui.GetWindowLong(janela_id, win32con.GWL_EXSTYLE)
         style |= win32con.WS_EX_NOACTIVATE | win32con.WS_EX_TOOLWINDOW
+        style |= win32con.WS_EX_TOPMOST
         win32gui.SetWindowLong(janela_id, win32con.GWL_EXSTYLE, style)
+        ctypes.windll.user32.SetWindowPos(
+            wintypes.HWND(janela_id), -1, 0, 0, 0, 0,
+            win32con.SWP_NOMOVE | win32con.SWP_NOSIZE | win32con.SWP_NOACTIVATE,
+        )
     except Exception:
         pass    # sem janela nativa (ex.: teste offscreen)
 

@@ -61,6 +61,31 @@ def test_lembrete_da_companhia_chega_na_tela(tmp_path, monkeypatch):
         log_module.desligar_arquivo()
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="API Win32 específica do Windows")
+def test_janela_maximizada_com_barra_oculta_nao_e_tela_cheia(monkeypatch):
+    from pestinha.plataforma import windows as w
+    monkeypatch.setattr(w.win32gui, "GetForegroundWindow", lambda: 1001)
+    monkeypatch.setattr(w.win32gui, "GetClassName", lambda hwnd: "Chrome_WidgetWin_1")
+    monkeypatch.setattr(w, "_frame_rect", lambda hwnd: (0, 0, 1920, 1080))
+    monkeypatch.setattr(w.win32api, "MonitorFromWindow", lambda hwnd, flag: 1)
+    monkeypatch.setattr(w.win32api, "GetMonitorInfo", lambda mon: {"Monitor": (0, 0, 1920, 1080)})
+
+    # 1. Janela maximizada (IsZoomed=1) em monitor com barra de tarefas auto-oculta -> NÃO é tela cheia
+    monkeypatch.setattr(w.ctypes.windll.user32, "IsZoomed", lambda hwnd: 1)
+    monkeypatch.setattr(w.win32gui, "GetWindowLong", lambda hwnd, idx: w.win32con.WS_CAPTION)
+    assert w.tela_cheia() is False
+
+    # 2. Menu Iniciar / Pesquisa do Windows 11 (CoreWindow cobrindo 1920x1080) -> NÃO é tela cheia
+    monkeypatch.setattr(w.ctypes.windll.user32, "IsZoomed", lambda hwnd: 0)
+    monkeypatch.setattr(w.win32gui, "GetWindowLong", lambda hwnd, idx: 0)
+    monkeypatch.setattr(w.win32gui, "GetClassName", lambda hwnd: "Windows.UI.Core.CoreWindow")
+    assert w.tela_cheia() is False
+
+    # 3. Jogo ou vídeo realmente em tela cheia (sem IsZoomed e sem WS_CAPTION, cobrindo o monitor) -> É tela cheia
+    monkeypatch.setattr(w.win32gui, "GetClassName", lambda hwnd: "UnrealWindow")
+    assert w.tela_cheia() is True
+
+
 @pytest.mark.skipif(sys.platform != "win32", reason="winsound só existe no Windows")
 def test_som_no_windows_nao_usa_async_com_memoria(monkeypatch):
     import winsound
@@ -100,4 +125,29 @@ def test_rotina_nao_e_relida_a_cada_leitura_dos_sentidos(tmp_path, monkeypatch):
         buddy.mischief.clear()
         buddy.tray.icon.hide()
         log_module.desligar_arquivo()
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="API Win32 específica do Windows")
+def test_janela_maximizada_com_barra_oculta_nao_e_tela_cheia(monkeypatch):
+    from pestinha.plataforma import windows as w
+    monkeypatch.setattr(w.win32gui, "GetForegroundWindow", lambda: 1001)
+    monkeypatch.setattr(w.win32gui, "GetClassName", lambda hwnd: "Chrome_WidgetWin_1")
+    monkeypatch.setattr(w, "_frame_rect", lambda hwnd: (0, 0, 1920, 1080))
+    monkeypatch.setattr(w.win32api, "MonitorFromWindow", lambda hwnd, flag: 1)
+    monkeypatch.setattr(w.win32api, "GetMonitorInfo", lambda mon: {"Monitor": (0, 0, 1920, 1080)})
+
+    # 1. Janela maximizada (IsZoomed=1) em monitor com barra de tarefas auto-oculta -> NÃO é tela cheia
+    monkeypatch.setattr(w.ctypes.windll.user32, "IsZoomed", lambda hwnd: 1)
+    monkeypatch.setattr(w.win32gui, "GetWindowLong", lambda hwnd, idx: w.win32con.WS_CAPTION)
+    assert w.tela_cheia() is False
+
+    # 2. Menu Iniciar / Pesquisa do Windows 11 (CoreWindow cobrindo 1920x1080) -> NÃO é tela cheia
+    monkeypatch.setattr(w.ctypes.windll.user32, "IsZoomed", lambda hwnd: 0)
+    monkeypatch.setattr(w.win32gui, "GetWindowLong", lambda hwnd, idx: 0)
+    monkeypatch.setattr(w.win32gui, "GetClassName", lambda hwnd: "Windows.UI.Core.CoreWindow")
+    assert w.tela_cheia() is False
+
+    # 3. Jogo ou vídeo realmente em tela cheia (sem IsZoomed e sem WS_CAPTION, cobrindo o monitor) -> É tela cheia
+    monkeypatch.setattr(w.win32gui, "GetClassName", lambda hwnd: "UnrealWindow")
+    assert w.tela_cheia() is True
 
