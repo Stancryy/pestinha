@@ -1,5 +1,6 @@
 """Gera o ícone `.ico` da Mia, os metadados de versão e empacota o executável `--onedir` em `executáveis/Pestinha/`."""
 
+import os
 from pathlib import Path
 import shutil
 import struct
@@ -73,12 +74,42 @@ def gerar_icone(origem=SPRITE_ORIGEM, destino=ICONE_DEST):
     return destino
 
 
+def _sincronizar_pasta(origem: Path, destino: Path):
+    """Copia arquivos de `origem` para `destino`, renomeando `.exe` em uso no Windows se necessário."""
+    destino.mkdir(parents=True, exist_ok=True)
+    old_exe = destino / "Pestinha.old.exe"
+    if old_exe.exists():
+        try:
+            old_exe.unlink()
+        except PermissionError:
+            pass
+    for item in origem.rglob("*"):
+        rel = item.relative_to(origem)
+        alvo = destino / rel
+        if item.is_dir():
+            alvo.mkdir(parents=True, exist_ok=True)
+            continue
+        alvo.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            shutil.copy2(item, alvo)
+        except PermissionError:
+            if alvo.suffix.lower() == ".exe":
+                temp_old = alvo.with_suffix(".old.exe")
+                try:
+                    if temp_old.exists():
+                        temp_old.unlink()
+                    os.replace(alvo, temp_old)
+                    shutil.copy2(item, alvo)
+                except OSError:
+                    pass
+
+
 def empacotar_onedir():
     """Compila `Pestinha.exe` no modo `--onedir` com ícone e metadados de versão e copia `assets/` e `pets/`."""
     icone = gerar_icone()
     pasta_build = ROOT / "executáveis" / "_build_tmp"
-    pasta_dist = ROOT / "executáveis"
-    pasta_app = pasta_dist / "Pestinha"
+    pasta_dist_tmp = pasta_build / "dist"
+    pasta_app = ROOT / "executáveis" / "Pestinha"
     pasta_build.mkdir(parents=True, exist_ok=True)
     arq_versao = pasta_build / "version_info.txt"
     arq_versao.write_text(VERSION_INFO_TEMPLATE, encoding="utf-8")
@@ -94,7 +125,7 @@ def empacotar_onedir():
         "--name",
         "Pestinha",
         "--distpath",
-        str(pasta_dist),
+        str(pasta_dist_tmp),
         "--workpath",
         str(pasta_build / "work"),
         "--specpath",
@@ -106,12 +137,10 @@ def empacotar_onedir():
         str(ROOT / "main.py"),
     ]
     subprocess.run(cmd, cwd=str(ROOT), check=True)
+    _sincronizar_pasta(pasta_dist_tmp / "Pestinha", pasta_app)
 
     for nome_pasta in ("assets", "pets"):
-        destino_sub = pasta_app / nome_pasta
-        if destino_sub.exists():
-            shutil.rmtree(destino_sub)
-        shutil.copytree(ROOT / nome_pasta, destino_sub)
+        _sincronizar_pasta(ROOT / nome_pasta, pasta_app / nome_pasta)
 
     shutil.rmtree(pasta_build, ignore_errors=True)
     return pasta_app / "Pestinha.exe"
