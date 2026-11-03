@@ -1,5 +1,12 @@
 # Histórico de versões
 
+## 0.8.0 — Versão Personalizada (Mia & Zuric)
+
+### Limpeza e base (Etapa 1)
+- Pasta `executáveis/` removida do rastreamento do Git e adicionada ao `.gitignore` (mantendo os arquivos locais intactos; builds vão para Releases).
+- Metadados do `pyproject.toml` atualizados (versão `0.8.0` e descrição multiplataforma) e texto da licença de `assets/` e `pets/` completado no `README.md`.
+- Compatibilidade limpa com Python 3.14 (`shutil.rmtree` atualizado para usar `onexc` sem aviso de depreciação).
+
 ## Suporte a macOS e Linux
 
 - Toda a leitura do sistema (programa em primeiro plano, tempo ocioso, janelas, tela cheia, foco e o atalho

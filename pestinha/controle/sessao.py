@@ -150,7 +150,11 @@ class SessaoMixin:
         log_module.desligar_arquivo()
         falhas = []
         if self.paths.memory.exists():
-            shutil.rmtree(self.paths.memory, onerror=lambda _f, caminho, _e: falhas.append(caminho))
+            cb = lambda _f, caminho, _e: falhas.append(caminho)
+            try:
+                shutil.rmtree(self.paths.memory, onexc=cb)
+            except TypeError:
+                shutil.rmtree(self.paths.memory, onerror=cb)
         if falhas or self.paths.memory.exists():
             print(f"[dados] não consegui apagar tudo: {falhas or self.paths.memory}")
         else:

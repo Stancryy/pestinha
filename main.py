@@ -28,7 +28,11 @@ def apagar_memoria(paths):
     """Apaga memory/ e confirma o resultado; devolve (sucesso, caminhos que falharam)."""
     falhas = []
     if paths.memory.exists():
-        shutil.rmtree(paths.memory, onerror=lambda _f, caminho, _e: falhas.append(str(caminho)))
+        cb = lambda _f, caminho, _e: falhas.append(str(caminho))
+        try:
+            shutil.rmtree(paths.memory, onexc=cb)
+        except TypeError:
+            shutil.rmtree(paths.memory, onerror=cb)
     return not falhas and not paths.memory.exists(), falhas
 
 
