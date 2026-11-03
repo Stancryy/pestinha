@@ -214,6 +214,11 @@ class Paths:
         """Log do programa (sem conteúdo de janelas)."""
         return self.memory / "logs" / "pestinha.log"
 
+    @property
+    def crash_log(self):
+        """Relatório local de travamento (exceções não tratadas), sem conteúdo de janelas."""
+        return self.memory / "logs" / "crash.log"
+
     # ----- estado de cada personagem -----
 
     @property

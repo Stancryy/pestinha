@@ -1,0 +1,13 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.10
+    hooks:
+      - id: ruff
+  - repo: local
+    hooks:
+      - id: pytest-arquitetura
+        name: Verificar arquitetura em camadas
+        entry: python -m pytest -q tests/test_arquitetura.py
+        language: system
+        pass_filenames: false
+

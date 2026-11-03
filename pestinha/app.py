@@ -86,7 +86,7 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.store = store
         self.perms = store.perms
         self.paths = paths or Paths()
-        log_module.setup(self.paths.log)
+        log_module.setup(self.paths.log, self.paths.crash_log)
         self.prof = config.profile(self.perms)
         self.debugging = lambda: self.perms["modo_teste"]
 

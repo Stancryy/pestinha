@@ -34,7 +34,7 @@ Podem ser usados por qualquer camada.
 | `config.py` | Caminhos, permissões da sessão, perfis de tempo e pets. |
 | `paths.py` | Onde ficam as coisas. |
 | `store.py` | A única forma de gravar e ler arquivos de estado. |
-| `log.py` | Um lugar só para mensagens do app: terminal e arquivo em memory/logs/. |
+| `log.py` | Um lugar só para mensagens do app: terminal, arquivo rotativo e crash report em memory/logs/. |
 | `mathutil.py` | Funções matemáticas pequenas, sem dependências. |
 | `settings_store.py` | As permissões da sessão, em um lugar só. |
 

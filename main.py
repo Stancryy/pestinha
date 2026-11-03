@@ -16,7 +16,7 @@ import sys
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication, QDialog, QMessageBox
 
-from pestinha import config
+from pestinha import config, log as log_module
 from pestinha.paths import Paths
 from pestinha.settings_store import SettingsStore
 from pestinha.app import PestinhaApp
@@ -47,6 +47,8 @@ def main():
     app.setWindowIcon(face_icon())
 
     paths = Paths()
+    log_module.setup(paths.log, paths.crash_log)
+    log_module.instalar_crash_handler()
     store = SettingsStore(paths)
     perms = store.perms
     if not args.direto:
