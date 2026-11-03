@@ -70,7 +70,7 @@ def carregar_atividades(path):
     dados = read_json(path, default=None) if path is not None else None
     if isinstance(dados, dict):
         for cat, lista in dados.items():
-            if cat in ACTIVITY_CHANNEL and isinstance(lista, list):
+            if (cat in ACTIVITY_CHANNEL or (isinstance(cat, str) and cat.isalpha() and cat.isupper())) and isinstance(lista, list):
                 validos = {_limpar_nome_app(x) for x in lista if _limpar_nome_app(x)}
                 if validos:
                     novo[cat] = validos
@@ -89,6 +89,12 @@ def salvar_atividades(path, mapa):
         else:
             validos = sorted(DEFAULT_ACTIVITY_APPS[cat])
         limpo[cat] = validos or sorted(DEFAULT_ACTIVITY_APPS[cat])
+    if isinstance(mapa, dict):
+        for cat, origem in mapa.items():
+            if cat not in limpo and isinstance(cat, str) and cat.isalpha() and cat.isupper() and isinstance(origem, (list, set, tuple)):
+                validos = sorted({_limpar_nome_app(x) for x in origem if _limpar_nome_app(x)})
+                if validos:
+                    limpo[cat] = validos
     write_json(path, limpo, indent=2)
     ACTIVITY_APPS.clear()
     ACTIVITY_APPS.update({k: set(v) for k, v in limpo.items()})

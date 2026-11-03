@@ -275,7 +275,80 @@ def load_pet(paths, name):
     pet["id"] = name
     if not pet["nome"]:
         pet["nome"] = name.capitalize()
-    return pet
+    res_pet = pet
+    return res_pet
+
+
+
+PERFIS_TEMPERAMENTO = {
+    "equilibrado": {"PLAYFUL->CHEER": 1.15, "PEDIDO->SENTAR": 0.75},
+    "calmo": {"CALM->CONTENT": 1.35, "PLAYFUL->TRAVESSURA": 0.75, "PEDIDO->SENTAR": 0.9},
+    "caotico": {"PLAYFUL->TRAVESSURA": 1.4, "FRUSTRATION->SCOWL": 1.3, "PEDIDO->SENTAR": 0.6},
+}
+
+
+def criar_pet_personalizado(paths, dados):
+    """Cria a definição JSON e as pastas iniciais de um novo personagem pelo assistente."""
+    import re
+    bruto = str((dados or {}).get("id") or (dados or {}).get("nome") or "novo_pet").strip().lower()
+    pet_id = re.sub(r"[^a-z0-9_-]+", "_", bruto).strip("_-")[:40] or "novo_pet"
+    if not pet_id_valido(pet_id):
+        pet_id = "novo_pet"
+    nome = str((dados or {}).get("nome") or pet_id.capitalize()).strip() or pet_id.capitalize()
+    seed = int((dados or {}).get("seed", 101)) if isinstance((dados or {}).get("seed"), int) else 101
+    reacao = (dados or {}).get("reacao_notebook", "misto")
+    if reacao not in ("bravo", "triste", "misto"):
+        reacao = "misto"
+    estilo_temp = (dados or {}).get("estilo_temperamento", "equilibrado")
+    temperamento = dict(PERFIS_TEMPERAMENTO.get(estilo_temp, PERFIS_TEMPERAMENTO["equilibrado"]))
+    if isinstance((dados or {}).get("temperamento"), dict):
+        temperamento.update(_pet_valido({"temperamento": dados["temperamento"]}).get("temperamento", {}))
+    aparencia = {
+        "formato": str((dados or {}).get("formato", "arredondado")),
+        "fundo": str((dados or {}).get("fundo", "#2a1f2d")),
+        "borda": str((dados or {}).get("borda", "#ff8da1")),
+        "olho": str((dados or {}).get("olho", "#e0115f")),
+        "boca": str((dados or {}).get("boca", "#ffebf0")),
+        "bochecha": str((dados or {}).get("bochecha", "#ff85a2")),
+        "acessorios": list((dados or {}).get("acessorios", ["orelhas_gatinho"])),
+    }
+    definicao = {
+        "nome": nome,
+        "seed": max(0, seed),
+        "reacao_notebook": reacao,
+        "temperamento": temperamento,
+        "brincadeira": {"chutar": 0.35, "buscar": 0.30, "atirar": 0.20, "postit": 0.15},
+        "aparencia": aparencia,
+    }
+    write_json(paths.definicao(pet_id), definicao, indent=2)
+    conteudo = paths.conteudo(pet_id)
+    conteudo.proprio.mkdir(parents=True, exist_ok=True)
+    for emocao in list(EMOTIONS) + ["trabalhando"]:
+        (conteudo.proprio / "memes" / emocao).mkdir(parents=True, exist_ok=True)
+    recados = (dados or {}).get("recadinhos") or [
+        f"Oi! Eu sou {nome} e estou de olho nesse código!",
+        "Já salvou seu arquivo hoje?",
+        "Faz um carinho aqui antes do próximo commit!",
+    ]
+    tristes = (dados or {}).get("recadinhos_tristes") or [
+        f"{nome} ficou no vácuo...",
+        "Ninguém brinca comigo hoje...",
+    ]
+    if not conteudo.notes.exists():
+        conteudo.notes.write_text("\n".join(recados) + "\n", encoding="utf-8")
+    if not conteudo.notes_sad.exists():
+        conteudo.notes_sad.write_text("\n".join(tristes) + "\n", encoding="utf-8")
+    if not conteudo.signs.exists():
+        conteudo.signs.write_text(
+            "[greve_1]\nPRECISO DE ATENÇÃO!\n[greve_2]\nGREVE DE CARINHO!\n"
+            "[greve_3]\nPARALISAÇÃO GERAL!\n[revolucao]\nABAIXO O CURSOR!\n"
+            "[acordo]\nACORDO FECHADO ♥\n[triste_1]\nESQUECERAM DE MIM...\n"
+            "[triste_2]\nABANDONO TOTAL\n[volto]\nVOLTEI ♥\n"
+            "[castigo]\nINOCENTE!!\n[xingamento]\n@#$%&*!!\n",
+            encoding="utf-8",
+        )
+    return pet_id
+
 
 
 # ============================================================

@@ -29,6 +29,7 @@ from PySide6.QtCore import QObject, QTimer
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QSystemTrayIcon
 
+from . import ajustes
 from . import config
 from . import log as log_module
 from . import migracao
@@ -90,6 +91,7 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.perms = store.perms
         self.paths = paths or Paths()
         log_module.setup(self.paths.log, self.paths.crash_log)
+        ajustes.carregar_ajustes(self.paths.ajustes)
         self.prof = config.profile(self.perms)
         self.debugging = lambda: self.perms["modo_teste"]
 

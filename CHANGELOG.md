@@ -33,6 +33,11 @@
 - Atalho global de pânico configurável (`atalho_panico`) na tela de configurações.
 - Modo `"Não Perturbe"` automático (em jogos `GAMING`, tela cheia ou reuniões como Zoom/Teams) e manual pelo menu da bandeja, pausando travessuras e escondendo a bolinha.
 
+### Interfaces de Ajustes Finos, Editor de Programas e Wizard de Personagem (Etapa 8)
+- Tela de Ajustes Finos (`AjustesDialog` em `pestinha/ui/ferramentas_ui.py`) para todos os números de `pestinha/ajustes.py`, validados por `_LIMITES` e salvos em `memory/ajustes.json` com botão de restauração.
+- Editor visual de programas por atividade (`AtividadesDialog`), permitindo adicionar programas e categorias personalizadas em `memory/activities.json`.
+- Assistente de criação de personagem (`WizardPetDialog` e `config.criar_pet_personalizado`), gerando `pets/<id>.json` e a estrutura de pastas e textos iniciais.
+
 ## Suporte a macOS e Linux
 
 - Toda a leitura do sistema (programa em primeiro plano, tempo ocioso, janelas, tela cheia, foco e o atalho

@@ -28,6 +28,7 @@ from .. import config
 from ..sense import timeline
 from ..core.emotion import EYE_SHAPES
 from ..body.pet import draw_face
+from .ferramentas_ui import AjustesDialog, AtividadesDialog, WizardPetDialog
 
 STYLE = """
 QDialog { background: #0c1f13; }
@@ -134,6 +135,9 @@ class SettingsDialog(QDialog):
         self.pet_combo.setCurrentIndex(max(0, self.pet_combo.findData(atual)))
         self.pet_combo.currentIndexChanged.connect(self._trocar_pet)
         pet_row.addWidget(self.pet_combo, 1)
+        btn_novo_pet = QPushButton("Criar personagem...")
+        btn_novo_pet.clicked.connect(self._abrir_wizard_pet)
+        pet_row.addWidget(btn_novo_pet)
         top_layout.addLayout(pet_row)
         self.pet_aviso = QLabel("Vale na próxima vez que abrir. Cada personagem tem a própria memória.")
         self.pet_aviso.setObjectName("hint")
@@ -175,6 +179,14 @@ class SettingsDialog(QDialog):
                 self._update_history_label()
             root.addWidget(group)
 
+        ferramentas_row = QHBoxLayout()
+        btn_atividades = QPushButton("Programas e atividades...")
+        btn_atividades.clicked.connect(self._abrir_atividades)
+        ferramentas_row.addWidget(btn_atividades)
+        btn_ajustes = QPushButton("Ajustes finos...")
+        btn_ajustes.clicked.connect(self._abrir_ajustes)
+        ferramentas_row.addWidget(btn_ajustes)
+        root.addLayout(ferramentas_row)
         hotkey_row = QHBoxLayout()
         hotkey_row.addWidget(QLabel("Atalho de pânico:"))
         self.hotkey_edit = QLineEdit(perms.get("atalho_panico", config.PANIC_HOTKEY_TEXT))
@@ -282,6 +294,31 @@ class SettingsDialog(QDialog):
         self.active_box.blockSignals(True)
         self.active_box.setChecked(on)
         self.active_box.blockSignals(False)
+
+    def _abrir_ajustes(self):
+        """Abre a janela de edição dos números de `ajustes.py`."""
+        AjustesDialog(self.paths, self).exec()
+
+    def _abrir_atividades(self):
+        """Abre a janela de edição de programas por atividade (`ACTIVITY_APPS`)."""
+        AtividadesDialog(self.paths, self).exec()
+
+    def _abrir_wizard_pet(self):
+        """Abre o assistente para criar um personagem novo e atualiza o seletor."""
+        wiz = WizardPetDialog(self.paths, self)
+
+        def ao_criar(novo_id):
+            self.pet_combo.blockSignals(True)
+            self.pet_combo.clear()
+            for pid in config.list_pets(self.paths):
+                self.pet_combo.addItem(config.load_pet(self.paths, pid)["nome"], pid)
+            self.pet_combo.setCurrentIndex(max(0, self.pet_combo.findData(novo_id)))
+            self.pet_combo.blockSignals(False)
+            self._set("pet", novo_id)
+            self._atualizar_resumo()
+
+        wiz.pet_criado.connect(ao_criar)
+        wiz.exec()
 
 
 class Tray(QObject):

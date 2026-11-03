@@ -229,6 +229,11 @@ class Paths:
         return self.memory / "activities.json"
 
     @property
+    def ajustes(self):
+        """Números de ajustes personalizados pelo usuário (memory/ajustes.json)."""
+        return self.memory / "ajustes.json"
+
+    @property
     def lock(self):
         """Trava de instância única (memory/pestinha.lock) com o PID do processo ativo."""
         return self.memory / "pestinha.lock"

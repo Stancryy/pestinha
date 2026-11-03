@@ -48,3 +48,4 @@ app inteiro usam um relógio virtual: avançam o tempo sem esperar.
 | `test_plataforma.py` | Plataforma: cada sistema expõe as mesmas funções, e as leituras de texto (wmctrl, xdotool, ioreg, janelas do Quartz) são testadas com saídas de exemplo, em qualquer sistema. |
 | `test_robustez.py` | Robustez: arquivo corrompido, assets faltando, log em arquivo. |
 | `test_robustez_v2.py` | Falhas do relatório técnico (docs/auditorias/ANALISE_TECNICA.md): cada caso tem um teste que reproduz o problema. |
+| `test_wizard_ajustes_ui.py` | Testes da Etapa 8: tela de Ajustes Finos (`ajustes.py`), Editor de Programas e Wizard de Personagem. |

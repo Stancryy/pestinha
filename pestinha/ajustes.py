@@ -246,4 +246,60 @@ def validar():
         raise ValueError("ajustes inválidos:\n  " + "\n  ".join(erros))
 
 
+VALORES_PADRAO = {nome: globals()[nome] for nome in _LIMITES}
+
+
+def valores_atuais():
+    """Devolve um dicionário com os valores numéricos atuais de todos os ajustes em `_LIMITES`."""
+    atuais = globals()
+    return {nome: atuais[nome] for nome in _LIMITES}
+
+
+def aplicar_ajustes(novos):
+    """Aplica um dicionário de ajustes validando tipo e limitando a `[minimo, maximo]` de `_LIMITES`."""
+    if not isinstance(novos, dict):
+        return valores_atuais()
+    atuais = globals()
+    for nome, valor in novos.items():
+        if nome not in _LIMITES or isinstance(valor, bool) or not isinstance(valor, (int, float)):
+            continue
+        tipo, minimo, maximo = _LIMITES[nome]
+        limitado = max(minimo, min(maximo, valor))
+        atuais[nome] = int(round(limitado)) if tipo is int else float(limitado)
+    validar()
+    return valores_atuais()
+
+
+def carregar_ajustes(caminho):
+    """Lê `memory/ajustes.json` (se existir) e aplica apenas valores válidos dentro de `_LIMITES`."""
+    from .store import read_json
+    salvos = read_json(caminho, default=None)
+    if isinstance(salvos, dict):
+        return aplicar_ajustes(salvos)
+    return valores_atuais()
+
+
+def salvar_ajustes(caminho, novos):
+    """Aplica `novos` e grava os ajustes personalizados em `memory/ajustes.json`."""
+    from .store import write_json
+    atuais = aplicar_ajustes(novos)
+    write_json(caminho, atuais, indent=2)
+    return atuais
+
+
+def restaurar_padroes(caminho=None):
+    """Restaura todos os números de `_LIMITES` para os valores originais de fábrica."""
+    atuais = globals()
+    for nome, valor in VALORES_PADRAO.items():
+        atuais[nome] = valor
+    if caminho is not None:
+        try:
+            from pathlib import Path
+            Path(caminho).unlink(missing_ok=True)
+        except OSError:
+            pass
+    validar()
+    return valores_atuais()
+
+
 validar()

@@ -8,6 +8,7 @@ Janelas de interface: tela de permissões, bandeja, passo a passo, monitor neura
 
 | Arquivo | O que faz |
 |---|---|
+| `ferramentas_ui.py` | Diálogos de Ajustes Finos (`ajustes.py`), Editor de Programas (`ACTIVITY_APPS`) e Assistente (Wizard) de Criação de Personagem. |
 | `float_manager.py` | Os painéis flutuantes (monitor neural e painel de protesto). |
 | `monitor.py` | O que a rede está fazendo agora, sincronizado com o corpo. |
 | `onboarding.py` | Passo a passo da primeira vez, com aviso de projeto em desenvolvimento. |
