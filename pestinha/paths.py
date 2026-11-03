@@ -122,6 +122,11 @@ class ConteudoPaths:
         return self.resolver("memes")
 
     @property
+    def sprites(self):
+        """Pasta de sprites de expressão em alta definição (pets/<pet>/sprites/)."""
+        return self.resolver("sprites")
+
+    @property
     def memes_trabalho(self):
         """Memes de quando você programa e ele não está sentado no notebook."""
         return self.resolver("memes/trabalhando")

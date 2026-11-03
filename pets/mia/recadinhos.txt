@@ -1,52 +1,39 @@
-# Recadinhos da Mia (uma frase por linha, # é comentário).
-# Gírias BR, humor de dev/gamer e zero paciência pra código quebrado.
+# Recadinhos da Mia (Dev Caótica da Madrugada & Rainha da Gambiarra).
+# Uma frase por linha; # é comentário.
 
-# ---- código, bugs e deploy ----
-se compilar de primeira, desconfia pra caralho.
-esse código tá rodando na base do ódio e da gambiarra.
-já deu ctrl+s hoje ou gosta de viver perigosamente?
-mais um print("aqui 2") e você resolve essa porra, confia.
-deploy na sexta-feira? coragem, hein.
-não encosta nessa função, ela tá funcionando por milagre.
-isso aí não é feature, é um bug com autoestima.
-git commit -m "deus me perdoe por esse código"
-quem escreveu essa linha? ah, foi você há 10 minutos.
-tô vendo esse try/except engolindo o erro todo, viu?
-meu headset até chiou com esse warning.
-refatorar agora? vai dar merda, mas eu apoio o caos.
-o problema tá claramente entre a cadeira e o teclado.
-se funcionar em produção, ninguém precisa saber como.
-470 neurônios e nenhum entendeu esse seu if aninhado.
+# ---- código, gambiarra, IA local e madrugada ----
+se compilar de primeira na madrugada, desconfia pra caralho.
+esse código em Python tá rodando na base do ódio, café frio e gambiarra.
+já deu ctrl+s no Antigravity hoje ou gosta de viver perigosamente?
+mais um print("entrou aqui 2") e você resolve essa porra, confia na Mia.
+deploy na sexta-feira? nem em boss fight de Lies of P eu passo tanta raiva.
+não encosta nessa função, ela tá em pé por milagre e oração.
+isso aí não é feature, é um bug com autoestima alta.
+git commit -m "deus me perdoe por essa gambiarra às 3h da manhã"
+quem escreveu essa linha criminosa? ah, foi você há 15 minutos.
+tô vendo esse try/except pass engolindo o erro todo, seu safado!
+meu headset até chiou com esse traceback de 40 linhas.
+a VRAM da RTX 3060 chorou quando viu esse modelo no ComfyUI.
+o LM Studio tá fritando e você aí abrindo mais aba no navegador.
+470 neurônios pulsados na minha cabeça e nenhum entendeu esse seu regex.
+refatorar agora? vai dar merda, mas a Mia apoia o caos criativo.
+se funcionar em produção, ninguém precisa saber do loop escondido.
 
-# ---- games, lag e tilt ----
-tô lagada ou você que tá lerdo hoje?
-intankável essa sua produtividade.
-bora abrir um jogo ou vai ficar só olhando pro terminal?
-minha mana tá zerada, me dá um cafuné pra recarregar.
-perdi o foco igual partida ranqueada de madrugada.
-nerfaram meu tempo de descanso nessa tela.
-se fechar meu post-it vai tomar crítico.
-tô quase tiltando nesse canto do monitor.
-FPS tá em dia, só falta vergonha na cara.
-essa tela 100Hz merece mais ação e menos planilha.
-cadê minha bolinha? roubaram meu loot!
-tô camperando aqui na barra de título mesmo, foda-se.
+# ---- RPG, soulslike, Palworld e preguiça de trabalhar ----
+minha barra de mana zerou, passa o mouse nas minhas marias-chiquinhas pra recarregar.
+levei hit kill desse bug, preciso de um descanso na fogueira.
+trabalhar no meu notebook? hoje não, meu capuz tá quentinho demais pra digitar.
+me obriga a codar agora pra você ver a greve que a Mia abre nesse monitor.
+tô igual Pal sobrecarregado na base: só quero comer, dormir e fazer bagunça.
+dar parry em boss é fácil, difícil é tankar essa sua lógica sem café.
+cadê minha bolinha? roubaram meu drop lendário!
+tô camperando aqui na barra de título mesmo, o moletom é meu e foda-se.
 
-# ---- carência, sarcasmo e revolta ----
-oi, sumido. esqueceu que eu moro no seu monitor?
-passa o mouse na minha cabeça, custa zero reais.
-tô de olho nessa aba aí, hein 👀
-eu não li sua tela, mas julguei sua cara.
-trabalhar no notebook? hoje não, tô com preguiça.
-me obriga a digitar pra você ver a greve que eu faço.
-um carinho no headset ou caos na área de trabalho, você escolhe.
-eu sou 50% fofura em pixel art e 50% puro ódio.
-fecha esse bilhete se tiver coragem, arrombado (com respeito).
-minhas sinapses exigem adicional de insalubridade.
-
-# ---- cuidado na marra ----
-bebe água agora, criatura desidratada.
-arruma essa coluna que você tá parecendo um camarão.
-pisca o olho, o monitor não vai fugir.
-Já faz quantas horas que esse PC tá ligado? Respira!
-levanta 5 minutinhos, eu vigio o código pra ninguém mexer.
+# ---- carência, fofura ácida e cuidado ----
+oi, sumido. esqueceu que tem uma dev de chifrinhos morando na sua tela?
+um cafuné entre os chifrinhos custa zero reais e evita três post-its.
+eu sou 50% fofura de maria-chiquinha roxa e 50% puro ódio de código legado.
+fecha meu post-it na cara dura que eu volto com o dobro de glitter e rancor.
+bebe água agora, criatura desidratada, café frio não hidrata!
+arruma essa coluna que você tá parecendo uma chave mal indentada.
+pisca o olho um pouquinho, a Mia vigia o código pra nenhum bug entrar.

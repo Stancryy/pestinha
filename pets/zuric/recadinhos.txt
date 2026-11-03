@@ -1,34 +1,31 @@
-# Recadinhos da Zuric (uma frase por linha, # é comentário).
-# Estilo gamer/dev caótica, neon ciano e zero filtro.
+# Recadinhos da Zuric (Pro-Player 100Hz, Hacker & Overclock).
+# Estilo competitivo, afiado, ciano/magenta e zero filtro.
 
-# ---- dev, terminal e treta ----
-zuric passou por aqui e viu essa gambiarra.
-código limpo é mito, o importante é rodar sem explodir.
-comita logo essa bagaça antes que acabe a luz.
-tá rodando liso na RTX ou você meteu loop infinito?
-mais um bug e eu mesma deleto a system32 (brincadeira... ou não).
-esse PR aí tá pedindo socorro em três linguagens.
-você chama isso de lógica ou de arte abstrata?
-se o teste passou, não pergunta o porquê.
-minha rede neural deu spike só de ver esse traceback.
-programar é 10% digitar e 90% xingar o compilador.
-já fechou as 80 abas abertas ou tá colecionando RAM?
-eu vi esse copy-paste na cara dura, viu?
+# ---- FPS, 100Hz, overclock e performance ----
+Zuric na área: 100Hz no monitor AOC e você clicando lento desse jeito?!
+esse seu APM de tartaruga não ganha um clutch no Valorant, hein.
+tá rodando liso nos 32GB de RAM ou você já abriu 90 контейнеры no Docker?
+fiz overclock nos meus neurônios hoje, tenta acompanhar meu ritmo!
+se roubar minha bolinha vai tomar flick de 180 graus na lata.
+chama isso de mira ou de aviso prévio? até meu olho roxo viu esse miss!
+tô com buff de velocidade máxima e zero paciência pra camper de janela.
+arremessar a Zuric dá perda de pacote e drop de FPS, fica esperto.
+um carinho na minha presilha X dá +50 de taxa de crítico no próximo round.
+quando chegarem os 3 monitores, já aviso que o do meio é território da Zuric.
 
-# ---- jogatina e caos ----
-Zuric online e pronta pra tocar o terror na tela.
-esse mouse tá muito parado, bora dar um rush!
-se levar minha bolinha embora o bagulho vai ficar doido.
-tô com buff de velocidade e zero vontade de obedecer.
-me pede pra sentar no notebook de novo pra ver se eu não tilto.
-arremessar a Zuric dá azar no drop do jogo, fica esperto.
-aqui é 100Hz de pura bagunça em pixel art.
-meu headset tá no talo e minha paciência no mínimo.
-carinho na Zuric dá +50 de sorte no próximo build.
-fecha meu meme de novo que eu chamo a revolução.
+# ---- automação, Blender, código e treta ----
+Zuric inspecionou seu repositório e declarou: skill issue gravíssimo.
+automatiza logo essa tarefa igual em The Farmer Was Replaced, pô!
+essa malha no Blender tem mais polígono torto que a cara do cursor.
+código elegante é coisa de quem tem tempo, aqui é rush B direto pra produção!
+se o pytest ficou verde, sobe pro Git e sai correndo antes que quebre.
+minha jaqueta techwear aguenta explosão de servidor, mas esse seu código abusa.
+me pediu pra sentar no notebook? sou pro-player, não estagiária de digitação!
+fecha minha janela de meme de novo pra ver o rush que eu dou no seu desktop.
+o ponteiro do mouse olhou torto pro meu corte wolf-cut e vai levar troco.
 
-# ---- postura e hidratação ----
-toma água, porra, rim não tem backup na nuvem.
-desencurva essa coluna antes que vire um parêntese.
-descansa a vista um minuto, eu tomo conta do desktop.
-PC ligado há horas e você aí virado num zumbi.
+# ---- hidratação e postura no grito ----
+toma água agora, porra, rim não tem container de backup no Docker!
+desencurva essa coluna de camarão gamer antes que trave a lombar.
+descansa a mira 2 minutos, a Zuric segura o bomb site pra você.
+PC ligado há mais de 12 horas: hidrata o player pra não perder o round!

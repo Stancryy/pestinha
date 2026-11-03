@@ -3,8 +3,11 @@ DESENHO DO ROSTO - só o que se desenha do pet: corpo/moldura, olhos, brilho, ac
 
 Suporta dois estilos visuais configuráveis em `aparencia.estilo` no `<pet>.json`:
 - `"tv"` (padrão clássico): telinha arredondada com olhos expressivos.
-- `"anime_pixel"`: garota de anime chibi em pixel art (cabelo em camadas, bochechas, olhos de anime
-  que seguem o cursor, boquinha expressiva por emoção e acessórios como headset gamer e chifrinhos).
+- `"anime_pixel"`: garota de anime chibi em pixel art de alta densidade (usa sprites 32-bit de
+  `pets/<variante>/sprites/<emocao>.webp` quando disponíveis, com fallback procedural em grade 2px
+  de 5 tons, variantes distintas para Mia e Zuric, olhos detalhados com cílios e degradê na íris
+  que seguem o cursor, boquinha com dentinho/fang, torso chibi com moletom/jaqueta, headset gamer
+  e chifrinhos).
 """
 
 import math
@@ -12,9 +15,10 @@ import re
 from dataclasses import dataclass, field
 
 from PySide6.QtCore import QPointF, QRectF, Qt
-from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen, QPolygonF
+from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPainterPath, QPen, QPolygonF
 
 from ..ajustes import ZZZ_PERIODO as ZZZ_PERIOD, ZZZ_QUANTIDADE as ZZZ_COUNT
+from ..paths import Paths
 
 BODY_W, BODY_H = 120, 90
 FRAME = QColor("#63e56f")
@@ -24,6 +28,7 @@ EYE = QColor("#3ee877")
 SHINE = QColor("#c8ffd8")
 
 ESTILOS_VALIDOS = ("tv", "anime_pixel")
+VARIANTES_VALIDAS = ("mia", "zuric")
 ACESSORIOS = ("oculos", "gravata", "headset", "chifrinhos", "bone", "gorro_natal", "chapeu_festa")
 COR_HEX = re.compile(r"^#[0-9a-fA-F]{6}$")
 COR_PADRAO_ACESSORIO = {
@@ -31,55 +36,80 @@ COR_PADRAO_ACESSORIO = {
     "gravata": "#b3261e",
     "headset": "#00f0ff",
     "chifrinhos": "#ff2a85",
-    "bone": "#7c4dff",
-    "gorro_natal": "#d62828",
+    "bone": "#3a86ff",
+    "gorro_natal": "#d90429",
     "chapeu_festa": "#ffbe0b",
 }
+
+_CACHE_SPRITES = {}
+
+
+def _carregar_sprite_anime(variante: str, chave: str):
+    """Carrega (com cache) o sprite .webp de alta definição de pets/<variante>/sprites/<chave>.webp."""
+    k = (variante, chave)
+    if k in _CACHE_SPRITES:
+        return _CACHE_SPRITES[k]
+    caminho = Paths().conteudo(variante).sprites / f"{chave}.webp"
+    if not caminho.exists():
+        return None
+    img = QImage(str(caminho))
+    if img.isNull():
+        return None
+    _CACHE_SPRITES[k] = img
+    return img
 
 
 @dataclass(frozen=True)
 class Aparencia:
-    """Cores do corpo, estilo visual e acessórios de um pet. O padrão é o visual original."""
-
+    """Cores, estilo e acessórios do pet. O padrão é idêntico ao visual original."""
     moldura: QColor = field(default_factory=lambda: QColor(FRAME))
     casca: QColor = field(default_factory=lambda: QColor(SHELL))
     tela: QColor = field(default_factory=lambda: QColor(SCREEN))
     olho: QColor = field(default_factory=lambda: QColor(EYE))
     brilho: QColor = field(default_factory=lambda: QColor(SHINE))
-    acessorios: tuple = ()  # ((nome, QColor), ...) na ordem em que são desenhados
-    estilo: str = "tv"
-    suando: bool = False
-    apertado: bool = False
-
-
-CAMPOS_DE_COR = ("moldura", "casca", "tela", "olho", "brilho")
-
-
-def aparencia_de(dados):
-    """
-    Monta a Aparencia a partir do "aparencia" do pet.json. Cor fora do formato #rrggbb e
-    acessório desconhecido são ignorados (ficam com o padrão), como os outros campos do pet.
-    """
-    if not isinstance(dados, dict):
-        return Aparencia()
-    cores = {
-        k: QColor(dados[k])
-        for k in CAMPOS_DE_COR
-        if isinstance(dados.get(k), str) and COR_HEX.match(dados[k])
-    }
-    estilo = dados.get("estilo") if dados.get("estilo") in ESTILOS_VALIDOS else "tv"
-    pedidos = dados.get("acessorios")
-    acessorios = []
-    if isinstance(pedidos, dict):
-        for nome in ACESSORIOS:  # ordem fixa
-            if nome in pedidos:
-                cor = pedidos[nome]
-                cor = cor if isinstance(cor, str) and COR_HEX.match(cor) else COR_PADRAO_ACESSORIO[nome]
-                acessorios.append((nome, QColor(cor)))
-    return Aparencia(**cores, acessorios=tuple(acessorios), estilo=estilo)
+    acessorios: tuple = ()          # ((nome, QColor), ...) na ordem de ACESSORIOS
+    estilo: str = "tv"              # "tv" ou "anime_pixel"
+    variante: str = "mia"           # "mia" (maria-chiquinha + moletom) ou "zuric" (wolf-cut + jaqueta)
+    suando: bool = False            # reação visual a CPU alta (Etapa 9)
+    apertado: bool = False          # reação visual a RAM cheia (Etapa 9)
 
 
 PADRAO = Aparencia()
+
+
+def _cor(valor, padrao):
+    """Aceita só #rrggbb; qualquer outra coisa volta para a cor padrão."""
+    return QColor(valor) if isinstance(valor, str) and COR_HEX.match(valor) else QColor(padrao)
+
+
+def aparencia_de(dados):
+    """Monta a Aparencia a partir do dict `aparencia` do `<pet>.json`. Tudo opcional; inválido vira padrão."""
+    if not isinstance(dados, dict):
+        return PADRAO
+    brutos = dados.get("acessorios")
+    acessorios = []
+    if isinstance(brutos, dict):
+        for nome in ACESSORIOS:
+            if nome in brutos and brutos[nome]:
+                acessorios.append((nome, _cor(brutos[nome], COR_PADRAO_ACESSORIO[nome])))
+    estilo = dados.get("estilo", "tv")
+    if estilo not in ESTILOS_VALIDOS:
+        estilo = "tv"
+    variante = dados.get("variante", "mia")
+    if variante not in VARIANTES_VALIDAS:
+        variante = "mia"
+    return Aparencia(
+        moldura=_cor(dados.get("moldura"), FRAME),
+        casca=_cor(dados.get("casca"), SHELL),
+        tela=_cor(dados.get("tela"), SCREEN),
+        olho=_cor(dados.get("olho"), EYE),
+        brilho=_cor(dados.get("brilho"), SHINE),
+        acessorios=tuple(acessorios),
+        estilo=estilo,
+        variante=variante,
+        suando=bool(dados.get("suando", False)),
+        apertado=bool(dados.get("apertado", False)),
+    )
 
 
 def lerp_shape(current, target, k):
@@ -87,22 +117,23 @@ def lerp_shape(current, target, k):
     return {key: current[key] + (target[key] - current[key]) * k for key in target}
 
 
-def draw_face(p, shape, gaze=(0.0, 0.0), blink=1.0, emotion="observando", carinho=False, aparencia=PADRAO):
+def draw_face(p: QPainter, shape: dict, gaze=(0.0, 0.0), blink=1.0, emotion="observando",
+              carinho=False, aparencia=PADRAO):
     """Desenha o pet (estilo clássico 'tv' ou 'anime_pixel') com centro na origem do painter."""
-    a = aparencia
+    a = aparencia or PADRAO
     p.save()
     if getattr(a, "apertado", False):
-        p.scale(0.84, 1.08)  # RAM cheia: espremida horizontalmente
+        p.scale(0.84, 1.08)
     if a.estilo == "anime_pixel":
         _draw_anime_pixel(p, shape, gaze, blink, emotion, carinho, a)
     else:
         _draw_tv(p, shape, gaze, blink, emotion, carinho, a)
     if getattr(a, "suando", False):
-        _desenhar_suor(p)
+        _desenhar_gotas_suor(p)
     p.restore()
 
 
-def _draw_tv(p, shape, gaze, blink, emotion, carinho, a):
+def _draw_tv(p: QPainter, shape: dict, gaze, blink: float, emotion: str, carinho: bool, a: Aparencia):
     """Desenho clássico da telinha com dois olhos e acessórios."""
     p.setPen(QPen(a.moldura, 5))
     p.setBrush(a.casca)
@@ -138,225 +169,253 @@ def _draw_tv(p, shape, gaze, blink, emotion, carinho, a):
             _chapeu_festa(p, cor)
 
 
-def _px(p, gx, gy, gw, gh, cor, grid=4):
-    """Desenha um bloco retangular alinhado na grade de pixel art (cada unidade = `grid` px)."""
-    p.fillRect(QRectF(gx * grid, gy * grid, gw * grid, gh * grid), cor)
+# ============================================================
+# ESTILO ANIME PIXEL ART DE ALTA DENSIDADE (MIA & ZURIC)
+# ============================================================
 
-
-def _draw_anime_pixel(p, shape, gaze, blink, emotion, carinho, a):
+def _draw_anime_pixel(p: QPainter, shape: dict, gaze, blink: float, emotion: str,
+                      carinho: bool, a: Aparencia):
     """
-    Garota de anime chibi em pixel art (grade 4 px).
-    - `a.moldura`: cor principal do cabelo
-    - `a.casca`: roupa / contorno escuro
-    - `a.tela`: detalhe secundário da roupa / sombra
-    - `a.olho`: íris dos olhos de anime
-    - `a.brilho`: brilho dos olhos e mechas de luz no cabelo
+    Desenha a personagem chibi de anime em pixel art detalhado:
+    - Se houver sprite 32-bit em `pets/<variante>/sprites/<emocao>.webp`, renderiza o sprite
+      com deslocamento suave pelo olhar (`gaze`) e detalhes de cor dos acessórios configurados.
+    - Caso contrário, renderiza o pixel art procedural de grade fina (2px) em 5 tons.
     """
     p.save()
     p.setRenderHint(QPainter.Antialiasing, False)
     p.setPen(Qt.NoPen)
 
-    cabelo = a.moldura
-    cabelo_escuro = QColor(cabelo).darker(145)
-    cabelo_luz = a.brilho
-    pele = QColor("#ffe3d3")
-    pele_sombra = QColor("#f3bfa8")
-    blush = QColor("#ff7aa2")
-    roupa = a.casca
-    roupa_detalhe = a.tela
+    acessorios_dict = dict(a.acessorios)
+    chave_sp = "carinho" if carinho else ("dormindo" if (emotion == "dormindo" or blink < 0.25) else emotion)
+    sprite = _carregar_sprite_anime(a.variante, chave_sp)
+    if sprite is not None:
+        gx, gy = gaze
+        dx = max(-1.0, min(1.0, gx)) * 3.0
+        dy = max(-1.0, min(1.0, gy)) * 2.0
+        p.setRenderHint(QPainter.SmoothPixmapTransform, True)
+        p.drawImage(QRectF(-68 + dx, -66 + dy, 136, 136), sprite)
+        p.setRenderHint(QPainter.Antialiasing, False)
+        # Pontos internos discretos para sincronizar as cores exatas configuradas em aparencia
+        p.fillRect(QRectF(-2 + dx, -28 + dy, 3, 3), a.moldura)
+        if "chifrinhos" in acessorios_dict:
+            cor_ch = acessorios_dict["chifrinhos"]
+            p.fillRect(QRectF(-26 + dx, -38 + dy, 2, 2), cor_ch)
+            p.fillRect(QRectF(24 + dx, -38 + dy, 2, 2), cor_ch)
+        if "headset" in acessorios_dict:
+            cor_hs = acessorios_dict["headset"]
+            p.fillRect(QRectF(-36 + dx, -6 + dy, 2, 4), cor_hs)
+            p.fillRect(QRectF(34 + dx, -6 + dy, 2, 4), cor_hs)
+        for nome in ("oculos", "gravata", "bone", "gorro_natal", "chapeu_festa"):
+            if nome in acessorios_dict:
+                _DESENHAR_ACESSORIO[nome](p, acessorios_dict[nome])
+        p.restore()
+        return
 
-    # 1. Cabelo de trás e maria-chiquinhas (twintails) volumosas
-    _px(p, -11, -9, 22, 16, cabelo_escuro)
-    # Twintails laterais
+    u = 2.0  # cada unidade da grade = 2x2 pixels na tela (grade ~64x56)
+
+    def px(gx, gy, gw, gh, color):
+        p.setBrush(color)
+        p.drawRect(QRectF(gx * u, gy * u, gw * u, gh * u))
+
+    def mirror_px(gx, gy, gw, gh, color):
+        px(gx, gy, gw, gh, color)
+        px(-gx - gw, gy, gw, gh, color)
+
+    c_hair = a.moldura
+    c_out = QColor("#120824") if a.variante == "mia" else QColor("#071324")
+    c_dark = c_hair.darker(210)
+    c_mid = c_hair.darker(140)
+    c_light = c_hair.lighter(130)
+    c_rim = a.olho.lighter(120)
+
+    c_skin_out = QColor("#8f5371")
+    c_skin_shd = QColor("#ebb8d0")
+    c_skin_mid = QColor("#f7d4e6")
+    c_skin = QColor(a.tela) if a.tela != SCREEN else QColor("#fde6f2")
+    c_blush = QColor("#ff6ea7")
+    c_blush_hi = QColor("#ffa6c9")
+
+    if a.variante == "mia":
+        for s in (-1, 1):
+            px(s * 20 - (4 if s < 0 else 0), -14, 4, 30, c_out)
+            px(s * 23 - (5 if s < 0 else 0), -10, 5, 28, c_out)
+            px(s * 25 - (4 if s < 0 else 0), -2, 4, 22, c_out)
+            px(s * 19 - (4 if s < 0 else 0), -13, 4, 28, c_dark)
+            px(s * 21 - (5 if s < 0 else 0), -11, 5, 27, c_mid)
+            px(s * 22 - (4 if s < 0 else 0), -9, 4, 23, c_hair)
+            px(s * 24 - (3 if s < 0 else 0), -1, 3, 19, c_hair)
+            px(s * 23 - (2 if s < 0 else 0), -6, 2, 10, c_light)
+            px(s * 22 - (3 if s < 0 else 0), 11, 3, 6, c_rim)
+            px(s * 24 - (2 if s < 0 else 0), 13, 2, 5, c_rim)
+            px(s * 18 - (4 if s < 0 else 0), -15, 4, 3, c_rim)
+            px(s * 19 - (2 if s < 0 else 0), -16, 2, 5, c_light)
+    else:
+        c_tip = QColor("#ff2a85")
+        for s in (-1, 1):
+            px(s * 18 - (5 if s < 0 else 0), -14, 5, 26, c_out)
+            px(s * 21 - (5 if s < 0 else 0), -11, 5, 10, c_out)
+            px(s * 23 - (4 if s < 0 else 0), -8, 4, 5, c_out)
+            px(s * 20 - (5 if s < 0 else 0), 2, 5, 12, c_out)
+            px(s * 23 - (4 if s < 0 else 0), 6, 4, 6, c_out)
+            px(s * 17 - (4 if s < 0 else 0), -13, 4, 24, c_dark)
+            px(s * 19 - (4 if s < 0 else 0), -10, 4, 18, c_mid)
+            px(s * 20 - (4 if s < 0 else 0), -9, 4, 8, c_hair)
+            px(s * 22 - (3 if s < 0 else 0), -7, 3, 3, c_light)
+            px(s * 19 - (4 if s < 0 else 0), 4, 4, 9, c_tip.darker(130))
+            px(s * 21 - (3 if s < 0 else 0), 6, 3, 5, c_tip)
+
+    px(-17, -18, 34, 30, c_out)
+    px(-16, -17, 32, 28, c_dark)
+    px(-4, 10, 8, 5, c_skin_out)
+    px(-3, 10, 6, 4, c_skin_shd)
+
+    if a.variante == "mia":
+        c_hoodie = QColor("#1f1138")
+        c_hoodie_hi = QColor("#351e5e")
+        px(-15, 13, 30, 11, c_out)
+        px(-14, 14, 28, 9, c_hoodie)
+        px(-12, 14, 24, 3, c_hoodie_hi)
+        mirror_px(8, 12, 6, 4, c_out)
+        mirror_px(8, 13, 5, 3, c_mid)
+        px(-4, 13, 8, 4, c_light)
+        px(-2, 14, 4, 4, c_rim)
+        px(-1, 17, 2, 6, c_out)
+        mirror_px(4, 15, 1, 7, c_rim)
+        mirror_px(4, 21, 2, 2, QColor("#ffffff"))
+    else:
+        c_jkt = QColor("#0f192e")
+        c_jkt_hi = QColor("#1c2e52")
+        c_neon = QColor("#ff2a85")
+        px(-3, 12, 6, 1, c_out)
+        px(-1, 12, 2, 2, c_neon)
+        px(-16, 13, 32, 11, c_out)
+        px(-15, 14, 30, 9, c_jkt)
+        px(-10, 12, 20, 4, c_out)
+        px(-9, 13, 18, 3, c_jkt_hi)
+        mirror_px(10, 15, 4, 2, c_neon)
+        mirror_px(6, 17, 2, 6, c_hair)
+        px(-2, 15, 4, 8, c_out)
+        px(-1, 16, 2, 6, c_neon)
+
+    mirror_px(15, -3, 3, 6, c_skin_out)
+    mirror_px(15, -2, 2, 4, c_skin_shd)
+    px(-15, -15, 30, 25, c_skin_out)
+    px(-13, 10, 26, 2, c_skin_out)
+    px(-10, 11, 20, 1, c_skin_out)
+    px(-14, -14, 28, 23, c_skin)
+    px(-12, 9, 24, 2, c_skin)
+    px(-12, 8, 24, 2, c_skin_shd)
+    px(-9, 10, 18, 1, c_skin_shd)
+    mirror_px(13, -6, 1, 14, c_skin_shd)
+    px(-14, -12, 28, 3, c_skin_mid)
+
+    blush_intenso = carinho or emotion in ("feliz", "contente", "dramatico")
     for s in (-1, 1):
-        base_x = -15 if s < 0 else 11
-        _px(p, base_x, -6, 4, 14, cabelo)
-        _px(p, base_x + (0 if s < 0 else 1), -4, 3, 13, cabelo_escuro)
-        _px(p, base_x + (1 if s < 0 else 0), -5, 2, 3, cabelo_luz)
+        bx = s * 10 - (4 if s < 0 else 0)
+        px(bx, 3, 4, 2, c_blush if blush_intenso else c_skin_shd)
+        if blush_intenso:
+            px(bx - 1, 4, 6, 2, c_blush)
+            px(bx + 1, 3, 1, 2, c_blush_hi)
+            px(bx + 3, 4, 1, 2, c_blush_hi)
 
-    # 2. Corpinho / ombros chibi (dentro de BODY_H: até y = +11 na grade = +44 px)
-    _px(p, -7, 6, 14, 5, roupa)
-    _px(p, -5, 6, 10, 4, roupa_detalhe)
-    # Gola / gravatinha ou detalhe neon no peito
-    _px(p, -2, 6, 4, 2, pele_sombra)
-    _px(p, -1, 8, 2, 3, a.olho)
+    gx, gy = gaze
+    ox_shift = int(round(max(-1.0, min(1.0, gx)) * 2.0))
+    oy_shift = int(round(max(-1.0, min(1.0, gy)) * 1.5))
 
-    for nome, cor in a.acessorios:
-        if nome == "gravata":
-            _px(p, -1, 7, 2, 4, cor)
+    for side in (-1, 1):
+        cx = side * 8
+        cy = -1
+        if emotion == "dormindo" or blink < 0.25:
+            px(cx - 4, cy, 8, 1, c_out)
+            px(cx - 3, cy + 1, 6, 1, c_out)
+            px(cx + (3 if side > 0 else -5), cy - 1, 2, 1, c_out)
+        elif carinho:
+            px(cx - 3, cy - 2, 6, 1, c_out)
+            px(cx - 4, cy - 1, 2, 2, c_out)
+            px(cx + 2, cy - 1, 2, 2, c_out)
+        else:
+            px(cx - 4, cy - 4, 8, 8, QColor("#ffffff"))
+            px(cx - 4, cy - 4, 8, 2, QColor("#d9d2e8"))
+            ix = cx - 2 + ox_shift
+            iy = cy - 3 + oy_shift
+            px(ix, iy, 5, 2, a.olho.darker(190))
+            px(ix, iy + 2, 5, 2, a.olho.darker(125))
+            px(ix, iy + 4, 5, 2, a.olho)
+            px(ix + 1, iy + 5, 3, 2, a.olho.lighter(145))
+            if a.variante == "zuric":
+                px(ix + 2, iy + 1, 1, 4, c_out)
+            else:
+                px(ix + 1, iy + 2, 3, 2, c_out)
+                px(ix + 2, iy + 1, 1, 4, c_out)
+            px(ix, iy + 1, 2, 2, a.brilho)
+            px(ix + 3, iy + 4, 1, 1, a.brilho)
+            px(cx - 4, cy - 6, 8, 1, c_skin_out)
+            px(cx - 5, cy - 5, 10, 2, c_out)
+            px(cx - 3, cy + 4, 6, 1, c_skin_out)
 
-    # 3. Rosto (cabeça chibi arredondada em pixel art)
-    _px(p, -9, -7, 18, 12, pele)
-    _px(p, -8, -8, 16, 14, pele)
-    _px(p, -7, 5, 14, 1, pele_sombra)  # sombra do queixo
-
-    # 4. Topo do cabelo e franja (hime cut + franja em M)
-    _px(p, -10, -11, 20, 4, cabelo)
-    _px(p, -9, -12, 18, 2, cabelo)
-    _px(p, -6, -10, 12, 1, cabelo_luz)  # halo de brilho no cabelo
-    # Franja na testa
-    _px(p, -9, -7, 3, 4, cabelo)
-    _px(p, -5, -7, 3, 3, cabelo)
-    _px(p, -1, -7, 3, 4, cabelo)
-    _px(p, 3, -7, 3, 3, cabelo)
-    _px(p, 6, -7, 3, 4, cabelo)
-    # Mechas laterais emoldurando o rosto (hime cut)
-    _px(p, -10, -7, 2, 13, cabelo)
-    _px(p, 8, -7, 2, 13, cabelo)
-    _px(p, -10, 2, 2, 4, cabelo_escuro)
-    _px(p, 8, 2, 2, 4, cabelo_escuro)
-
-    # 5. Bochechas coradas (blush)
-    if carinho or emotion in ("feliz", "contente", "bravo", "dramatico"):
-        _px(p, -7, 1, 2, 1, blush)
-        _px(p, 5, 1, 2, 1, blush)
-
-    # 6. Olhos de anime em pixel art (seguem o gaze)
-    gx_px = int(round(max(-1.0, min(1.0, gaze[0]))))
-    gy_px = int(round(max(-1.0, min(1.0, gaze[1]))))
-    fechado = blink <= 0.35 or emotion == "dormindo"
-
-    if carinho:
-        # Olhinhos ^ ^ felizes em pixel art
-        for ox in (-6, 3):
-            _px(p, ox, -2, 1, 1, a.olho)
-            _px(p, ox + 1, -3, 1, 1, a.olho)
-            _px(p, ox + 2, -2, 1, 1, a.olho)
-    elif fechado:
-        # Olhinhos fechados com cílios
-        for ox in (-6, 3):
-            _px(p, ox, -1, 3, 1, cabelo_escuro)
-            _px(p, ox, 0, 3, 1, a.olho)
-    else:
-        for side, ox in ((-1, -6), (1, 3)):
-            # Esclera branca + cílio superior grosso
-            _px(p, ox, -3, 3, 4, QColor("#ffffff"))
-            _px(p, ox, -4, 3, 1, QColor("#1a1026"))
-            # Íris colorida (move com o olhar)
-            ix = max(ox, min(ox + 1, ox + (1 if gx_px >= 0 else 0)))
-            iy = -3 + max(0, min(1, gy_px + 1))
-            _px(p, ix, iy, 2, 3, a.olho)
-            _px(p, ix, iy + 1, 2, 1, QColor(a.olho).darker(135))
-            # Brilho de anime no canto superior da íris
-            _px(p, ix, iy, 1, 1, a.brilho)
-
-            # Sobrancelhas expressivas conforme a emoção
-            if emotion == "bravo":
-                # Sobrancelha franzida em diagonal
-                _px(p, ox + (2 if side < 0 else 0), -4, 1, 1, cabelo_escuro)
-                _px(p, ox + 1, -5, 1, 1, cabelo_escuro)
-            elif emotion in ("triste", "dramatico"):
-                _px(p, ox + (0 if side < 0 else 2), -4, 1, 1, cabelo_escuro)
-                _px(p, ox + 1, -5, 1, 1, cabelo_escuro)
-                # Lagriminha pixelada no canto do olho
-                _px(p, ox + (0 if side < 0 else 2), 1, 1, 1, QColor("#4cc9f0"))
-
-    # Sinal de raiva de anime (veia saltando) na testa quando brava
-    if emotion == "bravo":
-        veia = QColor("#ff2a6d")
-        _px(p, 5, -9, 1, 2, veia)
-        _px(p, 4, -8, 3, 1, veia)
-
-    # 7. Boquinha de anime conforme a emoção
-    boca_cor = QColor("#d94b68")
-    if carinho or emotion == "feliz":
-        # Sorriso aberto fofo (:D / :3)
-        _px(p, -1, 2, 2, 2, boca_cor)
-        _px(p, -2, 2, 1, 1, boca_cor)
-        _px(p, 1, 2, 1, 1, boca_cor)
-    elif emotion == "contente":
-        _px(p, -1, 3, 2, 1, boca_cor)
-        _px(p, 1, 2, 1, 1, boca_cor)
-    elif emotion in ("curioso", "assustado"):
-        # Boquinha 'o' surpresa
-        _px(p, -1, 2, 2, 2, boca_cor)
+    px(0, 2, 1, 1, c_skin_out)
+    if emotion in ("feliz", "contente") or carinho:
+        px(-3, 5, 3, 1, c_skin_out)
+        px(0, 4, 1, 1, c_skin_out)
+        px(1, 5, 3, 1, c_skin_out)
+        px(2, 6, 1, 2, QColor("#ffffff"))
     elif emotion == "bravo":
-        # Boquinha franzida de rage
-        _px(p, -2, 3, 1, 1, boca_cor)
-        _px(p, -1, 2, 2, 1, boca_cor)
-        _px(p, 1, 3, 1, 1, boca_cor)
-    elif emotion in ("triste", "dramatico"):
-        _px(p, -1, 2, 2, 1, boca_cor)
-        _px(p, -2, 3, 1, 1, boca_cor)
-        _px(p, 1, 3, 1, 1, boca_cor)
+        px(-3, 4, 6, 4, c_out)
+        px(-2, 5, 4, 1, QColor("#ffffff"))
+        px(-2, 6, 4, 2, QColor("#d9386a"))
+    elif emotion == "triste":
+        px(-2, 5, 4, 1, c_skin_out)
+        for s in (-1, 1):
+            px(s * 8 - 1, 3, 2, 5, QColor("#4ddbff"))
     else:
-        _px(p, -1, 3, 2, 1, boca_cor)
+        px(-2, 5, 4, 1, c_skin_out)
 
-    # 8. Acessórios em pixel art
-    for nome, cor in a.acessorios:
-        if nome == "chifrinhos":
-            _chifrinhos_pixel(p, cor)
-        elif nome == "headset":
-            _headset_pixel(p, cor, a.casca)
-        elif nome == "oculos":
-            _oculos_pixel(p, cor)
-        elif nome == "bone":
-            _bone_pixel(p, cor)
-        elif nome == "gorro_natal":
-            _gorro_natal_pixel(p, cor)
-        elif nome == "chapeu_festa":
-            _chapeu_festa_pixel(p, cor)
+    px(-17, -21, 34, 4, c_out)
+    px(-15, -23, 30, 2, c_out)
+    px(-16, -20, 32, 7, c_dark)
+    px(-15, -21, 30, 6, c_mid)
+    px(-14, -19, 28, 6, c_hair)
+    px(-11, -17, 6, 2, c_light)
+    px(-3, -18, 6, 2, c_light)
+    px(5, -17, 6, 2, c_light)
+    px(-2, -17, 4, 1, a.brilho)
+
+    if "chifrinhos" in acessorios_dict:
+        cor_ch = acessorios_dict["chifrinhos"]
+        for s in (-1, 1):
+            px(s * 9 - (3 if s < 0 else 0), -24, 3, 4, cor_ch.darker(160))
+            px(s * 10 - (2 if s < 0 else 0), -27, 2, 4, cor_ch)
+            px(s * 11 - (1 if s < 0 else 0), -29, 1, 2, cor_ch.lighter(145))
+
+    if "headset" in acessorios_dict:
+        cor_hs = acessorios_dict["headset"]
+        px(-16, -23, 32, 3, c_out)
+        px(-10, -22, 20, 1, cor_hs)
+        for s in (-1, 1):
+            hx = s * 16 - (6 if s < 0 else 0)
+            px(hx, -9, 6, 13, c_out)
+            px(hx + (2 if s < 0 else 3), -6, 1, 7, cor_hs)
+
+    for nome in ("oculos", "gravata", "bone", "gorro_natal", "chapeu_festa"):
+        if nome in acessorios_dict:
+            _DESENHAR_ACESSORIO[nome](p, acessorios_dict[nome])
 
     p.restore()
 
 
-def _chifrinhos_pixel(p, cor):
-    """Dois chifrinhos de pestinha curvados no topo da cabeça."""
-    escuro = QColor(cor).darker(135)
-    for s in (-1, 1):
-        bx = -7 if s < 0 else 5
-        _px(p, bx, -13, 2, 2, escuro)
-        _px(p, bx + (0 if s < 0 else 1), -15, 1, 2, cor)
-        _px(p, bx + (1 if s < 0 else 0), -14, 1, 2, cor)
+def _desenhar_gotas_suor(p: QPainter):
+    """Gotinhas de suor azuis quando a CPU do PC está alta."""
+    p.save()
+    p.setPen(Qt.NoPen)
+    p.setBrush(QColor("#4cc9f0"))
+    p.drawEllipse(QPointF(42, -24), 4, 6)
+    p.drawEllipse(QPointF(48, -12), 3, 5)
+    p.restore()
 
 
-def _headset_pixel(p, cor, base_escura):
-    """Headset gamer com tiara, conchas laterais com LED neon e microfone."""
-    carcaca = QColor(base_escura).lighter(130)
-    # Tiara superior
-    _px(p, -9, -12, 18, 1, carcaca)
-    _px(p, -11, -10, 2, 3, carcaca)
-    _px(p, 9, -10, 2, 3, carcaca)
-    # Conchas acústicas nas laterais com anel de LED `cor`
-    for bx in (-12, 9):
-        _px(p, bx, -6, 3, 6, carcaca)
-        _px(p, bx + 1, -5, 1, 4, cor)
-    # haste do microfone na esquerda
-    _px(p, -10, 0, 2, 1, carcaca)
-    _px(p, -8, 1, 2, 1, cor)
-
-
-def _oculos_pixel(p, cor):
-    """Óculos estilizados em pixel art."""
-    for ox in (-7, 2):
-        _px(p, ox, -4, 5, 1, cor)
-        _px(p, ox, 0, 5, 1, cor)
-        _px(p, ox, -4, 1, 5, cor)
-        _px(p, ox + 4, -4, 1, 5, cor)
-    _px(p, -2, -3, 4, 1, cor)
-
-
-def _bone_pixel(p, cor):
-    """Boné em pixel art no topo da cabeça."""
-    _px(p, -9, -13, 18, 3, cor)
-    _px(p, -6, -10, 16, 1, QColor(cor).darker(130))
-
-
-def _gorro_natal_pixel(p, cor):
-    """Gorro de Natal em pixel art (vermelho com borda e pompom brancos)."""
-    branco = QColor("#ffffff")
-    _px(p, -9, -12, 18, 2, branco)
-    _px(p, -7, -15, 14, 3, cor)
-    _px(p, -4, -17, 10, 2, cor)
-    _px(p, 6, -16, 3, 3, branco)
-
-
-def _chapeu_festa_pixel(p, cor):
-    """Chapéu de aniversário em cone com pompom."""
-    _px(p, -4, -14, 8, 2, cor)
-    _px(p, -2, -16, 4, 2, cor)
-    _px(p, -1, -18, 2, 2, QColor("#ff2a85"))
-
+# ============================================================
+# OLHOS E ACESSÓRIOS DO MODO CLÁSSICO ("tv")
+# ============================================================
 
 def _olhos(p, shape, gaze, blink, emotion, a):
     """Desenha os dois olhos: forma, piscada, brilho e direção do olhar."""
@@ -398,7 +457,7 @@ def _olhos(p, shape, gaze, blink, emotion, a):
         p.setBrush(a.olho)
         p.drawPath(eye)
 
-        if blink > 0.5 and h >= 8:  # olho fechado não tem brilho
+        if blink > 0.5 and h >= 8:
             p.save()
             p.setClipPath(eye)
             p.setBrush(a.brilho)
@@ -455,7 +514,7 @@ def _gravata(p, cor):
     p.restore()
 
 
-def _headset(p, cor, base_escura):
+def _headset(p, cor, base_escura=SHELL):
     """Headset gamer para o modo clássico."""
     p.save()
     p.setPen(QPen(QColor(base_escura).lighter(150), 5, Qt.SolidLine, Qt.RoundCap))
@@ -523,22 +582,23 @@ def _chapeu_festa(p, cor):
     p.restore()
 
 
-def _desenhar_suor(p):
-    """Gotinhas de suor azuis quando a CPU do PC está alta."""
-    p.save()
-    p.setPen(Qt.NoPen)
-    p.setBrush(QColor("#4cc9f0"))
-    p.drawEllipse(QPointF(42, -24), 4, 6)
-    p.drawEllipse(QPointF(48, -12), 3, 5)
-    p.restore()
+_DESENHAR_ACESSORIO = {
+    "oculos": _oculos,
+    "gravata": _gravata,
+    "headset": _headset,
+    "chifrinhos": _chifrinhos,
+    "bone": _bone,
+    "gorro_natal": _gorro_natal,
+    "chapeu_festa": _chapeu_festa,
+}
 
 
 def draw_zzz(p, cx, cy, now, cor=EYE):
     """Zs subindo do canto de cima do corpo, crescendo, balançando e sumindo."""
     for i in range(ZZZ_COUNT):
-        t = ((now / ZZZ_PERIOD) + i / ZZZ_COUNT) % 1.0  # 0 nasce ... 1 some
+        t = ((now / ZZZ_PERIOD) + i / ZZZ_COUNT) % 1.0
         x = cx + BODY_W * 0.32 + 34 * t + 5 * math.sin(t * math.tau * 1.5)
-        y = cy - BODY_H * 0.42 - 44 * t  # sobe até ~12 px do topo da janela
+        y = cy - BODY_H * 0.42 - 44 * t
         size = 8 + 9 * t
         alpha = int(255 * min(1.0, t * 5) * (1.0 - t) ** 0.6)
         color = QColor(cor)

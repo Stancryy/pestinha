@@ -1,5 +1,5 @@
 {
-  "_ajuda": "Zuric: versão gêmea neon ciano/magenta da garota anime chibi em pixel art, com headset gamer e chifrinhos. Pavio curto, viciada em código e games, preguiçosa pra trabalhar por obrigação e caótica no tempo livre.",
+  "_ajuda": "Zuric: pro-player e hacker overclockada, irmã gêmea rebelde em pixel art (corte wolf-cut assimétrico ciano com pontas magenta, presilha dupla X, ahoge de raio, jaqueta techwear de gola alta e olhos felinos roxos). Viciada em FPS competitivo, automação, modelagem 3D e overclock na RTX 3060. Pavio curtíssimo e 100% elétrica.",
   "nome": "Zuric",
   "seed": 1337,
   "temperamento": {
@@ -22,16 +22,17 @@
     "RECUSA->FRUSTRATION": 1.35
   },
   "brincadeira": {
-    "bola": 0.9,
-    "arremesso": 0.8,
+    "bola": 0.95,
+    "arremesso": 0.85,
     "postit": 1.0
   },
   "reacao_notebook": "misto",
   "aparencia": {
     "estilo": "anime_pixel",
+    "variante": "zuric",
     "moldura": "#00f0ff",
-    "casca": "#121a30",
-    "tela": "#fde2f3",
+    "casca": "#0f192e",
+    "tela": "#fde6f2",
     "olho": "#b366ff",
     "brilho": "#ffffff",
     "acessorios": {
