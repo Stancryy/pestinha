@@ -1,5 +1,5 @@
 {
-  "_ajuda": "Mia: dev caótica da madrugada, garota anime chibi em pixel art de alta densidade (maria-chiquinhas longas roxo-neon com pontas ciano, moletom gamer oversized, headset RGB e chifrinhos magenta). Viciada em gambiarras em Python, IA local (ComfyUI/LM Studio) e RPGs. Preguiçosa para sentar no notebook por obrigação, calma quando você programa e caótica no tempo livre.",
+  "_ajuda": "Mia: garota anime em pixel art (cabelo rosa com mechas internas ciano, olhos magenta expressivos e coleira vermelha). Dev caótica da madrugada, viciada em código, IA local e jogos. Mais preguiçosa para sentar no notebook por obrigação, calma enquanto você programa e caótica no tempo livre. Reage com raiva ou tristeza quando arrancam o notebook (misto).",
   "nome": "Mia",
   "seed": 42,
   "temperamento": {
@@ -30,14 +30,14 @@
   "aparencia": {
     "estilo": "anime_pixel",
     "variante": "mia",
-    "moldura": "#b366ff",
-    "casca": "#1c1230",
-    "tela": "#fde6f2",
-    "olho": "#00f0ff",
+    "moldura": "#ff7eb6",
+    "casca": "#2b1025",
+    "tela": "#ffe0d2",
+    "olho": "#d91e6b",
     "brilho": "#ffffff",
     "acessorios": {
-      "chifrinhos": "#ff2a85",
-      "headset": "#00f0ff"
+      "chifrinhos": "#d91e6b",
+      "headset": "#2ce8f5"
     }
   }
 }

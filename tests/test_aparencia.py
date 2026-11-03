@@ -1,5 +1,5 @@
 """
-Etapa 5 do multipet + Etapa 6 (Mia & Zuric): cores, estilo (tv / anime_pixel) e acessórios por pet.
+Etapa 5 do multipet + Etapa 6 (Mia): cores, estilo (tv / anime_pixel) e acessórios por pet.
 
 Um pet sem "aparencia" no .json fica idêntico ao PADRAO original. Valor inválido nunca derruba o app:
 cor fora de #rrggbb, estilo desconhecido e acessório desconhecido ficam com o padrão.
@@ -72,17 +72,16 @@ def test_valor_invalido_fica_com_o_padrao():
         assert aparencia_de(ruim).acessorios == ()
 
 
-def test_mia_e_zuric_desenham_anime_pixel_com_headset_e_chifrinhos():
-    for pet_id in ("mia", "zuric"):
-        a = aparencia_de(config.load_pet(PATHS, pet_id)["aparencia"])
-        assert a.estilo == "anime_pixel"
-        assert [n for n, _c in a.acessorios] == ["headset", "chifrinhos"]
-        casos = [(e, 1.0, False) for e in EYE_SHAPES] + [("observando", 0.08, False), ("feliz", 1.0, True)]
-        cor_chifre = dict(a.acessorios)["chifrinhos"]
-        for emocao, blink, carinho in casos:
-            img = pintar(a, emocao, blink, carinho)
-            assert pixels_de(img, a.moldura), (pet_id, emocao)
-            assert pixels_de(img, cor_chifre), (pet_id, emocao)
+def test_mia_desenha_anime_pixel_em_toda_expressao():
+    a = aparencia_de(config.load_pet(PATHS, "mia")["aparencia"])
+    assert a.estilo == "anime_pixel"
+    assert [n for n, _c in a.acessorios] == ["headset", "chifrinhos"]
+    casos = [(e, 1.0, False) for e in EYE_SHAPES] + [("observando", 0.08, False), ("feliz", 1.0, True)]
+    cor_chifre = dict(a.acessorios)["chifrinhos"]
+    for emocao, blink, carinho in casos:
+        img = pintar(a, emocao, blink, carinho)
+        assert pixels_de(img, a.moldura), emocao
+        assert pixels_de(img, cor_chifre), emocao
 
 
 def test_estilo_tv_desenha_gravata_dentro_do_corpo():
@@ -106,11 +105,10 @@ def test_aparencia_chega_na_janela_do_pet(tmp_path, monkeypatch):
     shutil.copytree(PATHS.pets, tmp_path / "pets")
     paths = Paths(root=tmp_path)
     monkeypatch.setattr(app_mod, "PanicHotkey", lambda: SimpleNamespace(ok=True, pressed=Mock()))
-    for pet in ("mia", "zuric"):
-        SettingsStore(paths).update(dict(config.DEFAULT_PERMISSIONS, pet=pet))
-        app = app_mod.PestinhaApp(SettingsStore(paths), paths)
-        for timer in app.findChildren(app_mod.QTimer):
-            timer.stop()
-        assert app.pet.aparencia.estilo == "anime_pixel"
-        assert bool(app.pet.aparencia.acessorios) is True
-        app.pet.grab()                                                     # pinta de verdade, sem erro
+    SettingsStore(paths).update(dict(config.DEFAULT_PERMISSIONS, pet="mia"))
+    app = app_mod.PestinhaApp(SettingsStore(paths), paths)
+    for timer in app.findChildren(app_mod.QTimer):
+        timer.stop()
+    assert app.pet.aparencia.estilo == "anime_pixel"
+    assert bool(app.pet.aparencia.acessorios) is True
+    app.pet.grab()                                                     # pinta de verdade, sem erro

@@ -12,28 +12,31 @@ isso aí não é feature, é um bug com autoestima alta.
 git commit -m "deus me perdoe por essa gambiarra às 3h da manhã"
 quem escreveu essa linha criminosa? ah, foi você há 15 minutos.
 tô vendo esse try/except pass engolindo o erro todo, seu safado!
-meu headset até chiou com esse traceback de 40 linhas.
 a VRAM da RTX 3060 chorou quando viu esse modelo no ComfyUI.
 o LM Studio tá fritando e você aí abrindo mais aba no navegador.
 470 neurônios pulsados na minha cabeça e nenhum entendeu esse seu regex.
 refatorar agora? vai dar merda, mas a Mia apoia o caos criativo.
 se funcionar em produção, ninguém precisa saber do loop escondido.
+automatiza logo essa tarefa igual em The Farmer Was Replaced, pô!
+essa malha no Blender tem mais polígono torto que a cara do cursor.
 
-# ---- RPG, soulslike, Palworld e preguiça de trabalhar ----
-minha barra de mana zerou, passa o mouse nas minhas marias-chiquinhas pra recarregar.
+# ---- jogos, 100Hz e preguiça de trabalhar ----
+100Hz no monitor AOC e você clicando lento desse jeito?!
+minha barra de mana zerou, passa o mouse no meu cabelo rosa pra recarregar.
 levei hit kill desse bug, preciso de um descanso na fogueira.
-trabalhar no meu notebook? hoje não, meu capuz tá quentinho demais pra digitar.
+trabalhar no meu notebook? hoje não, tô com preguiça demais pra digitar.
 me obriga a codar agora pra você ver a greve que a Mia abre nesse monitor.
 tô igual Pal sobrecarregado na base: só quero comer, dormir e fazer bagunça.
 dar parry em boss é fácil, difícil é tankar essa sua lógica sem café.
 cadê minha bolinha? roubaram meu drop lendário!
-tô camperando aqui na barra de título mesmo, o moletom é meu e foda-se.
+tô camperando aqui na barra de título mesmo, o canto é meu e foda-se.
+quando chegarem os 3 monitores, já aviso que o do meio é território da Mia.
 
 # ---- carência, fofura ácida e cuidado ----
-oi, sumido. esqueceu que tem uma dev de chifrinhos morando na sua tela?
-um cafuné entre os chifrinhos custa zero reais e evita três post-its.
-eu sou 50% fofura de maria-chiquinha roxa e 50% puro ódio de código legado.
-fecha meu post-it na cara dura que eu volto com o dobro de glitter e rancor.
+oi, sumido. esqueceu que a Mia mora na sua tela?
+um cafuné na cabeça custa zero reais e evita três post-its.
+eu sou 50% fofura de cabelo rosa e 50% puro ódio de código legado.
+fecha meu post-it na cara dura que eu volto com o dobro de rancor.
 bebe água agora, criatura desidratada, café frio não hidrata!
 arruma essa coluna que você tá parecendo uma chave mal indentada.
 pisca o olho um pouquinho, a Mia vigia o código pra nenhum bug entrar.

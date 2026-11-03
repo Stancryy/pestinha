@@ -186,25 +186,31 @@ def _draw_anime_pixel(p: QPainter, shape: dict, gaze, blink: float, emotion: str
     p.setPen(Qt.NoPen)
 
     acessorios_dict = dict(a.acessorios)
-    chave_sp = "carinho" if carinho else ("dormindo" if (emotion == "dormindo" or blink < 0.25) else emotion)
+    if getattr(a, "suando", False) and _carregar_sprite_anime(a.variante, "suando") is not None:
+        chave_sp = "suando"
+    elif carinho:
+        chave_sp = "carinho"
+    elif emotion == "dormindo" or blink < 0.25:
+        chave_sp = "dormindo"
+    else:
+        chave_sp = emotion
     sprite = _carregar_sprite_anime(a.variante, chave_sp)
     if sprite is not None:
         gx, gy = gaze
-        dx = max(-1.0, min(1.0, gx)) * 3.0
-        dy = max(-1.0, min(1.0, gy)) * 2.0
-        p.setRenderHint(QPainter.SmoothPixmapTransform, True)
-        p.drawImage(QRectF(-68 + dx, -66 + dy, 136, 136), sprite)
-        p.setRenderHint(QPainter.Antialiasing, False)
+        dx = int(round(max(-1.0, min(1.0, gx)) * 3.0))
+        dy = int(round(max(-1.0, min(1.0, gy)) * 2.0))
+        p.setRenderHint(QPainter.SmoothPixmapTransform, False)
+        p.drawImage(QRectF(-60 + dx, -60 + dy, 120, 120), sprite)
         # Pontos internos discretos para sincronizar as cores exatas configuradas em aparencia
-        p.fillRect(QRectF(-2 + dx, -28 + dy, 3, 3), a.moldura)
+        p.fillRect(QRectF(-2 + dx, -36 + dy, 2, 2), a.moldura)
         if "chifrinhos" in acessorios_dict:
             cor_ch = acessorios_dict["chifrinhos"]
-            p.fillRect(QRectF(-26 + dx, -38 + dy, 2, 2), cor_ch)
-            p.fillRect(QRectF(24 + dx, -38 + dy, 2, 2), cor_ch)
+            p.fillRect(QRectF(-24 + dx, -42 + dy, 2, 2), cor_ch)
+            p.fillRect(QRectF(22 + dx, -42 + dy, 2, 2), cor_ch)
         if "headset" in acessorios_dict:
             cor_hs = acessorios_dict["headset"]
-            p.fillRect(QRectF(-36 + dx, -6 + dy, 2, 4), cor_hs)
-            p.fillRect(QRectF(34 + dx, -6 + dy, 2, 4), cor_hs)
+            p.fillRect(QRectF(-34 + dx, 18 + dy, 2, 3), cor_hs)
+            p.fillRect(QRectF(32 + dx, 18 + dy, 2, 3), cor_hs)
         for nome in ("oculos", "gravata", "bone", "gorro_natal", "chapeu_festa"):
             if nome in acessorios_dict:
                 _DESENHAR_ACESSORIO[nome](p, acessorios_dict[nome])
