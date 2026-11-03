@@ -200,6 +200,9 @@ def criar_app(tmp_path, monkeypatch, pet="bryan"):
     monkeypatch.setattr(app_mod, "PanicHotkey", lambda: SimpleNamespace(ok=True, pressed=Mock()))
     paths = Paths(root=tmp_path)
     store = SettingsStore(paths)
+    paths.pets.mkdir(parents=True, exist_ok=True)
+    if not paths.definicao(pet).exists():
+        paths.definicao(pet).write_text(f'{{"nome": "{pet.capitalize()}", "seed": 7}}', encoding="utf-8")
     store.update(dict(config.DEFAULT_PERMISSIONS, pet=pet))
     app = app_mod.PestinhaApp(store, paths)
     for timer in app.findChildren(app_mod.QTimer):

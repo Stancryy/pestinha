@@ -34,7 +34,7 @@ PANIC_HOTKEY_TEXT = "Ctrl + Alt + Shift + B"
 
 DEFAULT_PERMISSIONS = {
     "ativo": True,             # False depois do pânico, até religar na tela inicial
-    "pet": "bryan",
+    "pet": "mia",
     "travessuras": False,      # interruptor mestre de memes/fotos/bilhetes
     "memes": True,
     "fotos": False,
@@ -206,7 +206,7 @@ def profile(perms):
 # ============================================================
 
 APP_NOME = "Pestinha"             # o programa; cada personagem tem o próprio nome (pets/<pet>.json)
-PET_PADRAO = "bryan"
+PET_PADRAO = "mia"
 
 DEFAULT_PET = {
     "nome": None,                       # sem nome no .json: o id com inicial maiúscula

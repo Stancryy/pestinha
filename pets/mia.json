@@ -1,0 +1,42 @@
+{
+  "_ajuda": "Mia: garota anime chibi em pixel art com headset gamer e chifrinhos neon. Mais preguiçosa para sentar no notebook, mais calma enquanto você programa e caótica no tempo livre. Reage com raiva ou tristeza quando arrancam o notebook (misto).",
+  "nome": "Mia",
+  "seed": 42,
+  "temperamento": {
+    "BOREDOM->CURIOUS": 1.35,
+    "BOREDOM->PLAYFUL": 1.3,
+    "NOVELTY->CURIOUS": 1.4,
+    "POKE->PLAYFUL": 1.45,
+    "CARESS->PLAYFUL": 1.5,
+    "CARESS->CALM": 1.25,
+    "DISMISS->FRUSTRATION": 1.55,
+    "DISMISS->GLOOM": 1.3,
+    "TOY_TAKEN->FRUSTRATION": 1.4,
+    "TOY_TAKEN->GLOOM": 1.35,
+    "TOY_NEAR->PLAYFUL": 1.35,
+    "IMPACT->FRUSTRATION": 1.45,
+    "IMPACT->GLOOM": 1.25,
+    "LONELY->GLOOM": 1.35,
+    "PEDIDO->SENTAR": 0.65,
+    "PEDIDO->FOCUS": 0.7,
+    "RECUSA->FRUSTRATION": 1.3
+  },
+  "brincadeira": {
+    "bola": 1.0,
+    "arremesso": 0.7,
+    "postit": 0.8
+  },
+  "reacao_notebook": "misto",
+  "aparencia": {
+    "estilo": "anime_pixel",
+    "moldura": "#b366ff",
+    "casca": "#1c1230",
+    "tela": "#fde2f3",
+    "olho": "#00f0ff",
+    "brilho": "#ffffff",
+    "acessorios": {
+      "chifrinhos": "#ff2a85",
+      "headset": "#00f0ff"
+    }
+  }
+}

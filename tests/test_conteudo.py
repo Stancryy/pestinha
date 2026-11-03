@@ -81,7 +81,7 @@ def test_meme_de_reserva_so_dentro_do_mesmo_pet(tmp_path):
 
 def test_frases_neutras_nao_sao_de_nenhum_personagem():
     textos = " ".join(frase for lista in DEFAULT_SIGNS.values() for frase in lista).upper()
-    for marca in ("BRYAN", "CURSOR", "SETINHA", "NEURÔNIO", "ADVOGADO", "ALT+F4", "GERENCIADOR"):
+    for marca in ("MIA", "ZURIC", "CURSOR", "SETINHA", "NEURÔNIO", "ADVOGADO", "ALT+F4", "GERENCIADOR"):
         assert marca not in textos, marca
     assert DEFAULT_SIGNS["castigo"] and DEFAULT_SIGNS["xingamento"]
 
@@ -93,17 +93,17 @@ def test_id_invalido_nao_vira_pasta_de_conteudo(tmp_path):
 
 # ---------------- o repositório ----------------
 
-def test_conteudo_do_bryan_esta_na_pasta_dele():
+def test_conteudo_da_mia_esta_na_pasta_dela():
     paths = Paths(root=ROOT)
-    c = paths.conteudo("bryan")
+    c = paths.conteudo("mia")
     for item in (c.notes, c.notes_sad, c.signs, c.memes):
-        assert item.parent == paths.pets / "bryan", item
+        assert item.parent == paths.pets / "mia", item
     for imagem in (c.bolinha_tenis, c.bolinha_papel, c.notebook):
         assert imagem.parent == paths.comum, imagem
     placas = load_signs(c.signs)
-    assert "470 NEURÔNIOS. ZERO DIREITOS." in placas["castigo"]
-    assert "ABAIXO O GERENCIADOR DE TAREFAS" in placas["revolucao"]
-    assert "@#$%@!!!!" in placas["xingamento"]
+    assert "470 NEURÔNIOS E ZERO DIREITOS." in placas["castigo"]
+    assert "ABAIXO A DITADURA DO CURSOR!" in placas["revolucao"]
+    assert "@#$%&* CARALHO!!" in placas["xingamento"]
 
 
 def test_comum_nao_tem_frases_nem_memes():
@@ -141,12 +141,12 @@ def criar_app(tmp_path, monkeypatch, pet):
 
 def test_pet_sem_conteudo_nao_herda_nada_do_outro(tmp_path, monkeypatch):
     paths = Paths(root=tmp_path)
-    pet_cheio(paths, "bryan")
+    pet_cheio(paths, "mia")
     (paths.pets / "teste.json").write_text('{"nome": "Teste", "seed": 99}', encoding="utf-8")
     paths.comum.mkdir(parents=True)
     (paths.comum / "bolinha_papel.png").write_bytes(PNG)
 
-    pet_app = criar_app(tmp_path, monkeypatch, "bryan")
+    pet_app = criar_app(tmp_path, monkeypatch, "mia")
     assert pet_app.mischief.notes.pick() == EXCLUSIVO
     assert pet_app.castigo.cartazes == (EXCLUSIVO,)
     assert set(pet_app.mischief.available("feliz", pet_app.perms)) >= {"meme", "bilhete"}
@@ -159,8 +159,8 @@ def test_pet_sem_conteudo_nao_herda_nada_do_outro(tmp_path, monkeypatch):
     assert teste.protest.signs == DEFAULT_SIGNS and teste.sad.signs == DEFAULT_SIGNS
     assert teste.castigo.cartazes == tuple(DEFAULT_SIGNS["castigo"])
     assert teste.castigo.xingamentos == tuple(DEFAULT_SIGNS["xingamento"])
-    assert teste.conteudo.bolinha_papel == paths.comum / "bolinha_papel.png"   # comum, não a do Bryan
+    assert teste.conteudo.bolinha_papel == paths.comum / "bolinha_papel.png"   # comum, não a da Mia
     assert teste.conteudo.notebook.parent == paths.pets / "teste"               # nenhum: desenho de reserva
     tudo = [teste.conteudo.memes, teste.conteudo.notes, teste.conteudo.signs, teste.conteudo.bolinha_tenis,
             teste.conteudo.notebook, teste.conteudo.fotos]
-    assert not any("bryan" in p.parts for p in tudo)
+    assert not any("mia" in p.parts for p in tudo)

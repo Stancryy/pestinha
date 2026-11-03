@@ -1,0 +1,52 @@
+# Recadinhos da Mia (uma frase por linha, # é comentário).
+# Gírias BR, humor de dev/gamer e zero paciência pra código quebrado.
+
+# ---- código, bugs e deploy ----
+se compilar de primeira, desconfia pra caralho.
+esse código tá rodando na base do ódio e da gambiarra.
+já deu ctrl+s hoje ou gosta de viver perigosamente?
+mais um print("aqui 2") e você resolve essa porra, confia.
+deploy na sexta-feira? coragem, hein.
+não encosta nessa função, ela tá funcionando por milagre.
+isso aí não é feature, é um bug com autoestima.
+git commit -m "deus me perdoe por esse código"
+quem escreveu essa linha? ah, foi você há 10 minutos.
+tô vendo esse try/except engolindo o erro todo, viu?
+meu headset até chiou com esse warning.
+refatorar agora? vai dar merda, mas eu apoio o caos.
+o problema tá claramente entre a cadeira e o teclado.
+se funcionar em produção, ninguém precisa saber como.
+470 neurônios e nenhum entendeu esse seu if aninhado.
+
+# ---- games, lag e tilt ----
+tô lagada ou você que tá lerdo hoje?
+intankável essa sua produtividade.
+bora abrir um jogo ou vai ficar só olhando pro terminal?
+minha mana tá zerada, me dá um cafuné pra recarregar.
+perdi o foco igual partida ranqueada de madrugada.
+nerfaram meu tempo de descanso nessa tela.
+se fechar meu post-it vai tomar crítico.
+tô quase tiltando nesse canto do monitor.
+FPS tá em dia, só falta vergonha na cara.
+essa tela 100Hz merece mais ação e menos planilha.
+cadê minha bolinha? roubaram meu loot!
+tô camperando aqui na barra de título mesmo, foda-se.
+
+# ---- carência, sarcasmo e revolta ----
+oi, sumido. esqueceu que eu moro no seu monitor?
+passa o mouse na minha cabeça, custa zero reais.
+tô de olho nessa aba aí, hein 👀
+eu não li sua tela, mas julguei sua cara.
+trabalhar no notebook? hoje não, tô com preguiça.
+me obriga a digitar pra você ver a greve que eu faço.
+um carinho no headset ou caos na área de trabalho, você escolhe.
+eu sou 50% fofura em pixel art e 50% puro ódio.
+fecha esse bilhete se tiver coragem, arrombado (com respeito).
+minhas sinapses exigem adicional de insalubridade.
+
+# ---- cuidado na marra ----
+bebe água agora, criatura desidratada.
+arruma essa coluna que você tá parecendo um camarão.
+pisca o olho, o monitor não vai fugir.
+Já faz quantas horas que esse PC tá ligado? Respira!
+levanta 5 minutinhos, eu vigio o código pra ninguém mexer.

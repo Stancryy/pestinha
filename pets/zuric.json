@@ -1,0 +1,42 @@
+{
+  "_ajuda": "Zuric: versão gêmea neon ciano/magenta da garota anime chibi em pixel art, com headset gamer e chifrinhos. Pavio curto, viciada em código e games, preguiçosa pra trabalhar por obrigação e caótica no tempo livre.",
+  "nome": "Zuric",
+  "seed": 1337,
+  "temperamento": {
+    "BOREDOM->CURIOUS": 1.45,
+    "BOREDOM->PLAYFUL": 1.4,
+    "NOVELTY->CURIOUS": 1.45,
+    "POKE->PLAYFUL": 1.5,
+    "CARESS->PLAYFUL": 1.55,
+    "CARESS->CALM": 1.2,
+    "DISMISS->FRUSTRATION": 1.65,
+    "DISMISS->GLOOM": 1.25,
+    "TOY_TAKEN->FRUSTRATION": 1.45,
+    "TOY_TAKEN->GLOOM": 1.3,
+    "TOY_NEAR->PLAYFUL": 1.4,
+    "IMPACT->FRUSTRATION": 1.5,
+    "IMPACT->GLOOM": 1.2,
+    "LONELY->GLOOM": 1.3,
+    "PEDIDO->SENTAR": 0.6,
+    "PEDIDO->FOCUS": 0.65,
+    "RECUSA->FRUSTRATION": 1.35
+  },
+  "brincadeira": {
+    "bola": 0.9,
+    "arremesso": 0.8,
+    "postit": 1.0
+  },
+  "reacao_notebook": "misto",
+  "aparencia": {
+    "estilo": "anime_pixel",
+    "moldura": "#00f0ff",
+    "casca": "#121a30",
+    "tela": "#fde2f3",
+    "olho": "#b366ff",
+    "brilho": "#ffffff",
+    "acessorios": {
+      "chifrinhos": "#b366ff",
+      "headset": "#ff2a85"
+    }
+  }
+}

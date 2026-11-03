@@ -1,8 +1,8 @@
 """
-Etapa 4 do multipet: o Jorge, segundo personagem, feito só de configuração e conteúdo.
+Etapa 4 do multipet + Etapa 6 (Mia & Zuric): dois personagens feitos só de configuração e conteúdo.
 
-Mesma rede e mesmos estágios do Bryan; muda a semente, o temperamento (pets/jorge.json) e o
-conteúdo (pets/jorge/). Nada do Bryan aparece nele, e nada dele no Bryan.
+Mesma rede e mesmos estágios; muda a semente, o temperamento (pets/mia.json e pets/zuric.json) e o
+conteúdo (pets/mia/ e pets/zuric/). Nada da Mia aparece na Zuric, e nada da Zuric na Mia.
 """
 import re
 import sys
@@ -36,26 +36,28 @@ def frases(pet_id):
     return textos
 
 
-def test_jorge_existe_e_e_selecionavel():
-    assert config.list_pets(PATHS) == ["bryan", "jorge"]
-    jorge = config.load_pet(PATHS, "jorge")
-    assert jorge["nome"] == "Jorge" and jorge["seed"] != config.load_pet(PATHS, "bryan")["seed"]
-    assert len(jorge["temperamento"]) >= 8                   # nenhum campo descartado por tipo errado
+def test_mia_e_zuric_existem_e_sao_selecionaveis():
+    assert config.list_pets(PATHS) == ["mia", "zuric"]
+    mia = config.load_pet(PATHS, "mia")
+    zuric = config.load_pet(PATHS, "zuric")
+    assert mia["nome"] == "Mia" and zuric["nome"] == "Zuric"
+    assert zuric["seed"] != mia["seed"]
+    assert len(mia["temperamento"]) >= 8 and len(zuric["temperamento"]) >= 8
 
 
 def test_todo_temperamento_mexe_em_uma_ligacao_que_existe():
     """Uma chave com erro de digitação seria ignorada em silêncio; aqui ela falha."""
     validas = {f"{pre}->{post}" for pre, post, _w, _d in CONNECTIONS if pre in SENSORY_SPEC} | POOLS
-    for pet in ("bryan", "jorge"):
+    for pet in ("mia", "zuric"):
         chaves = set(config.load_pet(PATHS, pet)["temperamento"])
         assert chaves <= validas, (pet, chaves - validas)
 
 
 def test_mesmo_cerebro_outro_temperamento():
-    jorge = config.load_pet(PATHS, "jorge")
-    com = LIFBrain(seed=jorge["seed"], temperament=jorge["temperamento"])
-    sem = LIFBrain(seed=jorge["seed"])
-    pet_app = LIFBrain(seed=7, temperament=config.load_pet(PATHS, "bryan")["temperamento"])
+    zuric = config.load_pet(PATHS, "zuric")
+    com = LIFBrain(seed=zuric["seed"], temperament=zuric["temperamento"])
+    sem = LIFBrain(seed=zuric["seed"])
+    pet_app = LIFBrain(seed=42, temperament=config.load_pet(PATHS, "mia")["temperamento"])
     assert com.W.shape == pet_app.W.shape and com.N == pet_app.N   # mesma estrutura
     assert all(com.pool(m[0]) == pet_app.pool(m[0]) for m in MOTOR_SPEC)
 
@@ -63,61 +65,59 @@ def test_mesmo_cerebro_outro_temperamento():
         a, b = cerebro.pool(pre), cerebro.pool(post)
         return cerebro.W[a["start"]:a["start"] + a["n"], b["start"]:b["start"] + b["n"]].sum()
 
-    for chave, ganho in jorge["temperamento"].items():           # cada ganho chega na ligação certa
+    for chave, ganho in zuric["temperamento"].items():           # cada ganho chega na ligação certa
         pre, post = chave.split("->")
         assert np.isclose(bloco(com, pre, post), ganho * bloco(sem, pre, post)), chave
     assert np.isclose(bloco(com, "PRESO", "FRUSTRATION"), bloco(sem, "PRESO", "FRUSTRATION"))  # o resto igual
 
 
-def test_jorge_tem_conteudo_proprio_completo():
-    c = PATHS.conteudo("jorge")
+def test_zuric_tem_conteudo_proprio_completo():
+    c = PATHS.conteudo("zuric")
     placas = load_signs(c.signs)
     with open(c.signs, encoding="utf-8") as f:
         secoes = set(re.findall(r"^\[(\w+)\]", f.read(), re.M))
     assert secoes == set(DEFAULT_SIGNS)                          # não cai no neutro em nenhuma seção
     assert all(placas[s] for s in DEFAULT_SIGNS)
     assert config.Notes(c.notes).pick() and config.Notes(c.notes_sad).pick()
-    assert c.bolinha_papel == PATHS.pets / "jorge" / "bolinha_papel.png"    # o panfleto dele
+    assert c.bolinha_papel == PATHS.pets / "zuric" / "bolinha_papel.webp"
     assert c.bolinha_tenis.parent == PATHS.comum and c.notebook.parent == PATHS.comum
 
 
 def test_nada_exclusivo_de_um_aparece_no_outro():
     neutras = {t for lista in DEFAULT_SIGNS.values() for t in lista}
-    em_comum = frases("jorge") & frases("bryan")
+    em_comum = frases("zuric") & frases("mia")
     assert em_comum <= neutras, em_comum - neutras
-    textos = " ".join(frases("jorge")).upper()
-    for marca in ("BRYAN", "ABAIXO O CURSOR", "A RAM É DE QUEM USA", "ABAIXO O GERENCIADOR", "ABAIXO O ALT+F4",
-                  "CURSOR, RESPEITA", "470 NEURÔNIOS"):
-        assert marca not in textos, marca
-    textos_bryan = " ".join(frases("bryan")).upper()
-    for marca in ("JORGE", "MENTORIA", "MINDSET", "JORGECOIN"):
-        assert marca not in textos_bryan, marca
+    textos_zuric = " ".join(frases("zuric")).upper()
+    assert "MIA" not in textos_zuric
+    textos_mia = " ".join(frases("mia")).upper()
+    assert "ZURIC" not in textos_mia
 
 
-def test_satira_sem_nada_de_verdade():
-    """Nada de link, chave de PIX, e-mail ou valor para pagar: é só piada."""
-    for texto in frases("jorge"):
-        assert not re.search(r"https?://|www\.|\.com\b|R\$\s*\d|chave pix|@\w+\.\w+", texto, re.I), texto
+def test_sem_links_ou_dados_pessoais():
+    """Nada de link externo, chave de PIX ou e-mail nas falas."""
+    for pet_id in ("mia", "zuric"):
+        for texto in frases(pet_id):
+            assert not re.search(r"https?://|www\.|\.com\b|R\$\s*\d|chave pix|@\w+\.\w+", texto, re.I), texto
 
 
-def test_jorge_no_app(tmp_path, monkeypatch):
+def test_zuric_no_app(tmp_path, monkeypatch):
     QApplication.instance() or QApplication([])
     import shutil
     import pestinha.app as app_mod
     shutil.copytree(PATHS.pets, tmp_path / "pets")
     shutil.copytree(PATHS.comum, tmp_path / "assets" / "comum")
     paths = Paths(root=tmp_path)
-    SettingsStore(paths).update(dict(config.DEFAULT_PERMISSIONS, pet="jorge"))
+    SettingsStore(paths).update(dict(config.DEFAULT_PERMISSIONS, pet="zuric"))
     monkeypatch.setattr(app_mod, "PanicHotkey", lambda: SimpleNamespace(ok=True, pressed=Mock()))
     app = app_mod.PestinhaApp(SettingsStore(paths), paths)
     for timer in app.findChildren(app_mod.QTimer):
         timer.stop()
-    jorge = frases("jorge")
-    assert app.nome == "Jorge" and app.pet_paths == paths.pet("jorge")
-    assert app.tray.icon.toolTip().startswith("Pestinha · Jorge")
-    assert app.revolucao.sprite is not None                     # atira panfletos
-    assert app.mischief.notes.pick() in jorge
-    assert set(app.castigo.cartazes) <= jorge and set(app.castigo.xingamentos) <= jorge
+    zuric = frases("zuric")
+    assert app.nome == "Zuric" and app.pet_paths == paths.pet("zuric")
+    assert app.tray.icon.toolTip().startswith("Pestinha · Zuric")
+    assert app.revolucao.sprite is not None
+    assert app.mischief.notes.pick() in zuric
+    assert set(app.castigo.cartazes) <= zuric and set(app.castigo.xingamentos) <= zuric
     for secao in DEFAULT_SIGNS:
-        assert app.protest.pick(secao) in jorge
-    assert "meme" in app.mischief.available("feliz", dict(app.perms, travessuras=True, memes=True))   # tem memes felizes
+        assert app.protest.pick(secao) in zuric
+    assert "meme" in app.mischief.available("feliz", dict(app.perms, travessuras=True, memes=True))

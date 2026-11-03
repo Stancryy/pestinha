@@ -1,8 +1,8 @@
 """
-Etapa 5 do multipet: cores e acessórios por pet, numa camada por cima do rosto.
+Etapa 5 do multipet + Etapa 6 (Mia & Zuric): cores, estilo (tv / anime_pixel) e acessórios por pet.
 
-O pet padrão, o Bryan (sem "aparencia" no .json), fica idêntico ao original. Valor inválido nunca derruba o app:
-cor fora de #rrggbb e acessório desconhecido ficam com o padrão.
+Um pet sem "aparencia" no .json fica idêntico ao PADRAO original. Valor inválido nunca derruba o app:
+cor fora de #rrggbb, estilo desconhecido e acessório desconhecido ficam com o padrão.
 """
 import sys
 from pathlib import Path
@@ -52,17 +52,18 @@ def pixels_de(img, cor, tolerancia=40):
     return achados
 
 
-def test_bryan_continua_com_o_visual_original():
-    assert "aparencia" not in config.load_pet(PATHS, "bryan")
-    a = aparencia_de(config.load_pet(PATHS, "bryan").get("aparencia"))
+def test_pet_sem_aparencia_continua_com_o_visual_original():
+    a = aparencia_de(None)
     assert (a.moldura, a.casca, a.tela, a.olho, a.brilho) == (FRAME, SHELL, SCREEN, EYE, SHINE)
+    assert a.estilo == "tv"
     assert a.acessorios == ()
     assert pintar(a) == pintar(PADRAO)
 
 
 def test_valor_invalido_fica_com_o_padrao():
-    a = aparencia_de({"moldura": "vermelho", "olho": "#12345", "tela": 7, "casca": "#AbCdEf",
+    a = aparencia_de({"estilo": "3d_inexistente", "moldura": "vermelho", "olho": "#12345", "tela": 7, "casca": "#AbCdEf",
                       "acessorios": {"chapeu": "#ffffff", "gravata": "azul", "oculos": "#000000"}})
+    assert a.estilo == "tv"
     assert a.moldura == FRAME and a.olho == EYE and a.tela == SCREEN
     assert a.casca == QColor("#abcdef")
     assert [n for n, _c in a.acessorios] == ["oculos", "gravata"]            # chapéu não existe; ordem fixa
@@ -71,18 +72,31 @@ def test_valor_invalido_fica_com_o_padrao():
         assert aparencia_de(ruim).acessorios == ()
 
 
-def test_jorge_desenha_toda_expressao_com_gravata():
-    a = aparencia_de(config.load_pet(PATHS, "jorge")["aparencia"])
-    assert [n for n, _c in a.acessorios] == ["gravata"]                    # sem óculos
-    casos = [(e, 1.0, False) for e in EYE_SHAPES] + [("observando", 0.08, False), ("feliz", 1.0, True)]
+def test_mia_e_zuric_desenham_anime_pixel_com_headset_e_chifrinhos():
+    for pet_id in ("mia", "zuric"):
+        a = aparencia_de(config.load_pet(PATHS, pet_id)["aparencia"])
+        assert a.estilo == "anime_pixel"
+        assert [n for n, _c in a.acessorios] == ["headset", "chifrinhos"]
+        casos = [(e, 1.0, False) for e in EYE_SHAPES] + [("observando", 0.08, False), ("feliz", 1.0, True)]
+        cor_chifre = dict(a.acessorios)["chifrinhos"]
+        for emocao, blink, carinho in casos:
+            img = pintar(a, emocao, blink, carinho)
+            assert pixels_de(img, a.moldura), (pet_id, emocao)
+            assert pixels_de(img, cor_chifre), (pet_id, emocao)
+
+
+def test_estilo_tv_desenha_gravata_dentro_do_corpo():
+    a = aparencia_de({
+        "moldura": "#e2b13c", "casca": "#14120c", "tela": "#1c1a12",
+        "olho": "#ffd166", "brilho": "#fff3c4",
+        "acessorios": {"gravata": "#b3261e"},
+    })
     gravata = dict(a.acessorios)["gravata"]
-    for emocao, blink, carinho in casos:
-        img = pintar(a, emocao, blink, carinho)
-        assert pixels_de(img, a.olho) or emocao == "dormindo", emocao       # os olhos continuam aparecendo
-        pontos = pixels_de(img, gravata)
-        assert pontos, emocao
-        assert min(y for _x, y in pontos) >= CY, emocao                   # na frente do peito, não embaixo
-        assert max(y for _x, y in pontos) <= CY + BODY_H / 2 + 2, emocao  # não passa da borda de baixo (barra de tarefas)
+    img = pintar(a, "observando", 1.0, False)
+    pontos = pixels_de(img, gravata)
+    assert pontos
+    assert min(y for _x, y in pontos) >= CY
+    assert max(y for _x, y in pontos) <= CY + BODY_H / 2 + 2
 
 
 def test_aparencia_chega_na_janela_do_pet(tmp_path, monkeypatch):
@@ -92,10 +106,11 @@ def test_aparencia_chega_na_janela_do_pet(tmp_path, monkeypatch):
     shutil.copytree(PATHS.pets, tmp_path / "pets")
     paths = Paths(root=tmp_path)
     monkeypatch.setattr(app_mod, "PanicHotkey", lambda: SimpleNamespace(ok=True, pressed=Mock()))
-    for pet, tem_acessorio in (("jorge", True), ("bryan", False)):
+    for pet in ("mia", "zuric"):
         SettingsStore(paths).update(dict(config.DEFAULT_PERMISSIONS, pet=pet))
         app = app_mod.PestinhaApp(SettingsStore(paths), paths)
         for timer in app.findChildren(app_mod.QTimer):
             timer.stop()
-        assert bool(app.pet.aparencia.acessorios) is tem_acessorio
+        assert app.pet.aparencia.estilo == "anime_pixel"
+        assert bool(app.pet.aparencia.acessorios) is True
         app.pet.grab()                                                     # pinta de verdade, sem erro

@@ -15,7 +15,7 @@ app inteiro usam um relógio virtual: avançam o tempo sem esperar.
 | Arquivo | O que faz |
 |---|---|
 | `test_30_bugs.py` | Regressão dos 30 bugs encontrados na rodada de fuzzing e revisão (docs/auditorias/BUGS_30_RODADA.md). |
-| `test_aparencia.py` | Etapa 5 do multipet: cores e acessórios por pet, numa camada por cima do rosto. |
+| `test_aparencia.py` | Etapa 5 do multipet + Etapa 6 (Mia & Zuric): cores, estilo (tv / anime_pixel) e acessórios por pet. |
 | `test_app.py` | Testes de integração do app, com Qt em modo offscreen e tudo numa pasta temporária. |
 | `test_arquitetura.py` | Regra de camadas do pacote `pestinha`: cada camada só importa das que estão abaixo dela. |
 | `test_atividade.py` | Programas de trabalho: VS Code, Claude e Codex contam como programação. |
@@ -36,7 +36,7 @@ app inteiro usam um relógio virtual: avançam o tempo sem esperar.
 | `test_festa.py` | Fogos de artifício ligados à rede e brincadeira mais animada quando feliz. |
 | `test_fps_cache.py` | Testes para cache de QPixmap, resolução de imagens WebP/PNG e FPS adaptativo. |
 | `test_homeostase.py` | Homeostase: trabalhar é estímulo, então o tédio não sobe enquanto ele programa. |
-| `test_jorge.py` | Etapa 4 do multipet: o Jorge, segundo personagem, feito só de configuração e conteúdo. |
+| `test_jorge.py` | Etapa 4 do multipet + Etapa 6 (Mia & Zuric): dois personagens feitos só de configuração e conteúdo. |
 | `test_log_crash.py` | Testes de rotação de log por tamanho e relatório local de travamento (crash report). |
 | `test_mesa.py` | Notebook: sentar e levantar pelo disparo do neurônio SENTAR. |
 | `test_migracao.py` | Etapa 1 do multipet: memória por pet (memory/pets/<pet>/) e a migração da versão antiga. |
