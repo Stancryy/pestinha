@@ -39,6 +39,9 @@ from .ajustes import (
     DURACAO_TONTURA as DIZZY_SECONDS,
     INTERVALO_BATIDA as IMPACT_COOLDOWN,
     LIMIAR_CANTO_HZ,
+    INTERVALO_QUADRO_ATIVO_MS,
+    INTERVALO_QUADRO_PARADO_MS,
+    INTERVALO_QUADRO_DORMINDO_MS,
     PUNICAO_DISPENSA as DISMISS_PENALTY,
     RECOMPENSA_CARINHO as CARESS_REWARD,
     SILENCIO_MOUSE as MOUSE_QUIET,
@@ -207,7 +210,7 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
 
         # ----- relógios -----
         self.last_frame = time.monotonic()
-        self._timer(16, self.frame)
+        self.frame_timer = self._timer(INTERVALO_QUADRO_ATIVO_MS, self.frame)
         self._timer(100, self.think)
         self._timer(250, self.scan_windows)
         self._timer(500, self.sense)
@@ -510,6 +513,26 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.mischief.tick(dt, bounds[3])
         self.pet.animate(now)
         self.maybe_mischief(now, dt, bounds, cursor, motores)
+        self._ajustar_fps()
+
+    def _ajustar_fps(self):
+        """FPS adaptativo: ~60 fps em movimento, ~20 fps parado em repouso, ~5 fps dormindo."""
+        if not hasattr(self, "frame_timer"):
+            return
+        body = self.pet.body
+        bola_parada = not self.ball.isVisible() or (
+            self.ball.body.grounded and not self.ball.dragging and abs(self.ball.body.vx) < 2.0 and abs(self.ball.body.vy) < 2.0
+        )
+        objetos_parados = all(t.resting and not t.carried for t in self.mischief.things)
+        pet_parado = body.grounded and not body.held and abs(body.vx) < 2.0 and abs(body.vy) < 2.0 and not self.behavior.mission
+        if self.asleep and pet_parado and bola_parada and objetos_parados:
+            alvo = INTERVALO_QUADRO_DORMINDO_MS
+        elif pet_parado and bola_parada and objetos_parados and self.protest.stage < 4:
+            alvo = INTERVALO_QUADRO_PARADO_MS
+        else:
+            alvo = INTERVALO_QUADRO_ATIVO_MS
+        if self.frame_timer.interval() != alvo:
+            self.frame_timer.setInterval(alvo)
 
     def _atualizar_mesa(self, now):
         """O neurônio SENTAR decide se ele senta no notebook. Aqui só entram as condições do corpo."""

@@ -12,6 +12,13 @@
 - Relatório local de travamento (`memory/logs/crash.log`) via `sys.excepthook`, sem dados de janelas e respeitando `desligar_arquivo()`.
 - Configuração de `ruff`, `mypy`, `pytest-cov` e `.pre-commit-config.yaml`.
 
+### Otimização, WebP, cache e FPS adaptativo (Etapa 3)
+- Script `ferramentas/benchmark.py` para medir tempo de abertura, passo da rede neural, ciclos `frame`/`think`, RAM e tamanho de assets.
+- Imagens de `assets/comum/` convertidas para `.webp` e redimensionadas (**1.706,5 KB → 9,3 KB**, redução de 99,4%), com `ConteudoPaths.resolver_imagem` suportando `.webp` e `.png`.
+- Cache em memória de `QPixmap` (`carregar_pixmap`) para bolinhas, notebook e memes.
+- Otimização de `LIFBrain.step` com linhas esparsas ativas e `np.add.reduceat` (~1,7x mais rápido e 100% equivalente matematicamente).
+- FPS adaptativo em `PestinhaApp`: ~60 fps em movimento (`16 ms`), ~20 fps parado (`50 ms`), ~5 fps dormindo (`200 ms`).
+
 ## Suporte a macOS e Linux
 
 - Toda a leitura do sistema (programa em primeiro plano, tempo ocioso, janelas, tela cheia, foco e o atalho

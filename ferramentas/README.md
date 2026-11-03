@@ -15,6 +15,7 @@ python ferramentas/gerar_doc_rede.py
 
 | Arquivo | O que faz |
 |---|---|
+| `benchmark.py` | Benchmark de desempenho do Pestinha: abertura, rede neural, ciclos think/frame, RAM e tamanho de assets. |
 | `fuzz_pestinha.py` | Roda o app inteiro com relógio virtual e ações aleatórias, checando invariantes. |
 | `gerar_doc_rede.py` | Gera docs/REDE_NEURAL.md a partir do código (canais, interneurônios, motores, conexões e limiares). |
 | `gerar_panfleto.py` | Desenha pets/jorge/bolinha_papel.png: um panfleto de mentoria amassado, que o Jorge atira na revolução. |

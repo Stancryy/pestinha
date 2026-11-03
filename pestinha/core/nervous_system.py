@@ -495,6 +495,9 @@ class LIFBrain(Brain):
             onehot[p["start"]:p["start"] + p["n"], i] = 1.0
         self.onehot = onehot
         self.pool_sizes = np.array([p["n"] for p in self.pools], dtype=float)
+        self._pool_starts = np.array([p["start"] for p in self.pools])
+        self._one_minus_sd = 1.0 - self.s_d
+        self._spike_accum = np.zeros(self.N)
         self.pool_counts = np.zeros(len(self.pools))
         self.pool_rate = np.zeros(len(self.pools))
 
@@ -553,7 +556,8 @@ class LIFBrain(Brain):
         rng = self.rng
         Ns = self.Ns
 
-        drive = (self.spikes * self.pre_gain) @ self.W_lif
+        idx = np.flatnonzero(self.spikes)
+        drive = (self.pre_gain[idx] @ self.W_lif[idx]) if idx.size else 0.0
 
         v = self.v
         v *= self.decay
@@ -574,7 +578,7 @@ class LIFBrain(Brain):
         s_fired = rng.random(Ns) < self.s_prob
 
         # HABITUAÇÃO: depressão sináptica + recuperação lenta
-        self.p[s_fired] *= (1.0 - self.s_d[s_fired])
+        self.p[s_fired] *= self._one_minus_sd[s_fired]
         self.p += (1.0 - self.p) * self.s_rec
 
         self.spikes[:Ns] = s_fired
@@ -582,7 +586,7 @@ class LIFBrain(Brain):
 
         self.trace *= TRACE_DECAY
         self.trace[self.spikes > 0] = 1.0
-        self.pool_counts += self.spikes @ self.onehot
+        self._spike_accum += self.spikes
 
     def step(self, dt_ms):
         """Avança a rede `dt_ms` milissegundos (em passos de 1 ms, no máximo 400 por chamada)."""
@@ -596,6 +600,8 @@ class LIFBrain(Brain):
                     self._bin = np.zeros(self.N, dtype=bool)
 
         dt_s = n * 0.001
+        self.pool_counts += np.add.reduceat(self._spike_accum, self._pool_starts)
+        self._spike_accum[:] = 0.0
         rate = self.pool_counts / (dt_s * self.pool_sizes)
         alpha = 1.0 - math.exp(-dt_s / READ_TAU)
         self.pool_rate += alpha * (rate - self.pool_rate)

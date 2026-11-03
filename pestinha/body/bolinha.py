@@ -12,7 +12,36 @@ from PySide6.QtWidgets import QWidget
 
 from ..ajustes import MEMORIA_SOLTURA as RELEASE_MEMORY, RAIO_BOLINHA as RADIUS
 from ..core.physics import Body
+from pathlib import Path
 from .pet import overlay_flags, set_no_activate
+
+_PIXMAP_CACHE = {}
+_CACHE_MAX = 64
+
+
+def carregar_pixmap(path, max_w=None, max_h=None):
+    """Carrega e redimensiona um QPixmap com cache em memória (invalida se o arquivo mudar)."""
+    p = Path(path)
+    if not p.exists():
+        return None
+    try:
+        mtime = p.stat().st_mtime_ns
+    except OSError:
+        return None
+    chave = (str(p), mtime, max_w, max_h)
+    if chave in _PIXMAP_CACHE:
+        return _PIXMAP_CACHE[chave]
+    pixmap = QPixmap(str(p))
+    if pixmap.isNull():
+        return None
+    if max_w is not None and max_h is not None:
+        pixmap = pixmap.scaled(max_w, max_h, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+    elif max_w is not None:
+        pixmap = pixmap.scaledToWidth(max_w, Qt.SmoothTransformation)
+    if len(_PIXMAP_CACHE) >= _CACHE_MAX:
+        _PIXMAP_CACHE.pop(next(iter(_PIXMAP_CACHE)))
+    _PIXMAP_CACHE[chave] = pixmap
+    return pixmap
 
 
 def load_sprite(path):
@@ -22,7 +51,7 @@ def load_sprite(path):
     pixmap = QPixmap(str(path))
     if pixmap.isNull():
         return None
-    return pixmap.scaled(RADIUS * 2, RADIUS * 2, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+    return carregar_pixmap(path, RADIUS * 2, RADIUS * 2)
 
 
 class Ball(QWidget):

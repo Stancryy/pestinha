@@ -8,6 +8,7 @@ pestinha/mind/mesa.py; aqui só mostramos se ele está trabalhando (borda acesa)
 
 from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QColor, QGuiApplication, QLinearGradient, QPainter, QPen, QPixmap
+from ..body.bolinha import carregar_pixmap
 from .arrastavel import FloatingWidget
 
 NOTEBOOK_W, NOTEBOOK_H = 110, 70     # tamanho do desenho de reserva
@@ -28,7 +29,7 @@ def load_notebook_sprite(path):
     pixmap = QPixmap(str(path))
     if pixmap.isNull():
         return None
-    return pixmap.scaledToWidth(SPRITE_W, Qt.SmoothTransformation)
+    return carregar_pixmap(path, max_w=SPRITE_W)
 
 
 class Notebook(FloatingWidget):

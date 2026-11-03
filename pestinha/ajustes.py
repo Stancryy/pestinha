@@ -131,6 +131,9 @@ GANHO_PAPEL = 0.05              # bolinhas de papel por segundo, por Hz do motor
 LADO_JANELA_PET = 200         # px da janela transparente do corpo
 ZZZ_QUANTIDADE = 3
 ZZZ_PERIODO = 2.4               # s que cada Z leva para subir e sumir
+INTERVALO_QUADRO_ATIVO_MS = 16  # ms entre quadros em movimento (~60 fps)
+INTERVALO_QUADRO_PARADO_MS = 50 # ms entre quadros parado em repouso (~20 fps)
+INTERVALO_QUADRO_DORMINDO_MS = 200  # ms entre quadros dormindo (~5 fps)
 
 # ---------------------------------------------------------------------------
 # Validação
@@ -210,6 +213,9 @@ _LIMITES = {
     "LADO_JANELA_PET": (int, 100, 1000),
     "ZZZ_QUANTIDADE": (int, 0, 20),
     "ZZZ_PERIODO": (float, 0.1, 60.0),
+    "INTERVALO_QUADRO_ATIVO_MS": (int, 8, 50),
+    "INTERVALO_QUADRO_PARADO_MS": (int, 16, 200),
+    "INTERVALO_QUADRO_DORMINDO_MS": (int, 50, 1000),
 }
 
 

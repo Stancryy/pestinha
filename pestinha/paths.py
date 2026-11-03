@@ -107,6 +107,15 @@ class ConteudoPaths:
                 return base / nome
         return self.proprio / nome
 
+    def resolver_imagem(self, prefixo):
+        """Procura primeiro .webp e .png na pasta do pet, depois em assets/comum/."""
+        for base in (self.proprio, self.comum):
+            for ext in (".webp", ".png"):
+                candidato = base / f"{prefixo}{ext}"
+                if candidato.exists():
+                    return candidato
+        return self.proprio / f"{prefixo}.png"
+
     @property
     def memes(self):
         """Pasta de memes por emoção (feliz/, bravo/...)."""
@@ -140,17 +149,17 @@ class ConteudoPaths:
     @property
     def bolinha_tenis(self):
         """Imagem da bolinha que ele chuta."""
-        return self.resolver("bolinha_tenis.png")
+        return self.resolver_imagem("bolinha_tenis")
 
     @property
     def bolinha_papel(self):
         """Imagem da bolinha de papel (ou panfleto) que ele atira na revolução."""
-        return self.resolver("bolinha_papel.png")
+        return self.resolver_imagem("bolinha_papel")
 
     @property
     def notebook(self):
         """Imagem do notebook."""
-        return self.resolver("notebook.png")
+        return self.resolver_imagem("notebook")
 
 
 @dataclass(frozen=True)

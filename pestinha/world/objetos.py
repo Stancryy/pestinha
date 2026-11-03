@@ -11,6 +11,7 @@ from PySide6.QtCore import QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPixmap
 from PySide6.QtWidgets import QWidget
 
+from ..body.bolinha import carregar_pixmap
 from ..body.pet import overlay_flags, set_no_activate
 from ..ajustes import GRAVIDADE as GRAVITY
 
@@ -73,7 +74,12 @@ class ImageThing(Thing):
         if pix.isNull():
             pix = QPixmap(10, 10)
             pix.fill(Qt.transparent)
-        self.pix = pix.scaled(max_side, max_side, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        pix = carregar_pixmap(path, max_side, max_side)
+        self.valida = pix is not None
+        if pix is None:
+            pix = QPixmap(10, 10)
+            pix.fill(Qt.transparent)
+        self.pix = pix
         pad = 16
         super().__init__(self.pix.width() + pad, self.pix.height() + pad)
 
