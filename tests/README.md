@@ -15,6 +15,7 @@ app inteiro usam um relógio virtual: avançam o tempo sem esperar.
 | Arquivo | O que faz |
 |---|---|
 | `test_30_bugs.py` | Regressão dos 30 bugs encontrados na rodada de fuzzing e revisão (docs/auditorias/BUGS_30_RODADA.md). |
+| `test_ambiente_vivo.py` | Testes da Etapa 9: ciclo adaptativo à rotina, reação opt-in a CPU/RAM e música, e barra de tarefas. |
 | `test_aparencia.py` | Etapa 5 do multipet + Etapa 6 (Mia): cores, estilo (tv / anime_pixel) e acessórios por pet. |
 | `test_app.py` | Testes de integração do app, com Qt em modo offscreen e tudo numa pasta temporária. |
 | `test_arquitetura.py` | Regra de camadas do pacote `pestinha`: cada camada só importa das que estão abaixo dela. |

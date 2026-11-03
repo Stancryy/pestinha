@@ -22,7 +22,9 @@ from ._comum import (
     formatar_atalho,
     iniciar_com_windows_ativo,
     liberar_trava_instancia,
+    midia_tocando,
     parse_atalho,
+    uso_hardware,
 )
 
 if sys.platform == "win32":
@@ -52,10 +54,12 @@ __all__ = [
     "iniciar_com_windows_ativo",
     "janelas_visiveis",
     "liberar_trava_instancia",
+    "midia_tocando",
     "ocioso_segundos",
     "parse_atalho",
     "processo_ativo",
     "retangulo_ativo",
     "sem_foco_nativo",
     "tela_cheia",
+    "uso_hardware",
 ]

@@ -153,3 +153,31 @@ def atalho_pynput(callback, atalho="Ctrl+Alt+Shift+B"):
         log(f"[pânico] não deu para registrar o atalho: {error}")
         return False
     return True
+
+
+def uso_hardware():
+    """Retorna `(cpu_percent, ram_percent)` atuais sem bloquear a thread."""
+    try:
+        cpu = float(psutil.cpu_percent(interval=None))
+        ram = float(psutil.virtual_memory().percent)
+        return max(0.0, min(100.0, cpu)), max(0.0, min(100.0, ram))
+    except Exception:
+        return 0.0, 0.0
+
+
+def midia_tocando(apps_musica=()):
+    """
+    Diz se há aplicativo de música/mídia ativo (apenas booleano tocando/pausado, nunca lê títulos).
+    Verifica se algum processo da categoria MUSIC está aberto em execução ativa.
+    """
+    nomes_alvo = {str(a).lower().removesuffix(".exe") for a in (apps_musica or ())}
+    if not nomes_alvo:
+        nomes_alvo = {"spotify", "musicbee", "aimp", "foobar2000", "vlc", "wmplayer", "itunes"}
+    try:
+        for proc in psutil.process_iter(["name"]):
+            nome = (proc.info.get("name") or "").lower().removesuffix(".exe")
+            if nome in nomes_alvo:
+                return True
+    except Exception:
+        pass
+    return False

@@ -6,6 +6,7 @@ girado. Pixels transparentes deixam o clique passar para o que está embaixo.
 A janela nunca pega o foco (o teclado continua no seu programa).
 """
 
+from dataclasses import replace as _replace_dc
 import math
 import random
 import time
@@ -147,6 +148,9 @@ class PetWindow(QWidget):
         sway = 0.0
         if self.body.grounded and st.emotion != "dormindo":
             sway = st.tone.sway() * math.sin(time.monotonic() * 2.2)
+            if getattr(st, "dancando", False):
+                sway += 6.5 * math.sin(time.monotonic() * 8.0)
+                jitter_y -= 2.5 * abs(math.sin(time.monotonic() * 8.0))
         if st.emotion == "dormindo":
             jitter_y += 1.5 * math.sin(time.monotonic() * 1.6)     # respirando devagar
 
@@ -154,11 +158,19 @@ class PetWindow(QWidget):
         p.translate(CX + jitter_x, CY + jitter_y)
         p.rotate(self.body.angle + sway)
         blink = 0.08 if time.monotonic() < st.blink_until else 1.0
-        draw_face(p, st.shape, st.gaze, blink, st.emotion, carinho=st.feliz_fechado(), aparencia=self.aparencia)
+        ap_atual = self.aparencia
+        if getattr(st, "suando", False) or getattr(st, "apertado", False):
+            ap_atual = _replace_dc(self.aparencia, suando=bool(getattr(st, "suando", False)), apertado=bool(getattr(st, "apertado", False)))
+        draw_face(p, st.shape, st.gaze, blink, st.emotion, carinho=st.feliz_fechado(), aparencia=ap_atual)
         p.restore()
 
         if st.emotion == "dormindo":
             draw_zzz(p, CX + jitter_x, CY + jitter_y, time.monotonic(), self.aparencia.olho)
+        elif getattr(st, "dancando", False):
+            p.setPen(self.aparencia.olho)
+            p.setFont(QFont("Consolas", 11, QFont.Bold))
+            dy_nota = 4.0 * math.sin(time.monotonic() * 6.0)
+            p.drawText(QRectF(CX + 38, CY - 58 + dy_nota, 32, 20), Qt.AlignCenter, "♪ ♫")
 
         if st.show_label:
             p.setPen(self.aparencia.olho)

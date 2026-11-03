@@ -38,6 +38,12 @@
 - Editor visual de programas por atividade (`AtividadesDialog`), permitindo adicionar programas e categorias personalizadas em `memory/activities.json`.
 - Assistente de criação de personagem (`WizardPetDialog` e `config.criar_pet_personalizado`), gerando `pets/<id>.json` e a estrutura de pastas e textos iniciais.
 
+### Ambiente Vivo: Ciclo de Rotina, CPU/RAM, Música e Barra de Tarefas (Etapa 9)
+- Ciclo dia/noite adaptativo à rotina aprendida (`fator_ciclo_rotina` em `pestinha/sense/timeline.py`), ajustando o gasto de energia conforme seus horários reais de atividade em vez de horários fixos.
+- Reação opcional (`reagir_hardware`, desligada por padrão) ao uso de CPU (`suando`, usando o sprite `suando.webp` da Mia) e RAM (`apertado`), com limites configuráveis em `ajustes.py`.
+- Reação opcional (`reagir_musica`, desligada por padrão) à música tocando, fazendo a Mia dançar no ritmo e exibindo notas musicais (`♪ ♫`) sem nunca ler títulos de mídia.
+- Suporte explícito a andar e pousar na borda da barra de tarefas (`pousar_barra_tarefas`).
+
 ## Suporte a macOS e Linux
 
 - Toda a leitura do sistema (programa em primeiro plano, tempo ocioso, janelas, tela cheia, foco e o atalho

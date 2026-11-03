@@ -139,6 +139,20 @@ def list_windows(exclude, escala=1.0):
     return plataforma.janelas_visiveis(exclude, escala)
 
 
+def get_hardware_usage():
+    """Lê `(cpu_percent, ram_percent)` atuais do computador via `plataforma.uso_hardware`."""
+    return plataforma.uso_hardware()
+
+
+def is_media_playing(active_app=""):
+    """Diz se há música/mídia tocando (sem nunca ler títulos), olhando a categoria MUSIC."""
+    apps_musica = ACTIVITY_APPS.get("MUSIC", DEFAULT_ACTIVITY_APPS["MUSIC"])
+    limpo = _limpar_nome_app(active_app)
+    if limpo and limpo in apps_musica:
+        return True
+    return plataforma.midia_tocando(apps_musica)
+
+
 def foreground_rect(escala=1.0):
     """Retângulo da janela ativa (pixels físicos), para ele olhar para ela."""
     return plataforma.retangulo_ativo(escala)

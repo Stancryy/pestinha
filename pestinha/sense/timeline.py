@@ -140,3 +140,55 @@ def count_rows(path):
             return max(0, sum(1 for _ in f) - 1)
     except OSError:
         return 0
+
+
+def fator_ciclo_rotina(path, hora_atual=None):
+    """
+    Calcula o fator de energia (0.72 a 1.15) adaptativo à rotina aprendida em `timeline.csv`.
+    Não usa horários fixos: aprende em quais horas do dia você costuma estar ativo ou ausente.
+    Com menos de 10 minutos gravados, devolve 1.0 (neutro).
+    """
+    try:
+        with open(path, "r", encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f)
+            por_hora = {h: [0, 0] for h in range(24)}
+            total_linhas = 0
+            for row in reader:
+                try:
+                    minuto_dia = int(row.get("minuto_do_dia", -1))
+                    hora = (minuto_dia // 60) % 24 if minuto_dia >= 0 else 0
+                    ativ = (row.get("atividade") or "").strip().upper()
+                    ausente = float(row.get("ausente", 0.0))
+                except (TypeError, ValueError):
+                    continue
+                por_hora[hora][1] += 1
+                if ativ != "AWAY" and ausente < 0.5:
+                    por_hora[hora][0] += 1
+                total_linhas += 1
+    except OSError:
+        return 1.0
+    if total_linhas < 10:
+        return 1.0
+    hora_ref = datetime.now().hour if hora_atual is None else int(hora_atual) % 24
+    ativos_hora, total_hora = por_hora[hora_ref]
+    if total_hora == 0:
+        return 1.0
+    taxa_hora = ativos_hora / total_hora
+    total_ativos = sum(v[0] for v in por_hora.values())
+    media_geral = total_ativos / max(1, total_linhas)
+    if media_geral <= 0.05:
+        return 1.0
+    if taxa_hora < media_geral * 0.65:
+        return 0.72
+    if taxa_hora > media_geral * 1.15:
+        return 1.15
+    return 1.0
+
+
+def _ignorar_count_rows(path):
+    """Quantas linhas (minutos) já estão gravadas na rotina."""
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return max(0, sum(1 for _ in f) - 1)
+    except OSError:
+        return 0

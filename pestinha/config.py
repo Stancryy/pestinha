@@ -52,6 +52,9 @@ DEFAULT_PERMISSIONS = {
     "nao_perturbe_auto": True, # pausa travessuras e bolinha em jogos, tela cheia ou reuniões
     "iniciar_windows": False,  # cria/remove atalho na pasta Inicializar do Windows
     "atalho_panico": PANIC_HOTKEY_TEXT,
+    "pousar_barra_tarefas": True,
+    "reagir_hardware": False,  # opt-in: reage a CPU/RAM altas (suando/apertado)
+    "reagir_musica": False,    # opt-in: dança quando há música/mídia tocando
 }
 
 # (chave, rótulo, descrição) na ordem da tela inicial
@@ -69,6 +72,8 @@ PERMISSION_GROUPS = [
          "do que estava acontecendo quando ganhou carinho (e a desgostar de ser dispensado)."),
         ("arrastar", "Arrastar e arremessar", "Segurar, girar com a rodinha e jogar longe."),
         ("pousar_janelas", "Pousar em janelas", "Solto no ar, ele pode cair em cima da barra de título."),
+        ("pousar_barra_tarefas", "Andar e pousar na barra de tarefas",
+         "Usa a borda da barra de tarefas como plataforma para caminhar e pousar."),
     ]),
     ("Contexto", [
         ("tela_cheia", "Aparecer em tela cheia (experimental)",
@@ -77,6 +82,10 @@ PERMISSION_GROUPS = [
          "Em jogos, tela cheia ou reuniões (Zoom, Teams, Meet), pausa travessuras e esconde a bolinha."),
         ("iniciar_windows", "Iniciar junto com o Windows",
          "Cria um atalho silencioso na pasta Inicializar do usuário (abre direto na bandeja)."),
+        ("reagir_hardware", "Sentir uso de CPU e RAM (opcional)",
+         "CPU alta faz o pet suar; RAM cheia deixa ele apertado. Desligado por padrão."),
+        ("reagir_musica", "Dançar com música tocando (opcional)",
+         "Reage apenas ao estado tocando/pausado de players de música, sem nunca ler títulos. Desligado por padrão."),
     ]),
     ("Rotina", [
         ("rotina", "Aprender minha rotina",

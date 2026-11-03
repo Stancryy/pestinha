@@ -134,6 +134,8 @@ ZZZ_PERIODO = 2.4               # s que cada Z leva para subir e sumir
 INTERVALO_QUADRO_ATIVO_MS = 16  # ms entre quadros em movimento (~60 fps)
 INTERVALO_QUADRO_PARADO_MS = 50 # ms entre quadros parado em repouso (~20 fps)
 INTERVALO_QUADRO_DORMINDO_MS = 200  # ms entre quadros dormindo (~5 fps)
+LIMIAR_CPU_ALTA = 85.0          # % de CPU a partir do qual o pet sua (quando reagir_hardware ligado)
+LIMIAR_RAM_ALTA = 88.0          # % de RAM a partir do qual o pet fica apertado (quando reagir_hardware ligado)
 
 # ---------------------------------------------------------------------------
 # Validação
@@ -216,6 +218,8 @@ _LIMITES = {
     "INTERVALO_QUADRO_ATIVO_MS": (int, 8, 50),
     "INTERVALO_QUADRO_PARADO_MS": (int, 16, 200),
     "INTERVALO_QUADRO_DORMINDO_MS": (int, 50, 1000),
+    "LIMIAR_CPU_ALTA": (float, 10.0, 100.0),
+    "LIMIAR_RAM_ALTA": (float, 10.0, 100.0),
 }
 
 

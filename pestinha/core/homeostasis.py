@@ -57,12 +57,13 @@ class Drives:
 
     # ---------------- tempo ----------------
 
-    def update(self, dt, prof, asleep, moving, arousal, user_away, engaged=False, preso=False, visitado=False):
+    def update(self, dt, prof, asleep, moving, arousal, user_away, engaged=False, preso=False, visitado=False, fator_ciclo=1.0):
         """Um passo do tempo: cansa quando acordado e parado, recupera dormindo, e o tédio e a carência crescem sem atenção."""
         if asleep:
             self.energy = clamp(self.energy + dt / prof["sleep_recover"])
         else:
-            effort = 1.0 + 1.5 * moving + max(0.0, arousal)
+            escala_ciclo = max(0.5, min(1.5, float(fator_ciclo or 1.0)))
+            effort = (1.0 + 1.5 * moving + max(0.0, arousal)) / escala_ciclo
             self.energy = clamp(self.energy - dt * effort / prof["energy_span"])
         if engaged and not asleep:
             # trabalhar já é estímulo: sem eventos novos, a estimulação não cai e não vira tédio

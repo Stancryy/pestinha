@@ -42,6 +42,9 @@ class PetState:
         self.at_desk = False
         self.desk_top = None        # y (na tela) da tampa do notebook quando ele está sentado: o corpo para ali
         self.castigo = False        # no cantinho do castigo: parado, sem passear
+        self.suando = False         # CPU alta (reagir_hardware ligado)
+        self.apertado = False       # RAM cheia (reagir_hardware ligado)
+        self.dancando = False       # música/mídia tocando (reagir_musica ligado)
 
     def mark_caress(self, now=None):
         """Marca que ele está recebendo carinho agora (dura um instante)."""

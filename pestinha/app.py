@@ -72,7 +72,7 @@ from .mind.revolucao import RevolucaoController
 from .mind.sleep import SleepController
 from .paths import Paths
 from .sense import senses
-from .sense.timeline import TimelineRecorder
+from .sense.timeline import TimelineRecorder, fator_ciclo_rotina
 from .ui.float_manager import FloatManager
 from .ui.ui import PanicHotkey, Tray
 from .world.mischief import MischiefEngine
@@ -136,6 +136,8 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.tracker = senses.ActivityTracker()
         self.activity = "IDLE"
         self._active_app_name = ""
+        self.dnd_manual = False
+        self.fator_ciclo = 1.0
         self.dnd_manual = False
         self.idle_seconds = 0.0
         self.fullscreen = False
@@ -342,6 +344,20 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
                 continue
             platforms.append((hwnd, l + 10, r - 10, t))
         self.platforms = platforms
+        if self.perms.get("pousar_barra_tarefas", True):
+            self.platforms.extend(self.plataformas_barra_tarefas())
+
+    def plataformas_barra_tarefas(self):
+        """Plataformas correspondentes à borda da barra de tarefas de cada monitor."""
+        barras = []
+        for idx, (area, geom) in enumerate(zip(self.screen_bounds(), self.screen_geometries())):
+            al, at, ar, ab = area
+            gl, gt, gr, gb = geom
+            if ab < gb:
+                barras.append((f"taskbar_{idx}", al + 10, ar - 10, ab))
+            elif at > gt:
+                barras.append((f"taskbar_top_{idx}", al + 10, ar - 10, at))
+        return barras
 
     # ---------------- relógios ----------------
 
@@ -353,6 +369,18 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.idle_seconds = senses.get_idle_seconds()
         app = senses.get_active_app()
         self._active_app_name = (app or "").lower()
+        self.fator_ciclo = fator_ciclo_rotina(self.paths.timeline) if self.perms.get("rotina", True) else 1.0
+        if self.perms.get("reagir_hardware", False):
+            cpu_pct, ram_pct = senses.get_hardware_usage()
+            self.pet_state.suando = cpu_pct >= ajustes.LIMIAR_CPU_ALTA
+            self.pet_state.apertado = ram_pct >= ajustes.LIMIAR_RAM_ALTA
+        else:
+            self.pet_state.suando = False
+            self.pet_state.apertado = False
+        if self.perms.get("reagir_musica", False) and not self.asleep and not self.em_nao_perturbe:
+            self.pet_state.dancando = bool(senses.is_media_playing(self._active_app_name))
+        else:
+            self.pet_state.dancando = False
         self.activity = senses.detect_activity(app, self.idle_seconds, self.prof["away_after"])
         events = self.tracker.observe(app, self.activity)
         self.senses.on_events(events)
@@ -410,7 +438,8 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         moving = min(1.0, abs(body.vx) / 200.0 + (0.0 if body.grounded else 1.0))
         self.drives.update(dt, self.prof, self.asleep, moving, self.emotion.arousal,
                            self.activity == "AWAY", engaged=self.activity in ("PROGRAMMING", "DESIGNING"),
-                           preso=self.castigo.dentro, visitado=self.castigo.visita > 0.5)
+                           preso=self.castigo.dentro, visitado=self.castigo.visita > 0.5,
+                           fator_ciclo=getattr(self, "fator_ciclo", 1.0))
         self.castigo.tick_lento(dt)
         if caressing:
             self.drives.stimulate("caress", dt)
@@ -418,6 +447,8 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
             self.memory.on_interaction()
 
         intensities = self.senses.update(self.activity, idle, self.drives.channels(), caressing, mouse_moving)
+        if getattr(self.pet_state, "dancando", False):
+            intensities["SOUND"] = max(intensities.get("SOUND", 0.0), 0.75)
         # condicionamento: o cursor vindo rápido para ele, ou o botão apertado em cima, antecipam
         dist = math.hypot(cursor[0] - body.x, cursor[1] - body.y)
         approaching = (self.prev_pet_dist is not None and dist < 220
