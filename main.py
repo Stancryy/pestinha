@@ -39,6 +39,7 @@ def apagar_memoria(paths):
 def main():
     parser = argparse.ArgumentParser(description="Pestinha")
     parser.add_argument("--direto", action="store_true", help="pula a tela inicial")
+    parser.add_argument("--configurar", action="store_true", help="abre a tela de configurações ao iniciar")
     parser.add_argument("--sair-em", type=float, default=0.0, help="fecha sozinho após N segundos (teste)")
     args = parser.parse_args()
 
@@ -58,7 +59,7 @@ def main():
     log_module.instalar_crash_handler()
     store = SettingsStore(paths)
     perms = store.perms
-    if not args.direto:
+    if not args.direto and (not paths.permissions.exists() or args.configurar or not perms["ativo"]):
         first_time = not paths.permissions.exists()
         if first_time and Onboarding(config.load_pet(paths, config.escolher_pet(paths, perms["pet"]))["nome"]).exec() != QDialog.Accepted:
             pass                                    # "Pular" também segue para as permissões

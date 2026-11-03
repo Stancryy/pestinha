@@ -239,6 +239,7 @@ class SessaoMixin:
         if self.wiping:
             return
         try:
+            self.store.save()
             self.brain.save(str(self.state_file))
         except Exception as error:
             log(f"[app] não salvou o cérebro: {error}")
