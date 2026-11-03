@@ -98,6 +98,13 @@ class SessaoMixin:
         self.ball.setVisible(bola_visivel)
         if not visible or not self.perms["fogos"]:
             self.festa.fogos.recolher()
+        if hasattr(self, "segundo_pet"):
+            self.segundo_pet.sincronizar(
+                bool(self.perms.get("segundo_pet_ativo", False)),
+                visible,
+                self.bounds(),
+                self.perms.get("segundo_pet_id", ""),
+            )
         try:
             self.tray.set_state(self.paused, self.hidden, self.perms["modo_teste"], self.em_nao_perturbe)
         except TypeError:
@@ -269,6 +276,8 @@ class SessaoMixin:
         self.mesa.fechar()
         self.festa.fechar()
         self.revolucao.fechar()
+        if hasattr(self, "segundo_pet"):
+            self.segundo_pet.fechar()
         if self.wiping:
             self.tray.icon.hide()
             QApplication.quit()

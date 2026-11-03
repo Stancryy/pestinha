@@ -88,3 +88,4 @@ def test_reacao_hardware_musica_opt_in_e_barra_de_tarefas(tmp_path, monkeypatch)
         buddy.mischief.clear()
         buddy.tray.icon.hide()
         log_module.desligar_arquivo()
+

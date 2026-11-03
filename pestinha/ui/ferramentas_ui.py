@@ -346,3 +346,4 @@ class WizardPetDialog(QDialog):
             return
         self.pet_criado.emit(pet_id)
         self.accept()
+

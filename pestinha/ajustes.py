@@ -256,7 +256,7 @@ def validar():
         raise ValueError("ajustes inválidos:\n  " + "\n  ".join(erros))
 
 
-VALORES_PADRAO = {nome: globals()[nome] for nome in _LIMITES}
+_VALORES_PADRAO = {nome: globals()[nome] for nome in _LIMITES}
 
 
 def valores_atuais():
@@ -300,7 +300,7 @@ def salvar_ajustes(caminho, novos):
 def restaurar_padroes(caminho=None):
     """Restaura todos os números de `_LIMITES` para os valores originais de fábrica."""
     atuais = globals()
-    for nome, valor in VALORES_PADRAO.items():
+    for nome, valor in _VALORES_PADRAO.items():
         atuais[nome] = valor
     if caminho is not None:
         try:

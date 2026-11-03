@@ -109,3 +109,4 @@ def test_modo_nao_perturbe_automatico_em_jogo_e_reuniao(tmp_path, monkeypatch):
         buddy.mischief.clear()
         buddy.tray.icon.hide()
         log_module.desligar_arquivo()
+

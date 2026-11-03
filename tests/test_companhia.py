@@ -115,3 +115,4 @@ def test_lembretes_agua_postura_e_comemorar_commits_git_opt_in(tmp_path, monkeyp
         buddy.mischief.clear()
         buddy.tray.icon.hide()
         log_module.desligar_arquivo()
+

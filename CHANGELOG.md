@@ -55,6 +55,10 @@
 - Sistema de conquistas (`Conquistas` em `pestinha/core/conquistas.py`, salvo em `memory/pets/<id>/achievements.json`).
 - Painel local **"Diário do Pet"** (`DiarioPanel` em `pestinha/ui/diario_panel.py`), acessível pela bandeja e pelo menu da Mia, exibindo distribuição de humor e progresso das conquistas.
 
+### 2º Pet Simultâneo e Frases por LLM Local (Etapa 12)
+- Suporte opcional a um 2º pet simultâneo na tela (`SegundoPetController` em `pestinha/mind/segundo_pet.py` e permissão `segundo_pet_ativo`), que passeia, persegue a bolinha e interage com a Mia (brincam juntos quando calmos ou brigam/trombam em protesto) quando outro personagem é criado pelo assistente.
+- Geração opcional e 100% offline de frases de post-it por LLM local (`GeradorLLMLocal` em `pestinha/mind/llm_local.py`, suportando Ollama em `127.0.0.1:11434` e LM Studio / OpenAI local em `127.0.0.1:1234`), validando estritamente endereços de loopback (`127.0.0.1`, `localhost`, `::1`) e caindo imediatamente para os arquivos `.txt` quando desligado ou indisponível.
+
 ## Suporte a macOS e Linux
 
 - Toda a leitura do sistema (programa em primeiro plano, tempo ocioso, janelas, tela cheia, foco e o atalho

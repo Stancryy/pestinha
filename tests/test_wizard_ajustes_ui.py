@@ -105,3 +105,4 @@ def test_wizard_cria_personagem_completo_e_higieniza_id_invalido(tmp_path):
     assert conteudo.notes_sad.exists()
     assert conteudo.signs.exists()
     assert (conteudo.memes / "feliz").is_dir()
+

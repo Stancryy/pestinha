@@ -41,6 +41,7 @@ app inteiro usam um relógio virtual: avançam o tempo sem esperar.
 | `test_homeostase.py` | Homeostase: trabalhar é estímulo, então o tédio não sobe enquanto ele programa. |
 | `test_instancia_dnd.py` | Testes da Etapa 7: trava de instância única, atalhos configuráveis, iniciar com o Windows e modo Não Perturbe. |
 | `test_jorge.py` | Etapa 4 do multipet + Etapa 6 (Mia): personagem Mia feita de configuração e conteúdo próprio, e suporte completo a múltiplos personagens quando criados na pasta pets/. |
+| `test_llm_segundo_pet.py` | Testes do gerador de frases via LLM local (Item 27) e do 2º pet simultâneo (Item 24). |
 | `test_log_crash.py` | Testes de rotação de log por tamanho e relatório local de travamento (crash report). |
 | `test_mesa.py` | Notebook: sentar e levantar pelo disparo do neurônio SENTAR. |
 | `test_migracao.py` | Etapa 1 do multipet: memória por pet (memory/pets/<pet>/) e a migração da versão antiga. |

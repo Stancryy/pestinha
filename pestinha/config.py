@@ -61,6 +61,11 @@ DEFAULT_PERMISSIONS = {
     "skins_sazonais": True,    # gorro de Natal, chifrinhos no Halloween e chapéu no aniversário
     "efeitos_sonoros": False,  # opt-in: efeitos sonoros retrô sintetizados localmente
     "volume_som": 40,          # volume dos efeitos sonoros (0..100)
+    "llm_local": False,        # opt-in: frases geradas por LLM local (Ollama/LM Studio em 127.0.0.1)
+    "llm_endpoint": "http://127.0.0.1:11434",
+    "llm_modelo": "llama3.2",
+    "segundo_pet_ativo": False, # opt-in: segundo pet na tela interagindo quando houver outro personagem
+    "segundo_pet_id": "",
 }
 
 # (chave, rótulo, descrição) na ordem da tela inicial
@@ -109,6 +114,10 @@ PERMISSION_GROUPS = [
          "Coloca gorro de Natal em dezembro, chifrinhos no Halloween e chapéu de festa no aniversário do pet."),
         ("efeitos_sonoros", "Efeitos sonoros opcionais",
          "Sons curtos retrô em pulos, carinhos, fogos e conquistas. Desligado por padrão."),
+        ("segundo_pet_ativo", "Segundo pet simultâneo (opcional)",
+         "Se você tiver criado outro personagem pelo assistente, coloca os dois juntos para brincar e interagir."),
+        ("llm_local", "Frases por LLM local — Ollama / LM Studio (opcional)",
+         "Pede recadinhos inéditos a um modelo rodando em 127.0.0.1 (com fallback imediato para os .txt). Desligado por padrão."),
     ]),
     ("Teste", [
         ("modo_teste", "Modo teste", "Tempos curtos: travessuras e emoções acontecem em segundos."),

@@ -120,3 +120,4 @@ class DiarioPanel(QDialog):
         fechar.clicked.connect(self.accept)
         botoes.addWidget(fechar)
         outer.addLayout(botoes)
+

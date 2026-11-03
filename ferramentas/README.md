@@ -18,7 +18,7 @@ python ferramentas/gerar_doc_rede.py
 | `benchmark.py` | Benchmark de desempenho do Pestinha: abertura, rede neural, ciclos think/frame, RAM e tamanho de assets. |
 | `fuzz_pestinha.py` | Roda o app inteiro com relógio virtual e ações aleatórias, checando invariantes. |
 | `gerar_doc_rede.py` | Gera docs/REDE_NEURAL.md a partir do código (canais, interneurônios, motores, conexões e limiares). |
-| `gerar_mia_zuric.py` | Gera os arquivos de configuração, lore/falas (recadinhos, bilhetes tristes, cartazes), sprites de expressão em alta definição (pets/<pet>/sprites/*.webp) e cenas de memes em pixel art detalhado (com objetos: PC pegando fogo, café, controle gamer, teclado RGB, terminal, chuva, corações) das personagens Mia e Zuric. |
+| `gerar_mia_zuric.py` | Gera os arquivos de configuração, falas (recadinhos, bilhetes tristes, cartazes), os 15 sprites de expressão em pixel art (recortados com limpeza pixel-perfect da folha de referência `pets/mia/sprites/_sheet_ref.jpg`) e 27 cenas de memes com objetos em pixel art da personagem Mia. |
 | `gerar_panfleto.py` | Desenha pets/jorge/bolinha_papel.png: um panfleto de mentoria amassado, que o Jorge atira na revolução. |
 | `gerar_readmes.py` | Gera pestinha/README.md e o README de cada camada a partir das docstrings dos módulos. |
 | `medir_cartazes.py` | Mede se cada frase do cartazes.txt de cada pet cabe na placa em que aparece, com as fontes de verdade. |

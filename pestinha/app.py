@@ -66,6 +66,8 @@ from .core.protesto import Protesto
 from .log import log
 from .mind.castigo_ctl import CastigoController
 from .mind.companhia import CompanhiaController
+from .mind.llm_local import GeradorLLMLocal
+from .mind.segundo_pet import SegundoPetController
 from .mind.festa import FestaController
 from .mind.mesa import MesaController, pull
 from .mind.mischief_ctl import MischiefController
@@ -165,6 +167,17 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.pet.menu_requested.connect(self.show_pet_menu)
         self.ball_stored = False    # você guardou a bolinha pelo menu
         self.mischief = MischiefEngine(self.conteudo)
+        self.llm = GeradorLLMLocal()
+        self.mischief.gerador_nota = lambda emocao, notes: self.llm.escolher_frase(
+            notes,
+            ativo=bool(self.perms.get("llm_local", False)),
+            endpoint=self.perms.get("llm_endpoint", ""),
+            modelo=self.perms.get("llm_modelo", ""),
+            nome_pet=self.nome,
+            emocao=emocao,
+            atividade=self.activity,
+        )
+        self.segundo_pet = SegundoPetController(self.paths, pet_id)
         self.mischief.dismissed.connect(self.on_dismissed)
         self.behavior = Behavior(self.pet.body, self.pet_state, self.mischief)
 
@@ -340,6 +353,8 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         exclude |= {int(w.winId()) for w in self.sad_ctl.sign_windows()}
         if self.ball.isVisible():
             exclude.add(int(self.ball.winId()))
+        if self.segundo_pet.janela and self.segundo_pet.janela.isVisible():
+            exclude.add(int(self.segundo_pet.janela.winId()))
         above = []
         platforms = []
         for hwnd, (l, t, r, b), maximized in senses.list_windows(exclude, dpr):
@@ -611,6 +626,10 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.behavior.toy = (self.ball.body.x, self.ball.body.y) if self.ball.isVisible() else None
         self.mischief.tick(dt, bounds[3])
         self.pet.animate(now)
+        self.segundo_pet.tick(
+            dt, now, bounds, areas, monitores, self.platforms,
+            self.pet, self.pet_state, self.drives, self.ball,
+        )
         self.maybe_mischief(now, dt, bounds, cursor, motores)
         self._ajustar_fps()
 

@@ -103,3 +103,4 @@ class Conquistas:
             if self.contadores.get(k_cont, 0) >= meta and cid not in self.desbloqueadas:
                 self.desbloqueadas[cid] = time.time()
         return True
+
