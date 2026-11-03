@@ -19,6 +19,7 @@ app inteiro usam um relógio virtual: avançam o tempo sem esperar.
 | `test_app.py` | Testes de integração do app, com Qt em modo offscreen e tudo numa pasta temporária. |
 | `test_arquitetura.py` | Regra de camadas do pacote `pestinha`: cada camada só importa das que estão abaixo dela. |
 | `test_atividade.py` | Programas de trabalho: VS Code, Claude e Codex contam como programação. |
+| `test_atividades_config.py` | Testes para ACTIVITY_APPS configurável em JSON, programas do usuário e reação mista no notebook. |
 | `test_auditoria_30.py` | Contratos dos 30 bugs da auditoria (docs/auditorias/AUDITORIA_30_BUGS.md). |
 | `test_bolinha.py` | Testes da bolinha e da tristeza (abandono). |
 | `test_brincadeira.py` | Bolinha: colisão com post-its e estilos de brincadeira por pet. |

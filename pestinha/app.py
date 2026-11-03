@@ -129,6 +129,7 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.protest.load(self.prof)
 
         # ----- sentidos -----
+        senses.carregar_atividades(self.paths.activities)
         self.senses = senses.ComputerSenses()
         self.tracker = senses.ActivityTracker()
         self.activity = "IDLE"

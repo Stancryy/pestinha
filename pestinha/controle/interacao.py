@@ -100,7 +100,11 @@ class InteracaoMixin:
         """Arrancaram o notebook dele: ele levanta e fica bravo ou triste, conforme o pet."""
         self.mesa.levantar_arrancado(now)
         self.senses.dismissed()                    # a dispensa entra na rede como frustração
-        alvo = self.sad_ctl if self.reacao_notebook == "triste" else self.protest_ctl
+        reacao = self.reacao_notebook
+        if reacao == "misto":
+            self._alterna_reacao_nb = not getattr(self, "_alterna_reacao_nb", False)
+            reacao = "bravo" if self._alterna_reacao_nb else "triste"
+        alvo = self.sad_ctl if reacao == "triste" else self.protest_ctl
         alvo.provoke(INSATISFACAO_NOTEBOOK)
         if self.debugging():
             log(f"[notebook] arrancado: reação {self.reacao_notebook}")

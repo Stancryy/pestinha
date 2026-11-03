@@ -219,6 +219,11 @@ class Paths:
         return self.memory / "panels.json"
 
     @property
+    def activities(self):
+        """Mapa configurável de programas por categoria de atividade (memory/activities.json)."""
+        return self.memory / "activities.json"
+
+    @property
     def log(self):
         """Log do programa (sem conteúdo de janelas)."""
         return self.memory / "logs" / "pestinha.log"

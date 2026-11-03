@@ -53,7 +53,9 @@ class MischiefController:
         """
         if self.pedido_forcado and now > self.forcado_ate:
             self.pedido_forcado = False                # o pedido do menu venceu sem dar certo
-        if not self.pedido_forcado and random.random() >= motores.get("TRAVESSURA", 0.0) * GANHO_TRAVESSURA * dt:
+        taxa = motores.get("TRAVESSURA", 0.0)
+        fator_trabalho = 0.35 if (working and taxa < 100.0) else (1.35 if taxa < 100.0 else 1.0)
+        if not self.pedido_forcado and random.random() >= taxa * GANHO_TRAVESSURA * fator_trabalho * dt:
             return None
         if body.held or not body.grounded or self.behavior.mission:
             return None

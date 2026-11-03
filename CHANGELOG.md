@@ -24,6 +24,10 @@
 - Pouso em barras de título habilitado em todos os monitores (não apenas na tela primária).
 - Jogo ou vídeo em tela cheia num monitor não esconde o pet quando ele está em outro monitor livre.
 
+### Lista de programas configurável e ajustes de comportamento (Etapa 5)
+- `ACTIVITY_APPS` expandido com Antigravity IDE (`antigravity`, `agy`), Cursor, Trae, Verdent, Devin, LM Studio, terminais, Comfy Desktop, CapCut, SketchUp, Roblox Player/Studio, Construct 3 e jogos instalados, e persistido/configurável em `memory/activities.json`.
+- Ajustes de comportamento para a rotina do usuário: reserva de energia ampliada para sessões longas (+12h), menos travessuras enquanto programa e mais travessuras no tempo livre, pavio mais curto para protesto e suporte a `"reacao_notebook": "misto"` (alternando entre bravo e triste).
+
 ## Suporte a macOS e Linux
 
 - Toda a leitura do sistema (programa em primeiro plano, tempo ocioso, janelas, tela cheia, foco e o atalho

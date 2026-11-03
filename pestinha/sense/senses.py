@@ -10,18 +10,38 @@ import time
 
 from .. import plataforma
 from ..mathutil import clamp
+from ..store import read_json, write_json
 
 # Nomes sem ".exe" e em minúsculo: vale para Windows, macOS e Linux (ver detect_activity)
-ACTIVITY_APPS = {
-    "PROGRAMMING": {"code", "visual studio code", "devenv", "pycharm64", "pycharm", "xcode",
-                    "claude", "codex"},
-    "DESIGNING": {"fusion360", "fusion"},
-    "GAMING": {"valorant", "cs2", "csgo"},
-    "BROWSING": {"chrome", "google chrome", "chromium", "firefox", "msedge", "microsoft edge", "opera",
-                 "brave", "brave browser", "safari"},
-    "SOCIAL": {"discord", "teams", "microsoft teams", "whatsapp"},
-    "MUSIC": {"spotify"},
+DEFAULT_ACTIVITY_APPS = {
+    "PROGRAMMING": {
+        "code", "visual studio code", "devenv", "pycharm64", "pycharm", "xcode",
+        "claude", "codex", "antigravity", "antigravity ide", "agy", "cursor",
+        "trae", "verdent", "devin", "lm studio", "docker", "docker desktop",
+        "powershell", "pwsh", "cmd", "windowsterminal", "mintty", "git-bash",
+        "wsl", "idle", "python", "pythonw", "nsight-sys", "ncu-ui", "idea64",
+        "intellij", "notepad++", "obsidian",
+    },
+    "DESIGNING": {
+        "fusion360", "fusion", "comfy desktop", "comfyui", "capcut", "sketchup",
+        "blender", "photoshop", "figma",
+    },
+    "GAMING": {
+        "valorant", "cs2", "csgo", "robloxplayerbeta", "robloxstudiobeta",
+        "robloxstudio", "construct3", "javaw", "minecraft",
+        "palworld-win64-shipping", "palworld", "liesofp-win64-shipping",
+        "liesofp", "spider-man", "tlou-i", "tlou-ii", "nte", "gris",
+        "in stars and time", "worldbox", "the farmer was replaced",
+    },
+    "BROWSING": {
+        "chrome", "google chrome", "chromium", "firefox", "msedge",
+        "microsoft edge", "opera", "brave", "brave browser", "safari",
+    },
+    "SOCIAL": {"discord", "teams", "microsoft teams", "whatsapp", "telegram"},
+    "MUSIC": {"spotify", "wmplayer"},
 }
+
+ACTIVITY_APPS = {k: set(v) for k, v in DEFAULT_ACTIVITY_APPS.items()}
 
 # Qual canal sensorial cada atividade estimula
 ACTIVITY_CHANNEL = {
@@ -34,7 +54,45 @@ ACTIVITY_CHANNEL = {
 }
 
 
+def _limpar_nome_app(nome):
+    """Normaliza um nome de programa: minúsculo e sem sufixo '.exe'."""
+    if not isinstance(nome, str):
+        return ""
+    limpo = nome.strip().lower()
+    if limpo.endswith(".exe"):
+        limpo = limpo[:-4].strip()
+    return limpo
 
+
+def carregar_atividades(path):
+    """Carrega o mapa de programas por atividade de memory/activities.json (com fallback seguro)."""
+    novo = {k: set(v) for k, v in DEFAULT_ACTIVITY_APPS.items()}
+    dados = read_json(path, default=None) if path is not None else None
+    if isinstance(dados, dict):
+        for cat, lista in dados.items():
+            if cat in ACTIVITY_CHANNEL and isinstance(lista, list):
+                validos = {_limpar_nome_app(x) for x in lista if _limpar_nome_app(x)}
+                if validos:
+                    novo[cat] = validos
+    ACTIVITY_APPS.clear()
+    ACTIVITY_APPS.update(novo)
+    return {k: sorted(v) for k, v in ACTIVITY_APPS.items()}
+
+
+def salvar_atividades(path, mapa):
+    """Valida e salva o mapa de programas por atividade em memory/activities.json."""
+    limpo = {}
+    for cat in ACTIVITY_CHANNEL:
+        origem = mapa.get(cat, DEFAULT_ACTIVITY_APPS[cat]) if isinstance(mapa, dict) else DEFAULT_ACTIVITY_APPS[cat]
+        if isinstance(origem, (list, set, tuple)):
+            validos = sorted({_limpar_nome_app(x) for x in origem if _limpar_nome_app(x)})
+        else:
+            validos = sorted(DEFAULT_ACTIVITY_APPS[cat])
+        limpo[cat] = validos or sorted(DEFAULT_ACTIVITY_APPS[cat])
+    write_json(path, limpo, indent=2)
+    ACTIVITY_APPS.clear()
+    ACTIVITY_APPS.update({k: set(v) for k, v in limpo.items()})
+    return limpo
 
 
 # ============================================================

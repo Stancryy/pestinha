@@ -145,7 +145,7 @@ PROFILES = {
         "stage_hyst": 0.06,          # cartaz só some quando cai este tanto abaixo do limiar
     },
     "normal": {
-        "mischief_interval": (300.0, 900.0),
+        "mischief_interval": (180.0, 480.0),
         "max_objects": 3,
         "emotion_tau": 5.0,
         "emotion_dwell": 1.5,
@@ -156,7 +156,7 @@ PROFILES = {
         "righting_after": 8.0,
         "learn_rate": 0.001,
         "cond_rate": 0.03,
-        "energy_span": 3 * 3600.0,
+        "energy_span": 6 * 3600.0,
         "sleep_recover": 20 * 60.0,
         "stim_decay": 240.0,
         "contact_span": 40 * 60.0,
@@ -164,10 +164,10 @@ PROFILES = {
         "episode_window": 30.0,
         "dismiss_patience": 60.0,
         "explore": 0.1,
-        "grievance_up": 1800.0,      # ~1 h de provocação até a revolução
+        "grievance_up": 900.0,       # pavio mais curto (~30 min de provocação até a revolução)
         "grievance_down": 3600.0,
         "stage_up": [0.25, 0.5, 0.75, 1.0],
-        "stage_dwell": 120.0,        # s mínimos em cada estágio antes de subir (normal)
+        "stage_dwell": 75.0,         # s mínimos em cada estágio antes de subir (normal)
         "sad_up": 2400.0,            # tristeza: ~40 min sozinho ou triste leva ao abandono
         "sad_down": 5400.0,
         "sad_stage_up": [0.25, 0.5, 0.75, 1.0],
@@ -252,7 +252,7 @@ def _pet_valido(saved):
     temp = saved.get("temperamento")
     if isinstance(temp, dict) and all(isinstance(k, str) and _numero_ok(v) for k, v in temp.items()):
         out["temperamento"] = dict(temp)
-    if saved.get("reacao_notebook") in ("bravo", "triste"):
+    if saved.get("reacao_notebook") in ("bravo", "triste", "misto"):
         out["reacao_notebook"] = saved["reacao_notebook"]
     if isinstance(saved.get("aparencia"), dict):
         out["aparencia"] = dict(saved["aparencia"])    # cores e acessórios: validados em body/desenho_rosto.py
