@@ -202,7 +202,7 @@ CONNECTIONS = [
     ("BOREDOM", "PLAYFUL", 0.09, 0.6),
 
     # novos sensores -> interneurônios
-    ("TYPING_SPEED", "PLAYFUL", 0.10, 0.6),
+    ("TYPING_SPEED", "PLAYFUL", 0.033, 0.6),
     ("TYPING_SPEED", "ALERT", 0.05, 0.6),
     ("CPU_LOAD", "ALERT", 0.07, 0.6),
     ("CPU_LOAD", "FRUSTRATION", 0.05, 0.6),
