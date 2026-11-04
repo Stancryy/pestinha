@@ -187,6 +187,10 @@ class InteracaoMixin:
     def menu_alternar_notebook(self):
         """Menu: mostra ou esconde o notebook; sem o notebook, ele não pode sentar nele."""
         self.mesa.alternar_notebook()
+        if hasattr(self, "perms"):
+            self.perms["notebook_escondido"] = self.mesa.escondido
+            if hasattr(self, "store") and hasattr(self.store, "save"):
+                self.store.save()
         self.pet_state.at_desk = self.mesa.sentado
         if not self.mesa.sentado:
             self.pet_state.desk_top = None

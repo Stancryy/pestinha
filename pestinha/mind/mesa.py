@@ -72,6 +72,7 @@ class MesaController:
 
     def __init__(self, debug, app):
         """Controla o notebook: sentar, levantar, pedidos de trabalho e a janela do notebook."""
+        self.app = app
         self.decisao = DeskController()
         self.caderno = Notebook(app)            # sempre na tela junto com o pet, arrastável
         self.debug = debug
@@ -83,7 +84,7 @@ class MesaController:
         self.pedidos = []                       # quando você pediu (para a frustração crescer com a insistência)
         self.recusou = False                    # ele recusou o último pedido
         self.visivel = False                    # o pet está na tela
-        self.escondido = False                  # você escondeu o notebook pelo menu
+        self.escondido = bool(getattr(app, "perms", {}).get("notebook_escondido", False))
 
     @property
     def sentado(self):
@@ -132,7 +133,7 @@ class MesaController:
                 self.em_pedido = False
                 self.recusou = self.pode_no_pedido   # pediram, ele podia e não quis
         self.caderno.set_working(self.sentado)
-        if mudanca and mudanca[1]:
+        if mudanca and mudanca[1] and not self.escondido:
             self.ancora = (self.caderno.x(), self.caderno.y())
             self.caderno.raise_()                # o notebook fica na frente: ele aparece atrás dele
         if mudanca and mudanca[1] is False:
@@ -146,7 +147,7 @@ class MesaController:
 
     def pin(self, body, now):
         """Fixa o pet atrás do notebook. Devolve "arrancado" se o notebook foi levado longe demais."""
-        if not self.sentado or self.ancora is None:
+        if not self.sentado or self.ancora is None or self.escondido:
             return None
         dx = self.caderno.x() - self.ancora[0]
         dy = self.caderno.y() - self.ancora[1]
@@ -178,7 +179,11 @@ class MesaController:
     def alternar_notebook(self):
         """Esconde ou mostra o notebook pelo menu. Escondido, ele não senta."""
         self.escondido = not self.escondido
-        if self.escondido and self.sentado:          # sem notebook não dá para trabalhar: levanta na hora
+        if hasattr(self, "app") and hasattr(self.app, "perms"):
+            self.app.perms["notebook_escondido"] = self.escondido
+            if hasattr(self.app, "store") and hasattr(self.app.store, "save"):
+                self.app.store.save()
+        if self.escondido:          # sem notebook não dá para trabalhar: levanta na hora
             self.decisao.at_desk = False
             self.ancora = None
             self.caderno.set_working(False)

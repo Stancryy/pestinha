@@ -72,8 +72,10 @@
   - `BATTERY_LOW` (bateria baixa sem tomada em notebooks, urgência): afeta ALERT e GLOOM, gerando tremor leve e alertas de tomada.
   - `WINDOW_COUNT` (multitarefa com muitas janelas abertas, d=0.0002, tau_rec=1200 s): estimula CURIOUS e ALERT.
 - Validações completas em `pestinha/ajustes.py` (`LIMIAR_DIGITACAO_RAPIDA`, `LIMIAR_MOUSE_RAPIDO`, `LIMIAR_BATERIA_BAIXA`, `LIMIAR_JANELAS_MUITAS`).
+- Calibração de alegria moderada (`CHEER` em ~1.5 - 2.0 Hz durante digitação) e desacoplamento de digitação com o notebook.
+- Persistência permanente do estado do notebook escondido (`notebook_escondido` em `memory/permissions.json`), garantindo que o notebook nunca reapareça do nada nem atraia o pet quando escondido pelo usuário.
 - Conformidade estrita de privacidade em `PRIVACIDADE.md` (zero registro de teclas ou títulos de janelas).
-- Suíte completa de testes (`tests/test_novos_sensores.py`) e regeneração automática de `docs/REDE_NEURAL.md`.
+- Suíte completa de testes (`tests/test_novos_sensores.py` e `tests/test_notebook_persistencia.py`) e regeneração automática de `docs/REDE_NEURAL.md`.
 
 ## Suporte a macOS e Linux
 

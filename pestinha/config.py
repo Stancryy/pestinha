@@ -66,6 +66,7 @@ DEFAULT_PERMISSIONS = {
     "llm_modelo": "llama3.2",
     "segundo_pet_ativo": False, # opt-in: segundo pet na tela interagindo quando houver outro personagem
     "segundo_pet_id": "",
+    "notebook_escondido": False, # esconde o computadorzinho do pet (não senta nele)
 }
 
 # (chave, rótulo, descrição) na ordem da tela inicial
