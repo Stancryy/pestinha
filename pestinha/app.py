@@ -500,7 +500,7 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
             battery_low=fator_bateria,
             window_count=fator_janelas,
         )
-        st.torcendo = fator_digitacao >= 0.7
+        st.torcendo = (fator_digitacao >= 0.7) and not getattr(self.pet_state, "at_desk", False)
         st.bateria_baixa = fator_bateria >= 0.5
         st.corujao = fator_circadiano >= 0.7
         if self.perms.get("reagir_hardware", False):
@@ -698,7 +698,7 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         pode_sentar = (not self.asleep and self.pet.body.grounded and not self.pet.body.held
                        and not self.behavior.mission and not self.in_flight
                        and not self.castigo.dentro and self.castigo.fuga is None
-                       and not getattr(self.pet_state, "torcendo", False))   # preso, fugindo ou torcendo não senta
+                       and self.activity != "GAMING")   # preso, fugindo ou em jogo não senta
         self.mesa.tick(now, rates, motores["SENTAR"], pode_sentar, self.behavior.play)
         self.pet_state.at_desk = self.mesa.sentado
         self.pet_state.desk_top = self.mesa.caderno.y() if self.mesa.sentado else None

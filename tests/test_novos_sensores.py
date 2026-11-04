@@ -262,3 +262,34 @@ def test_digitacao_rapida_nao_dispara_sentar():
     sentar_rate = brain.motor_activity()["SENTAR"]
     assert sentar_rate < ajustes.LIMIAR_SENTAR_HZ, f"SENTAR disparou a {sentar_rate:.1f} Hz (> {ajustes.LIMIAR_SENTAR_HZ} Hz)"
 
+
+
+def test_anti_chatter_estabilidade_notebook():
+    """Garante que a transição de sentar e levantar possui proteção contra oscilação rápida."""
+    from pestinha.mind.mesa import DeskController
+    desk = DeskController(tempo_minimo_sentado=0.5, cooldown_sentar=1.0)
+
+    # 1) Senta no notebook com estímulo forte
+    m1 = desk.tick(1.0, ajustes.LIMIAR_SENTAR_HZ + 2.0, True)
+    assert m1 == (False, True)
+    assert desk.at_desk is True
+
+    # 2) Disparo oscila rapidamente antes do tempo mínimo: não levanta imediatamente (evita sair e entrar toda hora)
+    m2 = desk.tick(1.2, ajustes.LIMIAR_LEVANTAR_HZ - 1.0, True)
+    assert m2 is None
+    assert desk.at_desk is True
+
+    # 3) Após o tempo mínimo sentado, levanta com segurança
+    m3 = desk.tick(1.6, ajustes.LIMIAR_LEVANTAR_HZ - 1.0, True)
+    assert m3 == (True, False)
+    assert desk.at_desk is False
+
+    # 4) Cooldown para sentar de novo impede re-entrada instantânea em menos de 1 s
+    m4 = desk.tick(1.8, ajustes.LIMIAR_SENTAR_HZ + 2.0, True)
+    assert m4 is None
+    assert desk.at_desk is False
+
+    # 5) Passado o cooldown, senta normalmente
+    m5 = desk.tick(2.7, ajustes.LIMIAR_SENTAR_HZ + 2.0, True)
+    assert m5 == (False, True)
+    assert desk.at_desk is True

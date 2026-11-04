@@ -46,20 +46,24 @@ def pull(pool_rates):
 class DeskController:
     """Sentar quando o disparo de SENTAR passa do limiar; levantar quando cai abaixo do outro."""
 
-    def __init__(self):
+    def __init__(self, tempo_minimo_sentado=0.5, cooldown_sentar=1.0):
         """Guarda se o pet está sentado no notebook e quando se levantou."""
         self.at_desk = False
-        self.left_at = 0.0
+        self.sat_at = -1e9
+        self.left_at = -1e9
+        self.tempo_minimo_sentado = tempo_minimo_sentado
+        self.cooldown_sentar = cooldown_sentar
 
     def tick(self, now, sentar_hz, pode):
         """Devolve (antes, depois) quando o estado muda, senão None."""
         before = self.at_desk
         if self.at_desk:
-            if not pode or sentar_hz < LIMIAR_LEVANTAR_HZ:
+            if not pode or (sentar_hz < LIMIAR_LEVANTAR_HZ and (now - self.sat_at) >= self.tempo_minimo_sentado):
                 self.at_desk = False
                 self.left_at = now
-        elif pode and sentar_hz >= LIMIAR_SENTAR_HZ:
+        elif pode and sentar_hz >= LIMIAR_SENTAR_HZ and (now - self.left_at) >= self.cooldown_sentar:
             self.at_desk = True
+            self.sat_at = now
         return (before, self.at_desk) if before != self.at_desk else None
 
 
