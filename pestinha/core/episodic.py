@@ -189,6 +189,13 @@ class EpisodicMemory:
                 log(f"[memória] não revisou o episódio: {error}")
         log(f"[memória] {record['contexto']} -> {record['acao']}: revisado, {result} ({valence:+.2f})")
 
+    def on_read(self, thing, elapsed):
+        """Você leu o bilhete antes de fechar: conta como aceito e reforça a ação."""
+        for ep in list(self.open):
+            if ep["thing"] is thing:
+                bonus = 0.3 if ep["carinho"] else 0.0
+                self._resolve(ep, f"lido após {elapsed:.1f} s", 0.3 + bonus)
+
     def on_dismiss(self, thing, elapsed, patience):
         """Você dispensou a travessura: vale mais se foi rápido, e a valência fica registrada."""
         for ep in list(self.open):

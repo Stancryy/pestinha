@@ -15,7 +15,7 @@ VALIDADE_PEDIDO_S = 10.0    # s: "fazer uma travessura agora" vale por este temp
 
 from ..core.emotion import PRIORITY
 from ..ajustes import (DISPENSA_RAPIDA as QUICK_DISMISS, PENALIDADE_DISPENSA as PENALTY_SECONDS,
-                       GANHO_TRAVESSURA)
+                       GANHO_TRAVESSURA, TEMPO_LEITURA_POSTIT)
 
 
 
@@ -101,6 +101,9 @@ class MischiefController:
 
     def on_dismissed(self, thing, elapsed, prof, now):
         """Você dispensou uma travessura: vira frustração e entra na memória como aprendizado."""
+        if getattr(thing, "is_note", False) and elapsed >= TEMPO_LEITURA_POSTIT:
+            self.memory.on_read(thing, elapsed)
+            return
         self.senses.dismissed()
         self.drives.touched("dismiss")
         self.memory.on_dismiss(thing, elapsed, prof["dismiss_patience"])

@@ -40,6 +40,7 @@ RECOMPENSA_CARINHO = 1.0        # recompensa por segundo de carinho (aprendizado
 PUNICAO_DISPENSA = -0.6         # recompensa negativa depois de dispensar
 DISPENSA_RAPIDA = 3.0           # s: fechou tão rápido assim = dispensa "na cara"
 PENALIDADE_DISPENSA = 1.0       # s em que a dispensa pesa no aprendizado
+TEMPO_LEITURA_POSTIT = 5.0      # s: fechar depois disso conta como lido (sem irritar o pet)
 
 # ---------------------------------------------------------------------------
 # Física do corpo (núcleo)
@@ -167,6 +168,7 @@ _LIMITES = {
     "PUNICAO_DISPENSA": (float, -10.0, 0.0),
     "DISPENSA_RAPIDA": (float, 0.0, 60.0),
     "PENALIDADE_DISPENSA": (float, 0.0, 60.0),
+    "TEMPO_LEITURA_POSTIT": (float, 0.0, 60.0),
     "GRAVIDADE": (float, 0.0, 100000.0),
     "QUICA": (float, 0.0, 1.0),
     "ATRITO_CHAO": (float, 0.0, 100.0),

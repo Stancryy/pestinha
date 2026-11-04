@@ -21,6 +21,7 @@ NOTE_SIZE = (180, 150)
 class Thing(QWidget):
     """Objeto genérico na tela (post-it, meme ou foto): uma janela sem moldura que pode ser clicada, arrastada e cai."""
     clicked = Signal(object)
+    is_note = False
 
     def __init__(self, w, h):
         """Cria a janela do objeto com o tamanho `w` x `h`, transparente e sem foco."""
@@ -95,6 +96,7 @@ class ImageThing(Thing):
 
 class NoteThing(Thing):
     """Post-it com uma frase, num papel amarelo."""
+    is_note = True
     def __init__(self, text, small=False):
         """Monta o post-it com o texto; `small` é o tamanho de canto (bilhete de revolta)."""
         w, h = NOTE_SIZE

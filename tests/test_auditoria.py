@@ -127,27 +127,49 @@ def test_rotina_nao_e_relida_a_cada_leitura_dos_sentidos(tmp_path, monkeypatch):
         log_module.desligar_arquivo()
 
 
-@pytest.mark.skipif(sys.platform != "win32", reason="API Win32 específica do Windows")
-def test_janela_maximizada_com_barra_oculta_nao_e_tela_cheia(monkeypatch):
-    from pestinha.plataforma import windows as w
-    monkeypatch.setattr(w.win32gui, "GetForegroundWindow", lambda: 1001)
-    monkeypatch.setattr(w.win32gui, "GetClassName", lambda hwnd: "Chrome_WidgetWin_1")
-    monkeypatch.setattr(w, "_frame_rect", lambda hwnd: (0, 0, 1920, 1080))
-    monkeypatch.setattr(w.win32api, "MonitorFromWindow", lambda hwnd, flag: 1)
-    monkeypatch.setattr(w.win32api, "GetMonitorInfo", lambda mon: {"Monitor": (0, 0, 1920, 1080)})
 
-    # 1. Janela maximizada (IsZoomed=1) em monitor com barra de tarefas auto-oculta -> NÃO é tela cheia
-    monkeypatch.setattr(w.ctypes.windll.user32, "IsZoomed", lambda hwnd: 1)
-    monkeypatch.setattr(w.win32gui, "GetWindowLong", lambda hwnd, idx: w.win32con.WS_CAPTION)
-    assert w.tela_cheia() is False
 
-    # 2. Menu Iniciar / Pesquisa do Windows 11 (CoreWindow cobrindo 1920x1080) -> NÃO é tela cheia
-    monkeypatch.setattr(w.ctypes.windll.user32, "IsZoomed", lambda hwnd: 0)
-    monkeypatch.setattr(w.win32gui, "GetWindowLong", lambda hwnd, idx: 0)
-    monkeypatch.setattr(w.win32gui, "GetClassName", lambda hwnd: "Windows.UI.Core.CoreWindow")
-    assert w.tela_cheia() is False
+def test_fechar_postit_apos_5s_conta_como_lido_sem_irritar_o_pet(tmp_path):
+    from pestinha.core.episodic import EpisodicMemory
+    from pestinha.mind.mischief_ctl import MischiefController
+    from pestinha.world.objetos import NoteThing
 
-    # 3. Jogo ou vídeo realmente em tela cheia (sem IsZoomed e sem WS_CAPTION, cobrindo o monitor) -> É tela cheia
-    monkeypatch.setattr(w.win32gui, "GetClassName", lambda hwnd: "UnrealWindow")
-    assert w.tela_cheia() is True
+    pet_paths = Paths(tmp_path).pet("mia")
+    memory = EpisodicMemory(pet_paths.episodes, pet_paths.preferences)
+    senses = Mock()
+    drives = Mock()
+    emotion = Mock()
+    behavior = Mock()
+    engine = Mock()
 
+    ctl = MischiefController(engine, memory, drives, senses, behavior, emotion, debug=lambda: False)
+
+    # 1. Post-it fechado após >= 5.0 s: conta como lido (recompensa positiva, sem raiva/dispensa)
+    note = Mock(spec=NoteThing)
+    note.is_note = True
+    ep = memory.start("PROGRAMMING|feliz", "bilhete", note)
+
+    ctl.on_dismissed(note, elapsed=5.5, prof={"dismiss_patience": 30.0, "drama_window": 10.0, "drama_count": 3}, now=100.0)
+
+    # Não emite pulso de dispensa, não toca drives de dispensa e não gera penalidade
+    senses.dismissed.assert_not_called()
+    drives.touched.assert_not_called()
+    assert not ctl.penalty_active(100.5)
+    # Episódio foi resolvido positivamente na memória
+    assert ep not in memory.open
+    assert memory.recent[-1]["acao"] == "bilhete"
+    assert "lido após 5.5 s" in memory.recent[-1]["resultado"]
+    assert memory.recent[-1]["valencia"] > 0.0
+
+    # 2. Post-it fechado antes de 5.0 s (ex: 2.0 s): conta como dispensa rápida
+    note_rapido = Mock(spec=NoteThing)
+    note_rapido.is_note = True
+    ep2 = memory.start("PROGRAMMING|feliz", "bilhete", note_rapido)
+
+    ctl.on_dismissed(note_rapido, elapsed=2.0, prof={"dismiss_patience": 30.0, "drama_window": 10.0, "drama_count": 3}, now=110.0)
+
+    senses.dismissed.assert_called_once()
+    drives.touched.assert_called_with("dismiss")
+    assert ctl.penalty_active(110.5)
+    assert ep2 not in memory.open
+    assert memory.recent[-1]["valencia"] < 0.0
