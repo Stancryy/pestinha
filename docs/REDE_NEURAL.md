@@ -93,13 +93,13 @@ computador e você ──► sentidos (0..1) ──► neurônios sensoriais (Po
 | `DROWSE` | expressão | sonolência | TIRED (+0.30), CALM (+0.05) |  |
 | `ANGRY` | expressão | raiva | FRUSTRATION (+0.55), ALERT (+0.05), INHIB (−0.04) |  |
 | `SAD` | expressão | tristeza | GLOOM (+0.45) |  |
-| `SENTAR` | decisão | sentar no notebook | GLOOM (−0.60), PEDIDO (+0.55), FOCUS (+0.45), PLAYFUL (−0.40), FRUSTRATION (−0.35), PRESO (−0.30), RANCOR (−0.30), CURIOUS (−0.25), ALERT (−0.10) | quer trabalhar no notebook |
+| `SENTAR` | decisão | sentar notebook | GLOOM (−0.60), PEDIDO (+0.55), FOCUS (+0.45), PLAYFUL (−0.40), FRUSTRATION (−0.35), PRESO (−0.30), RANCOR (−0.30), CURIOUS (−0.25), ALERT (−0.10) | quer trabalhar no notebook |
 | `FUGIR` | decisão | fugir do canto | RECEIO (−0.40), FRUSTRATION (+0.35), LEMBRA_FUGA (+0.30), CALM (−0.30), ANTECIPA_PLACA (+0.15), BOREDOM (+0.15) | tenta escapar do cantinho |
 | `CARTAZ` | decisão | colar cartaz | FRUSTRATION (+0.25), CALM (−0.20) | cola um cartaz de protesto |
-| `CANTO` | decisão | ir para o cantinho | GLOOM (+0.50), TIRED (+0.05) | vai para o cantinho |
+| `CANTO` | decisão | ir pro cantinho | GLOOM (+0.50), TIRED (+0.05) | vai para o cantinho |
 | `TRAVESSURA` | decisão | aprontar | PLACA (−0.60), GLOOM (−0.50), BOREDOM (+0.30), CALM (−0.30), CURIOUS (+0.20), RANCOR (+0.15), PLAYFUL (+0.12) | apronta uma travessura (a taxa vira a frequência) |
 | `PAPEL` | decisão | atirar papel | FRUSTRATION (+0.40), CALM (−0.40) | atira bolinha de papel (na revolução) |
-| `ACEITAR` | decisão | aceitar o castigo | CALM (+0.45), FRUSTRATION (−0.40), CARESS (+0.30), RANCOR (−0.20), VISITA (+0.08) | aceita o castigo e sai do canto por conta própria (perdão) |
+| `ACEITAR` | decisão | aceitar castigo | CALM (+0.45), FRUSTRATION (−0.40), CARESS (+0.30), RANCOR (−0.20), VISITA (+0.08) | aceita o castigo e sai do canto por conta própria (perdão) |
 
 ## Decisões pela rede
 

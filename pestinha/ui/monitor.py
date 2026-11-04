@@ -48,7 +48,7 @@ class NeuralMonitor(FloatingWidget):
     """Janela de diagnóstico: mostra os disparos da rede, a atividade dos motores e as necessidades do pet em tempo real."""
     def __init__(self, app, default_pos):
         """Cria a janela do monitor e um relógio para redesenhar."""
-        super().__init__(app, "neural", f"{app.nome} · Monitor neural", (1280, 780), (1050, 700), default_pos)
+        super().__init__(app, "neural", f"{app.nome} · Monitor neural", (1280, 820), (1100, 720), default_pos)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update)
         self.timer.start(100)
@@ -72,9 +72,9 @@ class NeuralMonitor(FloatingWidget):
         p.fillRect(self.rect(), BG)
         p.setRenderHint(QPainter.Antialiasing)
         w, h = self.width(), self.height()
-        split = int(w * 0.46)
-        self._raster(p, QRectF(16, 16, split - 24, h - 32))
-        self._panel(p, QRectF(split + 8, 16, w - split - 24, h - 32))
+        split = int(w * 0.44)
+        self._raster(p, QRectF(16, 14, split - 24, h - 28))
+        self._panel(p, QRectF(split + 8, 14, w - split - 24, h - 28))
         p.end()
 
     def _title(self, p, x, y, text):
@@ -86,9 +86,9 @@ class NeuralMonitor(FloatingWidget):
     def _raster(self, p, area):
         """Desenha o raster dos disparos dos últimos 3 segundos (uma coluna = 10 ms)."""
         brain = self.app.brain
-        self._title(p, area.left(), area.top() + 10, "Disparos · últimos 3 s · 1 coluna = 10 ms")
-        label_w = 126
-        box = QRectF(area.left() + label_w, area.top() + 20, area.width() - label_w, area.height() - 40)
+        self._title(p, area.left(), area.top() + 8, "Disparos · últimos 3 s · 1 coluna = 10 ms")
+        label_w = 142
+        box = QRectF(area.left() + label_w, area.top() + 18, area.width() - label_w, area.height() - 36)
         p.fillRect(box, PANEL)
 
         bins = list(brain.raster)
@@ -118,12 +118,12 @@ class NeuralMonitor(FloatingWidget):
             if pool["n"] * row_h >= 6:
                 color = {"sensory": INPUT, "motor": MOTOR}.get(pool["group"], TEXT)
                 p.setPen(color)
-                p.drawText(QRectF(area.left(), y0, label_w - 6, y1 - y0), Qt.AlignRight | Qt.AlignVCenter, nome_canal(pool["name"]))
+                p.drawText(QRectF(area.left(), y0, label_w - 8, y1 - y0), Qt.AlignRight | Qt.AlignVCenter, nome_canal(pool["name"]))
         p.setPen(MUTED)
-        p.drawText(QRectF(box.left(), box.bottom() + 4, box.width(), 14), Qt.AlignLeft, "−3 s")
-        p.drawText(QRectF(box.left(), box.bottom() + 4, box.width(), 14), Qt.AlignRight, "agora")
+        p.drawText(QRectF(box.left(), box.bottom() + 3, box.width(), 13), Qt.AlignLeft, "−3 s")
+        p.drawText(QRectF(box.left(), box.bottom() + 3, box.width(), 13), Qt.AlignRight, "agora")
 
-    def _bar(self, p, x, y, w, value, color, h=6):
+    def _bar(self, p, x, y, w, value, color, h=5):
         """Desenha uma barra de 0 a 1 (cheia = 1)."""
         p.fillRect(QRectF(x, y, w, h), GRID)
         p.fillRect(QRectF(x, y, w * max(0.0, min(1.0, value)), h), color)
@@ -136,78 +136,78 @@ class NeuralMonitor(FloatingWidget):
         mono = QFont("Consolas", 8)
 
         # ---- entradas e habituação ----
-        self._title(p, x, y + 10, "Entrada (azul) · eficácia sináptica / habituação (laranja)")
-        y += 20
+        self._title(p, x, y + 8, "Entrada (azul) · eficácia sináptica / habituação (laranja)")
+        y += 18
         eff = brain.efficacy()
         names = brain.sensory_names
         col_w = (w - 14) / 2
-        lbl_w = 112
+        lbl_w = 126
         for i, name in enumerate(names):
             cx = x + (i % 2) * (col_w + 14)
-            cy = y + (i // 2) * 20
+            cy = y + (i // 2) * 18
             p.setFont(mono)
             p.setPen(TEXT)
-            p.drawText(QRectF(cx, cy, lbl_w, 13), Qt.AlignLeft | Qt.AlignVCenter, nome_canal(name))
+            p.drawText(QRectF(cx, cy, lbl_w, 14), Qt.AlignLeft | Qt.AlignVCenter, nome_canal(name))
             bx = cx + lbl_w + 4
-            bw = max(20.0, col_w - lbl_w - 42)
-            self._bar(p, bx, cy + 1, bw, app.intensities.get(name, 0.0), INPUT, 5)
+            bw = max(24.0, col_w - lbl_w - 46)
+            self._bar(p, bx, cy + 2, bw, app.intensities.get(name, 0.0), INPUT, 4)
             self._bar(p, bx, cy + 8, bw, eff[name], EFFICACY, 3)
             p.setPen(MUTED)
-            p.drawText(QRectF(bx + bw + 2, cy, 34, 13), Qt.AlignRight | Qt.AlignVCenter, f"{eff[name]:.2f}")
-        y += ((len(names) + 1) // 2) * 20 + 10
+            p.drawText(QRectF(bx + bw + 4, cy, 34, 14), Qt.AlignRight | Qt.AlignVCenter, f"{eff[name]:.2f}")
+        y += ((len(names) + 1) // 2) * 18 + 12
 
         # ---- motores -> corpo ----
-        self._title(p, x, y + 10, "Motores → o que controlam no corpo")
-        y += 20
+        self._title(p, x, y + 6, "Motores → o que controlam no corpo")
+        y += 18
         motor = brain.motor_activity()
         tone = app.behavior.tone
         for m in tone.r:
             p.setFont(mono)
             p.setPen(MOTOR)
-            p.drawText(QRectF(x, y, 62, 14), Qt.AlignLeft | Qt.AlignVCenter, nome_canal(m))
-            self._bar(p, x + 64, y + 4, w * 0.36, tone.r[m], MOTOR)
+            p.drawText(QRectF(x, y, 76, 14), Qt.AlignLeft | Qt.AlignVCenter, nome_canal(m))
+            self._bar(p, x + 78, y + 4, w * 0.35, tone.r[m], MOTOR, 5)
             p.setPen(TEXT)
-            p.drawText(QRectF(x + 70 + w * 0.36, y, 60, 14), Qt.AlignLeft | Qt.AlignVCenter, f"{motor[m]:5.1f} Hz")
+            p.drawText(QRectF(x + 84 + w * 0.35, y, 58, 14), Qt.AlignLeft | Qt.AlignVCenter, f"{motor[m]:5.1f} Hz")
             p.setPen(MUTED)
-            p.drawText(QRectF(x + 130 + w * 0.36, y, w, 14), Qt.AlignLeft | Qt.AlignVCenter, MOTOR_EFFECT[m])
-            y += 17
-        y += 4
+            p.drawText(QRectF(x + 146 + w * 0.35, y, max(60.0, w - (146 + w * 0.35)), 14), Qt.AlignLeft | Qt.AlignVCenter, MOTOR_EFFECT[m])
+            y += 16
+        y += 3
         p.setPen(TEXT)
-        p.drawText(QRectF(x, y, w, 14), Qt.AlignLeft,
+        p.drawText(QRectF(x, y, w, 13), Qt.AlignLeft,
                    f"velocidade {tone.speed():3.0f} px/s · pulinho {tone.hop_chance():.0%} · "
                    f"altura {tone.hop_power():3.0f} · tremor {tone.shake():.1f} px")
-        y += 15
-        p.drawText(QRectF(x, y, w, 14), Qt.AlignLeft,
+        y += 14
+        p.drawText(QRectF(x, y, w, 13), Qt.AlignLeft,
                    f"balanço {tone.sway():.1f}° · pálpebra +{tone.lid_droop():.2f} · "
                    f"fixa cursor {tone.watch():.0%} · sobe janela {tone.climb_chance():.0%}")
-        y += 26
+        y += 20
 
         # ---- estado ----
         self._title(p, x, y, "Estado")
-        y += 10
+        y += 12
         emo = app.emotion
-        p.setFont(QFont("Consolas", 11, QFont.Bold))
+        p.setFont(QFont("Consolas", 10, QFont.Bold))
         p.setPen(GOOD)
-        p.drawText(QRectF(x, y, w, 18), Qt.AlignLeft, EMOTION_NAMES.get(app.pet_state.emotion, app.pet_state.emotion))
+        p.drawText(QRectF(x, y, 130, 16), Qt.AlignLeft | Qt.AlignVCenter, EMOTION_NAMES.get(app.pet_state.emotion, app.pet_state.emotion))
         p.setFont(mono)
         p.setPen(TEXT)
-        p.drawText(QRectF(x + 140, y + 3, w, 16), Qt.AlignLeft,
+        p.drawText(QRectF(x + 135, y + 1, max(100.0, w - 135), 16), Qt.AlignLeft | Qt.AlignVCenter,
                    f"valência {emo.valence:+.2f} · ativação {emo.arousal:+.2f}")
-        y += 24
+        y += 20
         d = app.drives
         for label, value in (("energia", d.energy), ("estimulação", d.stimulation), ("carência", d.contact)):
             p.setPen(TEXT)
-            p.drawText(QRectF(x, y, 90, 12), Qt.AlignLeft | Qt.AlignVCenter, label)
-            self._bar(p, x + 92, y + 3, w * 0.4, value, GOOD)
-            p.drawText(QRectF(x + 98 + w * 0.4, y, 50, 12), Qt.AlignLeft | Qt.AlignVCenter, f"{value:.2f}")
-            y += 16
-        y += 6
+            p.drawText(QRectF(x, y, 88, 13), Qt.AlignLeft | Qt.AlignVCenter, label)
+            self._bar(p, x + 90, y + 4, w * 0.38, value, GOOD, 5)
+            p.drawText(QRectF(x + 96 + w * 0.38, y, 50, 13), Qt.AlignLeft | Qt.AlignVCenter, f"{value:.2f}")
+            y += 15
+        y += 4
         pr = app.protest
-        p.drawText(QRectF(x, y, w, 14), Qt.AlignLeft,
+        p.drawText(QRectF(x, y, w, 13), Qt.AlignLeft,
                    f"insatisfação {pr.grievance:.2f} · protesto: {STAGE_NAMES[pr.stage]} · revoluções {pr.revolutions}")
-        y += 16
+        y += 14
         poke = app.last_poke_response
         poke_text = "—" if poke is None else f"{poke:.2f}"
-        p.drawText(QRectF(x, y, w, 14), Qt.AlignLeft,
+        p.drawText(QRectF(x, y, w, 13), Qt.AlignLeft,
                    f"última cutucada: resposta {poke_text} · eficácia da cutucada {eff['POKE']:.2f}"
                    + ("   · DORMINDO" if app.asleep else ""))

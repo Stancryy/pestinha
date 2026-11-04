@@ -66,13 +66,13 @@ MOTORES = {
     "DROWSE": "sonolência",
     "ANGRY": "raiva",
     "SAD": "tristeza",
-    "SENTAR": "sentar no notebook",
+    "SENTAR": "sentar notebook",
     "FUGIR": "fugir do canto",
     "CARTAZ": "colar cartaz",
-    "CANTO": "ir para o cantinho",
+    "CANTO": "ir pro cantinho",
     "TRAVESSURA": "aprontar",
     "PAPEL": "atirar papel",
-    "ACEITAR": "aceitar o castigo",
+    "ACEITAR": "aceitar castigo",
 }
 
 GRUPOS = {"sensory": "sentido", "inter": "interneurônio", "motor": "motor"}
