@@ -2,7 +2,7 @@
 
 > Gerado por `ferramentas/gerar_doc_rede.py` a partir do código. Não edite à mão: rode o script.
 
-A rede tem **506 neurônios** de integração e disparo com vazamento (LIF), **16687 sinapses**, **36 canais sensoriais**, **10 populações de interneurônios** e **15 populações motoras**.
+A rede tem **506 neurônios** de integração e disparo com vazamento (LIF), **16549 sinapses**, **36 canais sensoriais**, **10 populações de interneurônios** e **15 populações motoras**.
 
 ## Como o sinal anda
 
@@ -50,19 +50,19 @@ computador e você ──► sentidos (0..1) ──► neurônios sensoriais (Po
 | `THROW` | arremesso | 0.0008 / 300 s | foi arremessado (a graça enjoa se repetir) |
 | `IMPACT` | batida | 0.0002 / 600 s | bateu forte na parede/chão |
 | `BOREDOM` | tédio | não | interno: pouca estimulação (homeostase; não habitua) |
-| `PEDIDO` | pedido de trabalho | não | você pediu para ele trabalhar (vale por um tempo) |
+| `PEDIDO` | pedido trabalho | não | você pediu para ele trabalhar (vale por um tempo) |
 | `PRESO` | preso no canto | 0.0004 / 900 s | preso no cantinho do castigo (habitua: ele se acostuma) |
-| `LEMBRA_FUGA` | lembra de fugas | não | memória: fugas que já deram certo |
+| `LEMBRA_FUGA` | lembra fugas | não | memória: fugas que já deram certo |
 | `RECUSA` | recusou pedido | não | você pediu e ele não quis (frustração pontual) |
-| `PLACA` | placa do castigo | 0.0001 / 1200 s | a placa do castigo está à vista (aviso) |
-| `ANTECIPA_PLACA` | antecipa o canto | não | previsão aprendida de ir para o canto (só a pista da placa) |
+| `PLACA` | placa castigo | 0.0001 / 1200 s | a placa do castigo está à vista (aviso) |
+| `ANTECIPA_PLACA` | antecipa canto | não | previsão aprendida de ir para o canto (só a pista da placa) |
 | `VISITA` | visita no canto | não | você está perto dele enquanto ele está preso |
 | `RECEIO` | receio de fugir | não | interno: fugas que deram errado (devolvido ao canto) |
 | `RANCOR` | rancor | não | interno: tempo de castigo acumulado, decai devagar |
-| `TYPING_SPEED` | velocidade de digitação | 0.0001 / 900 s | velocidade de digitação (teclas/s): habitua com ritmo constante |
+| `TYPING_SPEED` | vel. digitação | 0.0001 / 900 s | velocidade de digitação (teclas/s): habitua com ritmo constante |
 | `CPU_LOAD` | uso de cpu | não | máquina sob carga/calor (ambiental/homeostático: não habitua) |
 | `CIRCADIAN` | madrugada | não | período noturno/madrugada (ciclo biológico: não habitua) |
-| `MOUSE_SPEED` | velocidade do mouse | 0.0004 / 600 s | cursor muito rápido (agitação motora: habitua em minutos) |
+| `MOUSE_SPEED` | vel. do mouse | 0.0004 / 600 s | cursor muito rápido (agitação motora: habitua em minutos) |
 | `BATTERY_LOW` | bateria baixa | não | bateria acabando sem tomada (urgência: não habitua) |
 | `WINDOW_COUNT` | muitas janelas | 0.0002 / 1200 s | multitarefa com muitas janelas abertas (habitua devagar) |
 
@@ -70,10 +70,10 @@ computador e você ──► sentidos (0..1) ──► neurônios sensoriais (Po
 
 | População | Nome no monitor | Tipo | Neurônios | Entradas (peso) |
 |---|---|---|---:|---|
-| `ALERT` | alerta | excitatória | 16 | MOTION (+0.14), ANTICIPATE (+0.12), ANTECIPA_PLACA (+0.12), IMPACT (+0.10), POKE (+0.08), MOUSE_SPEED (+0.08), BATTERY_LOW (+0.08), CPU_LOAD (+0.07), NOVELTY (+0.06), DRAG (+0.06), TOY_TAKEN (+0.06), CIRCADIAN (−0.06), CALM (−0.06), THROW (+0.05), TIRED (−0.05), TYPING_SPEED (+0.04), WINDOW_COUNT (+0.04), QUIET (−0.04), INHIB (−0.04), PRESO (+0.04), PLAY (+0.03), DISMISS (+0.03), TYPING (+0.02), PLACA (+0.02) |
-| `FOCUS` | foco | excitatória | 16 | WORK (+0.14), PEDIDO (+0.12), QUIET (−0.08), TYPING_SPEED (+0.07), TYPING (+0.05), INHIB (−0.03) |
+| `ALERT` | alerta | excitatória | 16 | MOTION (+0.14), ANTICIPATE (+0.12), ANTECIPA_PLACA (+0.12), IMPACT (+0.10), POKE (+0.08), MOUSE_SPEED (+0.08), BATTERY_LOW (+0.08), CPU_LOAD (+0.07), NOVELTY (+0.06), DRAG (+0.06), TOY_TAKEN (+0.06), CIRCADIAN (−0.06), CALM (−0.06), THROW (+0.05), TYPING_SPEED (+0.05), TIRED (−0.05), WINDOW_COUNT (+0.04), QUIET (−0.04), INHIB (−0.04), PRESO (+0.04), PLAY (+0.03), DISMISS (+0.03), TYPING (+0.02), PLACA (+0.02) |
+| `FOCUS` | foco | excitatória | 16 | WORK (+0.14), PEDIDO (+0.12), QUIET (−0.08), TYPING (+0.05), INHIB (−0.03) |
 | `CURIOUS` | curiosidade | excitatória | 16 | BOREDOM (+0.12), NOVELTY (+0.10), DRAG (+0.07), WEB (+0.06), TOY_NEAR (+0.06), WINDOW_COUNT (+0.06), POKE (+0.05), MOUSE_SPEED (+0.05), ALERT (+0.05), QUIET (−0.05), SOCIAL (+0.04), GLOOM (−0.04), TIRED (−0.04), THROW (+0.03), INHIB (−0.03) |
-| `PLAYFUL` | brincadeira | excitatória | 12 | TOY_NEAR (+0.10), BOREDOM (+0.09), PLAY (+0.08), POKE (+0.08), THROW (+0.08), GLOOM (−0.06), DRAG (+0.05), CARESS (+0.05), FRUSTRATION (−0.05), TIRED (−0.05), BATTERY_LOW (−0.04), TYPING_SPEED (+0.03), INHIB (−0.03), SOUND (+0.02) |
+| `PLAYFUL` | brincadeira | excitatória | 12 | TOY_NEAR (+0.10), TYPING_SPEED (+0.10), BOREDOM (+0.09), PLAY (+0.08), POKE (+0.08), THROW (+0.08), GLOOM (−0.06), DRAG (+0.05), CARESS (+0.05), FRUSTRATION (−0.05), TIRED (−0.05), BATTERY_LOW (−0.04), INHIB (−0.03), SOUND (+0.02) |
 | `CALM` | calma | excitatória | 12 | CARESS (+0.07), SOUND (+0.06), FRUSTRATION (−0.06), CPU_LOAD (−0.05), VISITA (+0.05), MOUSE_SPEED (−0.04), WORK (+0.03), SILENCE (+0.03) |
 | `TIRED` | cansaço | excitatória | 12 | CIRCADIAN (+0.12), FATIGUE (+0.08), SILENCE (+0.06) |
 | `QUIET` | quietude | inibitória | 12 | SILENCE (+0.08), CIRCADIAN (+0.08), FATIGUE (+0.03), LONELY (+0.03) |

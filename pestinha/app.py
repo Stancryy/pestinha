@@ -503,8 +503,12 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         st.torcendo = fator_digitacao >= 0.7
         st.bateria_baixa = fator_bateria >= 0.5
         st.corujao = fator_circadiano >= 0.7
-        if self.perms.get("reagir_hardware", False) or fator_cpu >= (ajustes.LIMIAR_CPU_ALTA / 100.0):
-            st.suando = True
+        if self.perms.get("reagir_hardware", False):
+            st.suando = cpu_pct >= ajustes.LIMIAR_CPU_ALTA
+            st.apertado = _ram_pct >= ajustes.LIMIAR_RAM_ALTA
+        else:
+            st.suando = False
+            st.apertado = False
         if getattr(self.pet_state, "dancando", False):
             intensities["SOUND"] = max(intensities.get("SOUND", 0.0), 0.75)
         # condicionamento: o cursor vindo rápido para ele, ou o botão apertado em cima, antecipam
@@ -693,7 +697,8 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         motores = self.brain.motor_activity()
         pode_sentar = (not self.asleep and self.pet.body.grounded and not self.pet.body.held
                        and not self.behavior.mission and not self.in_flight
-                       and not self.castigo.dentro and self.castigo.fuga is None)   # preso ou fugindo não senta
+                       and not self.castigo.dentro and self.castigo.fuga is None
+                       and not getattr(self.pet_state, "torcendo", False))   # preso, fugindo ou torcendo não senta
         self.mesa.tick(now, rates, motores["SENTAR"], pode_sentar, self.behavior.play)
         self.pet_state.at_desk = self.mesa.sentado
         self.pet_state.desk_top = self.mesa.caderno.y() if self.mesa.sentado else None

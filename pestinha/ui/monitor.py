@@ -48,7 +48,7 @@ class NeuralMonitor(FloatingWidget):
     """Janela de diagnóstico: mostra os disparos da rede, a atividade dos motores e as necessidades do pet em tempo real."""
     def __init__(self, app, default_pos):
         """Cria a janela do monitor e um relógio para redesenhar."""
-        super().__init__(app, "neural", f"{app.nome} · Monitor neural", (1180, 700), (980, 620), default_pos)
+        super().__init__(app, "neural", f"{app.nome} · Monitor neural", (1280, 780), (1050, 700), default_pos)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update)
         self.timer.start(100)
@@ -72,7 +72,7 @@ class NeuralMonitor(FloatingWidget):
         p.fillRect(self.rect(), BG)
         p.setRenderHint(QPainter.Antialiasing)
         w, h = self.width(), self.height()
-        split = int(w * 0.52)
+        split = int(w * 0.46)
         self._raster(p, QRectF(16, 16, split - 24, h - 32))
         self._panel(p, QRectF(split + 8, 16, w - split - 24, h - 32))
         p.end()
@@ -87,7 +87,7 @@ class NeuralMonitor(FloatingWidget):
         """Desenha o raster dos disparos dos últimos 3 segundos (uma coluna = 10 ms)."""
         brain = self.app.brain
         self._title(p, area.left(), area.top() + 10, "Disparos · últimos 3 s · 1 coluna = 10 ms")
-        label_w = 92
+        label_w = 126
         box = QRectF(area.left() + label_w, area.top() + 20, area.width() - label_w, area.height() - 40)
         p.fillRect(box, PANEL)
 
@@ -115,7 +115,7 @@ class NeuralMonitor(FloatingWidget):
             y1 = y0 + pool["n"] * row_h
             p.setPen(GRID)
             p.drawLine(int(box.left()), int(y0), int(box.right()), int(y0))
-            if pool["n"] * row_h >= 7:
+            if pool["n"] * row_h >= 6:
                 color = {"sensory": INPUT, "motor": MOTOR}.get(pool["group"], TEXT)
                 p.setPen(color)
                 p.drawText(QRectF(area.left(), y0, label_w - 6, y1 - y0), Qt.AlignRight | Qt.AlignVCenter, nome_canal(pool["name"]))
@@ -140,20 +140,21 @@ class NeuralMonitor(FloatingWidget):
         y += 20
         eff = brain.efficacy()
         names = brain.sensory_names
-        col_w = (w - 12) / 2
+        col_w = (w - 14) / 2
+        lbl_w = 112
         for i, name in enumerate(names):
-            cx = x + (i % 2) * (col_w + 12)
-            cy = y + (i // 2) * 22
+            cx = x + (i % 2) * (col_w + 14)
+            cy = y + (i // 2) * 20
             p.setFont(mono)
             p.setPen(TEXT)
-            p.drawText(QRectF(cx, cy, 64, 12), Qt.AlignLeft | Qt.AlignVCenter, nome_canal(name))
-            bx = cx + 66
-            bw = col_w - 66 - 34
+            p.drawText(QRectF(cx, cy, lbl_w, 13), Qt.AlignLeft | Qt.AlignVCenter, nome_canal(name))
+            bx = cx + lbl_w + 4
+            bw = max(20.0, col_w - lbl_w - 42)
             self._bar(p, bx, cy + 1, bw, app.intensities.get(name, 0.0), INPUT, 5)
             self._bar(p, bx, cy + 8, bw, eff[name], EFFICACY, 3)
             p.setPen(MUTED)
-            p.drawText(QRectF(bx + bw + 2, cy, 32, 12), Qt.AlignRight | Qt.AlignVCenter, f"{eff[name]:.2f}")
-        y += ((len(names) + 1) // 2) * 22 + 10
+            p.drawText(QRectF(bx + bw + 2, cy, 34, 13), Qt.AlignRight | Qt.AlignVCenter, f"{eff[name]:.2f}")
+        y += ((len(names) + 1) // 2) * 20 + 10
 
         # ---- motores -> corpo ----
         self._title(p, x, y + 10, "Motores → o que controlam no corpo")

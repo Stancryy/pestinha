@@ -73,22 +73,22 @@ def test_habituacao_dinamica_typing_speed():
     assert brain.efficacy()["TYPING_SPEED"] == pytest.approx(1.0, abs=1e-3)
 
 
-def test_typing_speed_estimula_focus_e_alert():
-    """Digitação rápida deve excitar as populações de foco e alerta da rede."""
+def test_typing_speed_estimula_playful_e_alert():
+    """Digitação rápida deve excitar as populações de brincadeira/torcida (PLAYFUL) e alerta."""
     brain = LIFBrain(seed=7)
     brain.rng = np.random.default_rng(99)
 
     for _ in range(20):
         brain.stimulate({})
         brain.step(100)
-    base_focus = brain.pool_rates()["FOCUS"]
+    base_playful = brain.pool_rates()["PLAYFUL"]
 
     for _ in range(25):
         brain.stimulate({"TYPING_SPEED": 1.0})
         brain.step(100)
-    ativo_focus = brain.pool_rates()["FOCUS"]
+    ativo_playful = brain.pool_rates()["PLAYFUL"]
 
-    assert ativo_focus > base_focus, "FOCUS deveria subir com TYPING_SPEED ativo"
+    assert ativo_playful > base_playful, "PLAYFUL deveria subir com TYPING_SPEED ativo"
 
 
 def test_cpu_load_aumenta_alerta_e_frustracao():
@@ -235,4 +235,30 @@ def test_bateria_status_executa_sem_excecao():
         assert isinstance(plug, bool)
     else:
         assert plug is None
+
+
+def test_suando_desligado_com_cpu_baixa():
+    """Garante que com CPU baixa (ex.: 2%), o pet não sua, mesmo com reagir_hardware ligado."""
+    from pestinha.body.pet_state import PetState
+    st = PetState()
+    cpu_pct = 2.0
+    reagir_hardware = True
+    if reagir_hardware:
+        st.suando = cpu_pct >= ajustes.LIMIAR_CPU_ALTA
+    else:
+        st.suando = False
+    assert st.suando is False
+
+
+def test_digitacao_rapida_nao_dispara_sentar():
+    """Digitação rápida excita PLAYFUL/CHEER e não deve ativar o motor SENTAR (notebook)."""
+    brain = LIFBrain(seed=7)
+    brain.rng = np.random.default_rng(42)
+
+    for _ in range(30):
+        brain.stimulate({"TYPING_SPEED": 1.0})
+        brain.step(100)
+
+    sentar_rate = brain.motor_activity()["SENTAR"]
+    assert sentar_rate < ajustes.LIMIAR_SENTAR_HZ, f"SENTAR disparou a {sentar_rate:.1f} Hz (> {ajustes.LIMIAR_SENTAR_HZ} Hz)"
 
