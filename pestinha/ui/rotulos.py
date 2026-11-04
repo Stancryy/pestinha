@@ -36,6 +36,12 @@ CANAIS_SENSORIAIS = {
     "VISITA": "visita no canto",
     "RECEIO": "receio de fugir",
     "RANCOR": "rancor",
+    "TYPING_SPEED": "velocidade de digitação",
+    "CPU_LOAD": "uso de cpu",
+    "CIRCADIAN": "madrugada",
+    "MOUSE_SPEED": "velocidade do mouse",
+    "BATTERY_LOW": "bateria baixa",
+    "WINDOW_COUNT": "muitas janelas",
 }
 
 INTERNEURONIOS = {

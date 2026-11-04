@@ -9,6 +9,12 @@ import math
 import time
 
 from .. import plataforma
+from ..ajustes import (
+    LIMIAR_BATERIA_BAIXA,
+    LIMIAR_DIGITACAO_RAPIDA,
+    LIMIAR_JANELAS_MUITAS,
+    LIMIAR_MOUSE_RAPIDO,
+)
 from ..mathutil import clamp
 from ..store import read_json, write_json
 
@@ -158,6 +164,60 @@ def foreground_rect(escala=1.0):
     return plataforma.retangulo_ativo(escala)
 
 
+def calcular_fator_circadiano(hora_decimal=None):
+    """
+    Retorna 0..1 indicando a intensidade do período noturno/madrugada (ciclo circadiano).
+    Pico (1.0) entre 00h e 05h; transição suave entre 22h-00h e 05h-07h; 0.0 durante o dia.
+    """
+    if hora_decimal is None:
+        lt = time.localtime()
+        hora_decimal = lt.tm_hour + lt.tm_min / 60.0
+    h = float(hora_decimal) % 24.0
+    if 0.0 <= h <= 5.0:
+        return 1.0
+    if 5.0 < h < 7.0:
+        return clamp((7.0 - h) / 2.0)
+    if 22.0 <= h < 24.0:
+        return clamp((h - 22.0) / 2.0)
+    return 0.0
+
+
+def calcular_fator_bateria(porcentagem, conectado):
+    """
+    Retorna 0..1 para nível de urgência de bateria baixa sem tomada.
+    Se conectado ou sem sensor de bateria (desktop), retorna 0.0.
+    Abaixo de LIMIAR_BATERIA_BAIXA (20%), escala de 0.0 até 1.0 (em 5%).
+    """
+    if porcentagem is None or conectado is True or conectado is None:
+        return 0.0
+    pct = float(porcentagem)
+    if pct >= LIMIAR_BATERIA_BAIXA:
+        return 0.0
+    piso = 5.0
+    return clamp((LIMIAR_BATERIA_BAIXA - pct) / max(1.0, (LIMIAR_BATERIA_BAIXA - piso)))
+
+
+def calcular_fator_janelas(total_janelas):
+    """Retorna 0..1 normalizado para a quantidade de janelas visíveis abertas."""
+    if total_janelas is None or total_janelas <= 0:
+        return 0.0
+    return clamp(float(total_janelas) / float(LIMIAR_JANELAS_MUITAS))
+
+
+def calcular_fator_mouse(velocidade_px_s):
+    """Retorna 0..1 normalizado para a velocidade do cursor em px/s."""
+    if velocidade_px_s is None or velocidade_px_s <= 0.0:
+        return 0.0
+    return clamp(float(velocidade_px_s) / float(LIMIAR_MOUSE_RAPIDO))
+
+
+def calcular_fator_digitacao(teclas_s):
+    """Retorna 0..1 normalizado para a taxa de digitação (teclas por segundo)."""
+    if teclas_s is None or teclas_s <= 0.0:
+        return 0.0
+    return clamp(float(teclas_s) / float(LIMIAR_DIGITACAO_RAPIDA))
+
+
 # ============================================================
 # EVENTOS DO COMPUTADOR
 # ============================================================
@@ -215,6 +275,8 @@ class ComputerSenses:
         self.pulse = {name: 0.0 for name in self.PULSE_TAU}
         self.level = {"WORK": 0.0, "PLAY": 0.0, "SOUND": 0.0, "SOCIAL": 0.0, "WEB": 0.0}
         self.typing = 0.0
+        self.typing_speed = 0.0
+        self.mouse_speed = 0.0
         self.drag = 0.0
         self.dragging = False
         self.caress = 0.0
@@ -252,7 +314,9 @@ class ComputerSenses:
         """strength 0..1 (velocidade da batida); a irritação acumula entre batidas."""
         self.kick("IMPACT", 0.5 * strength)
 
-    def update(self, activity, idle_seconds, drives, caressing=False, mouse_moving=False):
+    def update(self, activity, idle_seconds, drives, caressing=False, mouse_moving=False,
+               typing_speed=0.0, cpu_load=0.0, circadian=0.0, mouse_speed=0.0,
+               battery_low=0.0, window_count=0.0):
         """drives: canais internos da homeostase (BOREDOM, LONELY, FATIGUE)."""
         now = time.monotonic()
         dt = clamp(now - self.last, 0.0, 1.0)
@@ -270,6 +334,8 @@ class ComputerSenses:
         # que é mexer o mouse). Antes, mexer o mouse contava como digitar.
         typing_now = 1.0 if idle_seconds < 0.3 and not mouse_moving and not caressing else 0.0
         self.typing += (typing_now - self.typing) * (1.0 - math.exp(-dt / 2.0))
+        self.typing_speed += (clamp(typing_speed) - self.typing_speed) * (1.0 - math.exp(-dt / 1.5))
+        self.mouse_speed += (clamp(mouse_speed) - self.mouse_speed) * (1.0 - math.exp(-dt / 0.8))
 
         drag_now = 1.0 if self.dragging else 0.0
         self.drag += (drag_now - self.drag) * (1.0 - math.exp(-dt / 0.7))
@@ -283,5 +349,11 @@ class ComputerSenses:
         intensities["DRAG"] = self.drag
         intensities["CARESS"] = self.caress
         intensities["SILENCE"] = clamp((idle_seconds - 5.0) / 60.0)
+        intensities["TYPING_SPEED"] = self.typing_speed
+        intensities["CPU_LOAD"] = clamp(cpu_load)
+        intensities["CIRCADIAN"] = clamp(circadian)
+        intensities["MOUSE_SPEED"] = self.mouse_speed
+        intensities["BATTERY_LOW"] = clamp(battery_low)
+        intensities["WINDOW_COUNT"] = clamp(window_count)
         intensities.update(drives)
         return intensities

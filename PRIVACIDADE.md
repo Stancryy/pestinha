@@ -6,6 +6,14 @@ O Pestinha roda só no seu computador. Ele não envia nada para a internet.
 
 - O **nome** do programa em primeiro plano (por exemplo `code.exe`). Nunca o título nem o conteúdo da janela.
 - Quanto tempo você está sem usar teclado ou mouse, e se o teclado ou o mouse foram usados agora.
+- A **velocidade de digitação** (taxa agregada de teclas por segundo). O pet conta estritamente a quantidade de eventos de toque para saber se você está digitando rápido ou devagar. **NUNCA** registra, processa, armazena ou inspeciona quais teclas foram pressionadas, texto digitado, senhas ou clipboard.
+- A posição e a **velocidade do cursor do mouse**, para saber se ele encostou na bolinha, se você está em cima do pet (carinho, cutucar), se o mouse passou rápido perto dele ou se você está perto dele no cantinho do castigo.
+- O **uso de hardware (CPU e RAM)** agregado do sistema (via `psutil`) e o **status da bateria** (nível percentual e se está na tomada, caso seja notebook), para o pet reagir à máquina sob carga pesada ou com bateria no fim.
+- O **número de janelas abertas**, bem como a geometria (posição e tamanho das barras de título), para saber onde pousar e reagir a multitarefas intensas.
+- A **hora local do sistema**, para o ritmo biológico/circadiano do pet (identificar madrugadas e noites para sonolência).
+
+- O **nome** do programa em primeiro plano (por exemplo `code.exe`). Nunca o título nem o conteúdo da janela.
+- Quanto tempo você está sem usar teclado ou mouse, e se o teclado ou o mouse foram usados agora.
 - A posição do cursor, para saber se ele encostou na bolinha, se você está em cima do pet (carinho,
   cutucar) ou perto dele no cantinho do castigo.
 - Se uma janela cobre a tela inteira (para não aparecer em jogos ou apresentações).

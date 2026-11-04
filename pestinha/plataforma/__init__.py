@@ -17,14 +17,17 @@ import sys
 
 from ._comum import (
     adquirir_trava_instancia,
+    bateria_status,
     caminho_atalho_inicializar,
     configurar_iniciar_com_windows,
     formatar_atalho,
     iniciar_com_windows_ativo,
     liberar_trava_instancia,
     midia_tocando,
+    obter_monitor_digitacao,
     parse_atalho,
     uso_hardware,
+    MonitorDigitacao,
 )
 
 if sys.platform == "win32":
@@ -46,7 +49,9 @@ iniciar_atalho = _backend.iniciar_atalho
 
 __all__ = [
     "NOME_DO_SISTEMA",
+    "MonitorDigitacao",
     "adquirir_trava_instancia",
+    "bateria_status",
     "caminho_atalho_inicializar",
     "configurar_iniciar_com_windows",
     "formatar_atalho",
@@ -55,6 +60,7 @@ __all__ = [
     "janelas_visiveis",
     "liberar_trava_instancia",
     "midia_tocando",
+    "obter_monitor_digitacao",
     "ocioso_segundos",
     "parse_atalho",
     "processo_ativo",

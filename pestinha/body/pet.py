@@ -12,7 +12,7 @@ import random
 import time
 
 from PySide6.QtCore import QRect, QRectF, Qt, Signal
-from PySide6.QtGui import QCursor, QFont, QPainter
+from PySide6.QtGui import QColor, QCursor, QFont, QPainter
 from PySide6.QtWidgets import QWidget
 
 from ..config import EMOTION_NAMES
@@ -151,6 +151,13 @@ class PetWindow(QWidget):
             if getattr(st, "dancando", False):
                 sway += 6.5 * math.sin(time.monotonic() * 8.0)
                 jitter_y -= 2.5 * abs(math.sin(time.monotonic() * 8.0))
+            elif getattr(st, "torcendo", False):
+                sway += 4.0 * math.sin(time.monotonic() * 9.0)
+                jitter_y -= 3.5 * abs(math.sin(time.monotonic() * 9.0))
+        if getattr(st, "bateria_baixa", False):
+            jitter_x += random.uniform(-1.2, 1.2)
+        if getattr(st, "corujao", False) and st.emotion != "dormindo":
+            jitter_y += 1.0 * math.sin(time.monotonic() * 1.4)
         if st.emotion == "dormindo":
             jitter_y += 1.5 * math.sin(time.monotonic() * 1.6)     # respirando devagar
 
@@ -171,6 +178,20 @@ class PetWindow(QWidget):
             p.setFont(QFont("Consolas", 11, QFont.Bold))
             dy_nota = 4.0 * math.sin(time.monotonic() * 6.0)
             p.drawText(QRectF(CX + 38, CY - 58 + dy_nota, 32, 20), Qt.AlignCenter, "♪ ♫")
+        elif getattr(st, "torcendo", False):
+            p.setPen(self.aparencia.olho)
+            p.setFont(QFont("Consolas", 11, QFont.Bold))
+            dy_fogo = 3.0 * math.sin(time.monotonic() * 8.0)
+            p.drawText(QRectF(CX + 38, CY - 58 + dy_fogo, 32, 20), Qt.AlignCenter, "🔥")
+        elif getattr(st, "bateria_baixa", False):
+            p.setPen(QColor("#ffbe0b"))
+            p.setFont(QFont("Consolas", 11, QFont.Bold))
+            p.drawText(QRectF(CX + 38, CY - 58, 32, 20), Qt.AlignCenter, "⚡!")
+        elif getattr(st, "corujao", False):
+            p.setPen(QColor("#90e0ef"))
+            p.setFont(QFont("Consolas", 11, QFont.Bold))
+            dy_lua = 2.0 * math.sin(time.monotonic() * 2.0)
+            p.drawText(QRectF(CX + 38, CY - 58 + dy_lua, 32, 20), Qt.AlignCenter, "🌙")
 
         if st.show_label:
             p.setPen(self.aparencia.olho)

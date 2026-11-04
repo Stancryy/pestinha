@@ -33,6 +33,7 @@ from . import ajustes
 from . import config
 from . import log as log_module
 from . import migracao
+from . import plataforma
 from .ajustes import (
     ATIVIDADE_MINIMA_VOO as REFLEX_MIN_HZ,
     BATIDA_FORTE as HARD_IMPACT,
@@ -141,6 +142,8 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         # ----- sentidos -----
         senses.carregar_atividades(self.paths.activities)
         self.senses = senses.ComputerSenses()
+        self.monitor_digitacao = plataforma.obter_monitor_digitacao()
+        self.monitor_digitacao.iniciar()
         self.tracker = senses.ActivityTracker()
         self.activity = "IDLE"
         self._active_app_name = ""
@@ -475,11 +478,39 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
                 self.registrar_conquista("carinhos", 1)
                 self.tocar_som("carinho")
 
-        intensities = self.senses.update(self.activity, idle, self.drives.channels(), caressing, mouse_moving)
+        # novos canais sensoriais expandidos
+        teclas_s = self.monitor_digitacao.teclas_por_segundo() if hasattr(self, "monitor_digitacao") else 0.0
+        fator_digitacao = senses.calcular_fator_digitacao(teclas_s)
+        dist_cursor = math.hypot(cursor[0] - self.last_cursor[0], cursor[1] - self.last_cursor[1])
+        mouse_vel_px_s = (dist_cursor / dt) if dt > 0 else 0.0
+        fator_mouse = senses.calcular_fator_mouse(mouse_vel_px_s)
+        cpu_pct, _ram_pct = senses.get_hardware_usage()
+        fator_cpu = cpu_pct / 100.0
+        bat_pct, bat_plugged = plataforma.bateria_status()
+        fator_bateria = senses.calcular_fator_bateria(bat_pct, bat_plugged)
+        fator_janelas = senses.calcular_fator_janelas(len(self.platforms))
+        fator_circadiano = senses.calcular_fator_circadiano()
+
+        intensities = self.senses.update(
+            self.activity, idle, self.drives.channels(), caressing, mouse_moving,
+            typing_speed=fator_digitacao,
+            cpu_load=fator_cpu,
+            circadian=fator_circadiano,
+            mouse_speed=fator_mouse,
+            battery_low=fator_bateria,
+            window_count=fator_janelas,
+        )
+        st.torcendo = fator_digitacao >= 0.7
+        st.bateria_baixa = fator_bateria >= 0.5
+        st.corujao = fator_circadiano >= 0.7
+        if self.perms.get("reagir_hardware", False) or fator_cpu >= (ajustes.LIMIAR_CPU_ALTA / 100.0):
+            st.suando = True
         if getattr(self.pet_state, "dancando", False):
             intensities["SOUND"] = max(intensities.get("SOUND", 0.0), 0.75)
         # condicionamento: o cursor vindo rápido para ele, ou o botão apertado em cima, antecipam
         dist = math.hypot(cursor[0] - body.x, cursor[1] - body.y)
+        if fator_mouse >= 0.8 and dist < 220:
+            self.senses.kick("ALERT", 0.4)
         approaching = (self.prev_pet_dist is not None and dist < 220
                        and dt > 0 and (self.prev_pet_dist - dist) / dt > 500)
         self.prev_pet_dist = dist

@@ -84,6 +84,12 @@ SENSORY_SPEC = {
     "VISITA":  (6,  60.0, 0.0,        1.0),   # você está perto dele enquanto ele está preso
     "RECEIO":  (6,  40.0, 0.0,        1.0),   # interno: fugas que deram errado (devolvido ao canto)
     "RANCOR":  (6,  40.0, 0.0,        1.0),   # interno: tempo de castigo acumulado, decai devagar
+    "TYPING_SPEED": (6, 80.0, 0.00010, 900.0),   # velocidade de digitação (teclas/s): habitua com ritmo constante
+    "CPU_LOAD":     (6, 60.0, 0.0,       1.0),   # máquina sob carga/calor (ambiental/homeostático: não habitua)
+    "CIRCADIAN":    (6, 40.0, 0.0,       1.0),   # período noturno/madrugada (ciclo biológico: não habitua)
+    "MOUSE_SPEED":  (6, 80.0, 0.00040, 600.0),   # cursor muito rápido (agitação motora: habitua em minutos)
+    "BATTERY_LOW":  (6, 60.0, 0.0,       1.0),   # bateria acabando sem tomada (urgência: não habitua)
+    "WINDOW_COUNT": (6, 40.0, 0.00020, 1200.0),  # multitarefa com muitas janelas abertas (habitua devagar)
 }
 
 # ============================================================
@@ -99,7 +105,7 @@ PLASTIC_POSTS = {"PLAYFUL": 1.0, "CALM": 1.0, "FRUSTRATION": -1.0, "GLOOM": -1.0
 PLASTIC_DENSITY = 0.5
 LEARN_MIN, LEARN_MAX = -0.05, 0.08     # peso aprendido (fração do limiar)
 ELIGIBILITY_TAU = 4.0                  # s: quanto tempo um contexto "conta" para a recompensa
-LEARNED_VERSION = 2                    # 2: TYPING passou a ser só teclado
+LEARNED_VERSION = 3                    # 3: expansão de sensores (digitação rápida, carga, circadiano, mouse, bateria, janelas)
 
 # ============================================================
 # INTERNEURÔNIOS: nome, tipo, n, tau_m (ms), adapt_b, adapt_tau (s), centro
@@ -194,6 +200,25 @@ CONNECTIONS = [
     ("IMPACT",  "GLOOM",   0.02, 0.6),
     ("BOREDOM", "CURIOUS", 0.12, 0.6),
     ("BOREDOM", "PLAYFUL", 0.09, 0.6),
+
+    # novos sensores -> interneurônios
+    ("TYPING_SPEED", "FOCUS", 0.07, 0.6),
+    ("TYPING_SPEED", "ALERT", 0.04, 0.6),
+    ("TYPING_SPEED", "PLAYFUL", 0.03, 0.6),
+    ("CPU_LOAD", "ALERT", 0.07, 0.6),
+    ("CPU_LOAD", "FRUSTRATION", 0.05, 0.6),
+    ("CPU_LOAD", "CALM", -0.05, 0.5),
+    ("CIRCADIAN", "TIRED", 0.12, 0.6),
+    ("CIRCADIAN", "QUIET", 0.08, 0.6),
+    ("CIRCADIAN", "ALERT", -0.06, 0.5),
+    ("MOUSE_SPEED", "ALERT", 0.08, 0.6),
+    ("MOUSE_SPEED", "CURIOUS", 0.05, 0.6),
+    ("MOUSE_SPEED", "CALM", -0.04, 0.5),
+    ("BATTERY_LOW", "ALERT", 0.08, 0.6),
+    ("BATTERY_LOW", "GLOOM", 0.06, 0.6),
+    ("BATTERY_LOW", "PLAYFUL", -0.04, 0.5),
+    ("WINDOW_COUNT", "CURIOUS", 0.06, 0.6),
+    ("WINDOW_COUNT", "ALERT", 0.04, 0.6),
 
     # interneurônios entre si
     ("TIRED",   "GLOOM",   0.03, 0.5),
@@ -381,7 +406,7 @@ class LIFBrain(Brain):
             return pool
 
         for i, (name, (n, *_rest)) in enumerate(SENSORY_SPEC.items()):
-            add_pool(name, "sensory", n, "sens", (0.05, 0.06 + i * 0.0933))
+            add_pool(name, "sensory", n, "sens", (0.05, 0.04 + i * (0.90 / max(1, len(SENSORY_SPEC) - 1))))
 
         for name, kind, n, _tau, _b, _bt, center in INTER_SPEC:
             add_pool(name, "inter", n, kind, center)

@@ -45,6 +45,9 @@ class PetState:
         self.suando = False         # CPU alta (reagir_hardware ligado)
         self.apertado = False       # RAM cheia (reagir_hardware ligado)
         self.dancando = False       # música/mídia tocando (reagir_musica ligado)
+        self.torcendo = False       # digitação rápida / euforia produtiva
+        self.bateria_baixa = False  # bateria crítica sem tomada
+        self.corujao = False        # madrugada / período noturno profundo
 
     def mark_caress(self, now=None):
         """Marca que ele está recebendo carinho agora (dura um instante)."""

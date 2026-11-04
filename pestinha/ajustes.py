@@ -140,6 +140,10 @@ LIMIAR_RAM_ALTA = 88.0          # % de RAM a partir do qual o pet fica apertado 
 POMODORO_FOCO_MIN = 25          # minutos do ciclo de foco do Pomodoro
 POMODORO_PAUSA_MIN = 5          # minutos de pausa sugerida após o Pomodoro
 INTERVALO_LEMBRETE_MIN = 45     # minutos entre lembretes opcionais de água e postura
+LIMIAR_DIGITACAO_RAPIDA = 6.0   # teclas/s a partir do qual a digitação é considerada rápida
+LIMIAR_MOUSE_RAPIDO = 1500.0    # px/s a partir do qual o movimento do mouse é considerado rápido
+LIMIAR_BATERIA_BAIXA = 20.0     # % de bateria restante para considerar em nível baixo/urgente
+LIMIAR_JANELAS_MUITAS = 10      # quantidade de janelas visíveis para considerar multitarefa intensa
 
 # ---------------------------------------------------------------------------
 # Validação
@@ -228,6 +232,10 @@ _LIMITES = {
     "POMODORO_FOCO_MIN": (int, 1, 180),
     "POMODORO_PAUSA_MIN": (int, 1, 60),
     "INTERVALO_LEMBRETE_MIN": (int, 5, 240),
+    "LIMIAR_DIGITACAO_RAPIDA": (float, 1.0, 50.0),
+    "LIMIAR_MOUSE_RAPIDO": (float, 100.0, 10000.0),
+    "LIMIAR_BATERIA_BAIXA": (float, 5.0, 50.0),
+    "LIMIAR_JANELAS_MUITAS": (int, 2, 100),
 }
 
 

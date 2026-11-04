@@ -62,6 +62,19 @@
 ### Build `--onedir` com ícone da Mia e metadados de versão (Etapa 13 / Fase 4)
 - Script `ferramentas/empacotar.py` que converte `pets/mia/sprites/feliz.webp` em `assets/comum/icone_mia.ico` multi-resolução (`16x16` a `256x256`), gera metadados de versão `0.8.0.0` do Windows e compila `executáveis/Pestinha/Pestinha.exe` no modo `--onedir` com cópia integrada de `assets/` e `pets/`.
 
+### Expansão da SNN: Novos Sentidos e Comportamentos (Fase 1)
+- Expansão da rede neural pulsada para **506 neurônios**, **16.687 sinapses** e **36 canais sensoriais** (6 novos canais de 6 neurônios cada).
+- Novos canais com modelagem biológica de habituação:
+  - `TYPING_SPEED` (velocidade de digitação agregada, d=0.0001, tau_rec=900 s): monitor anônimo que afeta FOCUS, ALERT e desperta euforia/torcida.
+  - `CPU_LOAD` (carga de CPU, ambiental sem habituação): afeta ALERT e FRUSTRATION, gerando animação ofegante/suor e reações a aquecimento.
+  - `CIRCADIAN` (ritmo circadiano noturno/madrugada, ciclo biológico): afeta TIRED e QUIET, elevando o motor DROWSE e bocejos.
+  - `MOUSE_SPEED` (velocidade do cursor, d=0.0004, tau_rec=600 s): afeta ALERT e CURIOUS, reagindo a movimentos bruscos do mouse próximo ao pet.
+  - `BATTERY_LOW` (bateria baixa sem tomada em notebooks, urgência): afeta ALERT e GLOOM, gerando tremor leve e alertas de tomada.
+  - `WINDOW_COUNT` (multitarefa com muitas janelas abertas, d=0.0002, tau_rec=1200 s): estimula CURIOUS e ALERT.
+- Validações completas em `pestinha/ajustes.py` (`LIMIAR_DIGITACAO_RAPIDA`, `LIMIAR_MOUSE_RAPIDO`, `LIMIAR_BATERIA_BAIXA`, `LIMIAR_JANELAS_MUITAS`).
+- Conformidade estrita de privacidade em `PRIVACIDADE.md` (zero registro de teclas ou títulos de janelas).
+- Suíte completa de testes (`tests/test_novos_sensores.py`) e regeneração automática de `docs/REDE_NEURAL.md`.
+
 ## Suporte a macOS e Linux
 
 - Toda a leitura do sistema (programa em primeiro plano, tempo ocioso, janelas, tela cheia, foco e o atalho

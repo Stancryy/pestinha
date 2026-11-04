@@ -4,6 +4,8 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import threading
+import time
 
 import psutil
 
@@ -181,3 +183,89 @@ def midia_tocando(apps_musica=()):
     except Exception:
         pass
     return False
+
+
+def bateria_status():
+    """
+    Retorna `(porcentagem, conectado_na_tomada)`.
+    Se o computador for um desktop ou o sensor não estiver disponível, retorna `(None, None)`.
+    """
+    try:
+        bateria = psutil.sensors_battery()
+        if bateria is None:
+            return None, None
+        return float(bateria.percent), bool(bateria.power_plugged)
+    except Exception:
+        return None, None
+
+
+class MonitorDigitacao:
+    """
+    Monitor de velocidade de digitação (teclas por segundo).
+    CONFORMIDADE COM A PRIVACIDADE:
+    Conta exclusivamente a QUANTIDADE de eventos de toque por segundo,
+    descartando de imediato qualquer informação sobre QUAL tecla foi pressionada.
+    Nenhuma tecla, caractere, texto ou identificador de tecla é armazenado ou transmitido.
+    """
+
+    def __init__(self):
+        self._contador = 0
+        self._lock = threading.Lock()
+        self._ultimo_calculo = time.monotonic()
+        self._taxa_atual = 0.0
+        self._listener = None
+        self._ativo = False
+
+    def iniciar(self):
+        """Inicia o listener em segundo plano. Degrada graciosamente se indisponível."""
+        if self._ativo:
+            return True
+        try:
+            from pynput import keyboard
+
+            def _on_press(_key):
+                # Descarte imediato do argumento _key: apenas incrementa contador
+                with self._lock:
+                    self._contador += 1
+
+            self._listener = keyboard.Listener(on_press=_on_press)
+            self._listener.daemon = True
+            self._listener.start()
+            self._ativo = True
+            return True
+        except Exception as error:
+            log(f"[teclado] monitor de digitação desligado ou indisponível: {error}")
+            return False
+
+    def parar(self):
+        """Interrompe o monitor de digitação."""
+        if self._listener is not None:
+            try:
+                self._listener.stop()
+            except Exception:
+                pass
+            self._listener = None
+        self._ativo = False
+
+    def teclas_por_segundo(self):
+        """Retorna a taxa recente de teclas/segundo (sempre >= 0.0)."""
+        agora = time.monotonic()
+        dt = agora - self._ultimo_calculo
+        if dt >= 0.2:
+            with self._lock:
+                self._taxa_atual = self._contador / dt
+                self._contador = 0
+            self._ultimo_calculo = agora
+        return self._taxa_atual
+
+
+_MONITOR_DIGITACAO = None
+
+
+def obter_monitor_digitacao():
+    """Retorna a instância compartilhada do MonitorDigitacao."""
+    global _MONITOR_DIGITACAO
+    if _MONITOR_DIGITACAO is None:
+        _MONITOR_DIGITACAO = MonitorDigitacao()
+    return _MONITOR_DIGITACAO
+

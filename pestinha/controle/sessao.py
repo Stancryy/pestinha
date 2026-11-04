@@ -283,6 +283,8 @@ class SessaoMixin:
         if self.perms["rotina"]:
             self.timeline.close()
         self.mischief.clear()
+        if hasattr(self, "monitor_digitacao") and self.monitor_digitacao is not None:
+            self.monitor_digitacao.parar()
         plataforma.liberar_trava_instancia(self.paths.lock)
         self.tray.icon.hide()
         QApplication.quit()
