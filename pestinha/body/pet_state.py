@@ -49,6 +49,20 @@ class PetState:
         self.bateria_baixa = False  # bateria crítica sem tomada
         self.corujao = False        # madrugada / período noturno profundo
         self.fuga = False           # fugindo do cantinho do castigo
+        self.delivering = False     # carregando/entregando meme ou post-it
+        self.acao_temp = ""         # ação momentânea ativa (chute, cutucada, quique, etc)
+        self.acao_temp_ate = 0.0    # expiração da ação momentânea em monotonic
+
+    def definir_acao(self, nome: str, duracao: float, now=None):
+        """Define uma ação visual temporária de prioridade com duração determinada."""
+        agora = time.monotonic() if now is None else now
+        self.acao_temp = nome
+        self.acao_temp_ate = agora + duracao
+
+    def acao_ativa(self, now=None) -> str:
+        """Retorna o nome da ação temporária se ainda estiver dentro do prazo."""
+        agora = time.monotonic() if now is None else now
+        return self.acao_temp if agora < self.acao_temp_ate else ""
 
     def mark_caress(self, now=None):
         """Marca que ele está recebendo carinho agora (dura um instante)."""
