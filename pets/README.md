@@ -25,6 +25,7 @@ Pode editar com ele aberto: ele relê os textos e procura imagens novas sozinho.
 
 | Arquivo ou pasta | O que é |
 |---|---|
+| `animacoes/` | Opcional (MiaUp): animações em formato `.svg` cobrindo movimentos e estados corporais/faciais em tempo real. |
 | `memes/<emoção>/` | Imagens (.png .jpg .gif .webp .bmp) que ele traz com aquela emoção: `feliz`, `contente`, `observando`, `curioso` (arrastadas pela tela), `bravo` (pequenas, num cantinho), `triste`, `assustado`, `dramatico`. Se a pasta da emoção estiver vazia, usa um meme de outra emoção **do mesmo pet**. |
 | `memes/trabalhando/` | Memes de quando você programa e ele não está sentado no notebook. |
 | `recadinhos.txt` | Uma frase por linha, sorteada para os post-its. `#` é comentário. |
@@ -38,6 +39,7 @@ de outro pet.
 
 ## Personagens que já existem
 
+- **Mia (MiaUp)** (`mia.json`, `mia/`): personagem estilo anime em arte vetorial com motor de 34 animações SVG em `mia/animacoes/` (movimentos físicos, expressões faciais, carinho, trabalho no notebook, castigo e protesto em 4 estágios). Cabelo rosa com pontas azuis e olhos rubi.
 - **Bryan** (`bryan.json`, `bryan/`): o original.
 - **Jorge** (`jorge.json`, `jorge/`): coach trambiqueiro. Mais insistente quando ignorado, muito animado
   com atenção, desesperado quando dispensam as coisas dele e quase nunca triste. O panfleto que ele atira
