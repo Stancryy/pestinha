@@ -209,7 +209,7 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.companhia = CompanhiaController(self)
         self.castigo = CastigoController(self, self.debugging)
         paper = load_sprite(self.conteudo.bolinha_papel)
-        self.revolucao = RevolucaoController(self.behavior.play, self.debugging, sprite=paper)
+        self.revolucao = RevolucaoController(self.behavior.play, self.debugging, sprite=paper, state=self.pet_state)
 
         # ----- reflexos e medições -----
         self.in_flight = False      # voando depois de um arremesso
@@ -628,9 +628,11 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         body.step(dt, bounds, self.platforms, areas, monitores)
         self.behavior.screen_areas = areas
         if not body.held and self.mesa.pin(body, now) == "arrancado":
+            self.pet_state.definir_acao("arrancada_notebook", 0.8, now)
             self.arrancar_notebook(now)
         speed = max(body.pop_impacts(), default=0.0)
         if speed >= HARD_IMPACT and now - self.last_impact >= IMPACT_COOLDOWN:
+            self.pet_state.definir_acao("quique", 0.35, now)
             self.last_impact = now
             self.senses.impact(min(1.0, 0.3 + (speed - HARD_IMPACT) / 1500.0))
             if self.asleep:
