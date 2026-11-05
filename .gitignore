@@ -10,6 +10,7 @@ dist/
 executáveis/
 executaveis/
 *.spec
+*.exe
 
 # Temporários
 *.tmp
