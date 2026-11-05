@@ -175,7 +175,7 @@ class PetWindow(QWidget):
         ap_atual = self.aparencia
         if getattr(st, "suando", False) or getattr(st, "apertado", False):
             ap_atual = _replace_dc(self.aparencia, suando=bool(getattr(st, "suando", False)), apertado=bool(getattr(st, "apertado", False)))
-        draw_face(p, st.shape, st.gaze, blink, st.emotion, carinho=st.feliz_fechado(), aparencia=ap_atual)
+        draw_face(p, st.shape, st.gaze, blink, st.emotion, carinho=st.feliz_fechado(), aparencia=ap_atual, estado=st, corpo=self.body)
         p.restore()
 
         if st.emotion == "dormindo":
