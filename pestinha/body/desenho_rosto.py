@@ -191,22 +191,75 @@ def _carregar_animacao_svg(variante: str, chave: str):
 
 
 def resolver_animacao_mia(emotion: str, carinho: bool, a: Aparencia, estado=None, corpo=None) -> str:
-    """Determina qual das 34 animações da Mia deve ser exibida com base no estado e física atuais."""
-    if corpo is not None:
-        if getattr(corpo, "held", False):
-            return "07-segurada-drag.svg"
-        if hasattr(corpo, "upright") and not corpo.upright():
-            return "12-tombada-de-lado.svg"
+    """Determina de forma estrita e sem conflito qual das 34 animações da Mia deve ser exibida."""
+    import time
+    import math
+    now = time.monotonic()
 
+    # 1. Carinho / Afeto direto tem prioridade máxima (sobrepõe qualquer repouso ou protesto leve)
+    if carinho or (estado is not None and (getattr(estado, "caressing", lambda n=None: False)(now)
+                                           or getattr(estado, "feliz_fechado", lambda n=None: False)(now))):
+        return "10-cafune.svg"
+
+    # 2. Segurada pelo mouse (drag ativo do usuário)
+    if corpo is not None and getattr(corpo, "held", False):
+        return "07-segurada-drag.svg"
+
+    # 3. Ações momentâneas de alta prioridade (chute, cutucada, quique, pirueta, arremesso, perdao...)
+    if estado is not None and hasattr(estado, "acao_ativa"):
+        acao = estado.acao_ativa(now)
+        if acao == "chute":
+            return "23-chute-na-bolinha.svg"
+        elif acao == "cutucada":
+            return "09-cutucada.svg"
+        elif acao == "quique":
+            return "26-pouso-e-quique.svg"
+        elif acao == "papel":
+            return "15-bolinha-de-papel.svg"
+        elif acao == "pirueta":
+            return "05-pirueta.svg"
+        elif acao == "arremesso":
+            return "08-arremessada.svg"
+        elif acao == "escalada":
+            return "25-escalada-de-janela.svg"
+        elif acao == "levantar":
+            return "27-levantar-do-chao.svg"
+        elif acao == "perdao":
+            return "28-saida-por-perdao.svg"
+        elif acao == "arrancada_notebook":
+            return "30-arrancada-do-notebook.svg"
+
+    # 4. Tontura ou tombada física
+    if estado is not None and getattr(estado, "dizzy", lambda n=None: False)(now):
+        return "11-tontura.svg"
+    if corpo is not None and hasattr(corpo, "upright") and not corpo.upright():
+        return "12-tombada-de-lado.svg"
+
+    # 5. Física no ar (arremesso de alta velocidade, pulo ou queda)
+    if corpo is not None and not getattr(corpo, "grounded", False):
+        vx = getattr(corpo, "vx", 0.0)
+        vy = getattr(corpo, "vy", 0.0)
+        speed = math.hypot(vx, vy)
+        if speed > 320.0 or vy > 120.0:
+            return "08-arremessada.svg"
+        elif vy < -30.0:
+            return "04-pulinho.svg"
+        else:
+            return "04-pulinho.svg"
+
+    # 6. Fuga, Trabalho no Notebook, Castigo e Entregas
     if estado is not None:
         if getattr(estado, "fuga", False):
             return "06-fuga-em-disparada.svg"
-        if getattr(estado, "dizzy", lambda now=None: False)():
-            return "11-tontura.svg"
         if getattr(estado, "at_desk", False):
             return "14-no-notebook.svg"
         if getattr(estado, "castigo", False):
             return "29-de-castigo-na-placa.svg"
+        if getattr(estado, "delivering", False):
+            return "24-entregar-travessura.svg"
+
+    # 7. Protesto Graduado (Estágios 1 a 4)
+    if estado is not None:
         stage = getattr(estado, "protest_stage", 0)
         if stage == 1:
             return "34-reclamacao-estagio-1.svg"
@@ -216,6 +269,9 @@ def resolver_animacao_mia(emotion: str, carinho: bool, a: Aparencia, estado=None
             return "18-greve-sentada.svg"
         elif stage == 4:
             return "19-revolucao-neon.svg"
+
+    # 8. Reações Especiais de Ambiente / Hardware
+    if estado is not None:
         if getattr(estado, "dancando", False):
             return "16-dancando.svg"
         if getattr(estado, "torcendo", False):
@@ -228,35 +284,35 @@ def resolver_animacao_mia(emotion: str, carinho: bool, a: Aparencia, estado=None
             return "22-bateria-baixa.svg"
         if getattr(estado, "corujao", False):
             return "32-corujao-da-madrugada.svg"
-        if carinho or (hasattr(estado, "feliz_fechado") and estado.feliz_fechado()):
-            return "10-cafune.svg"
 
     if getattr(a, "suando", False):
         return "21-cpu-alta-suando.svg"
     if getattr(a, "apertado", False):
         return "31-ram-alta-comprimida.svg"
-    if carinho:
-        return "10-cafune.svg"
+
+    # 9. Sono
     if emotion == "dormindo":
         return "13-dormindo.svg"
+
+    # 10. Locomoção no chão (sempre prioriza andar quando há velocidade)
+    if corpo is not None and getattr(corpo, "grounded", False):
+        vx = abs(getattr(corpo, "vx", 0.0))
+        if vx > 140.0:
+            return "06-fuga-em-disparada.svg"
+        elif vx > 10.0:
+            return "02-andar.svg"
+
+    # 11. Expressões em repouso parado no chão (nunca pula parado)
     if emotion == "triste":
         return "20-chorando.svg"
     if emotion == "bravo":
         return "34-reclamacao-estagio-1.svg"
-    if emotion == "assustado":
-        return "09-cutucada.svg"
-    if emotion == "trabalhando":
-        return "14-no-notebook.svg"
-    if emotion in ("feliz", "contente"):
-        if corpo is not None and getattr(corpo, "grounded", False) and abs(getattr(corpo, "vx", 0.0)) > 15.0:
-            return "02-andar.svg"
-        return "04-pulinho.svg"
     if emotion == "curioso":
         return "03-hesitacao.svg"
+    if emotion == "assustado":
+        return "09-cutucada.svg"
 
-    if corpo is not None and getattr(corpo, "grounded", False) and abs(getattr(corpo, "vx", 0.0)) > 15.0:
-        return "02-andar.svg"
-
+    # 12. Padrão Absoluto de Repouso
     return "01-parada.svg"
 
 
@@ -409,21 +465,19 @@ def _draw_anime_pixel(p: QPainter, shape: dict, gaze, blink: float, emotion: str
     chave_svg = resolver_animacao_mia(emotion, carinho, a, estado, corpo)
     svg_renderer = _carregar_animacao_svg(a.variante, chave_svg)
     if svg_renderer is not None:
-        gx, gy = gaze
-        dx = int(round(max(-1.0, min(1.0, gx)) * 3.0))
-        dy = int(round(max(-1.0, min(1.0, gy)) * 2.0))
-        target_rect = QRectF(-60 + dx, -68 + dy, 120, 150)
+        # Inversão horizontal para olhar/andar sempre na direção do movimento
+        olhando_esquerda = False
+        if corpo is not None and abs(getattr(corpo, "vx", 0.0)) > 6.0:
+            olhando_esquerda = getattr(corpo, "vx", 0.0) < 0
+        elif gaze is not None and len(gaze) >= 1:
+            olhando_esquerda = gaze[0] < -0.15
+
+        if olhando_esquerda:
+            p.scale(-1.0, 1.0)
+
+        # target_rect alinhado: 120x150, pés tocam o chão exatamente no nível da física (y=+45)
+        target_rect = QRectF(-60, -99, 120, 150)
         svg_renderer.render(p, target_rect)
-        # Pontos internos discretos para sincronizar as cores exatas configuradas em aparencia
-        p.fillRect(QRectF(-2 + dx, -36 + dy, 2, 2), a.moldura)
-        if "chifrinhos" in acessorios_dict:
-            cor_ch = acessorios_dict["chifrinhos"]
-            p.fillRect(QRectF(-24 + dx, -42 + dy, 2, 2), cor_ch)
-            p.fillRect(QRectF(22 + dx, -42 + dy, 2, 2), cor_ch)
-        if "headset" in acessorios_dict:
-            cor_hs = acessorios_dict["headset"]
-            p.fillRect(QRectF(-34 + dx, 18 + dy, 2, 3), cor_hs)
-            p.fillRect(QRectF(32 + dx, 18 + dy, 2, 3), cor_hs)
         p.restore()
         return
 
