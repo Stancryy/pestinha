@@ -122,6 +122,45 @@ def test_mapeamento_de_estados_para_animacoes():
     # Sono e choro
     assert resolver_animacao_mia("dormindo", False, a, st, body) == "13-dormindo.svg"
     assert resolver_animacao_mia("triste", False, a, st, body) == "20-chorando.svg"
+    assert resolver_animacao_mia("curioso", False, a, st, body) == "03-hesitacao.svg"
+
+    # No ar: pulinho e arremesso
+    body.grounded = False
+    body.vy = -50.0
+    assert resolver_animacao_mia("observando", False, a, st, body) == "04-pulinho.svg"
+    body.vy = 200.0
+    body.vx = 400.0
+    assert resolver_animacao_mia("observando", False, a, st, body) == "08-arremessada.svg"
+    body.grounded = True
+    body.vx = 0.0
+    body.vy = 0.0
+
+    # Castigo e entrega
+    st.castigo = True
+    assert resolver_animacao_mia("observando", False, a, st, body) == "29-de-castigo-na-placa.svg"
+    st.castigo = False
+
+    st.delivering = True
+    assert resolver_animacao_mia("observando", False, a, st, body) == "24-entregar-travessura.svg"
+    st.delivering = False
+
+    # Ações temporárias de alta prioridade
+    acoes_esperadas = {
+        "chute": "23-chute-na-bolinha.svg",
+        "cutucada": "09-cutucada.svg",
+        "quique": "26-pouso-e-quique.svg",
+        "papel": "15-bolinha-de-papel.svg",
+        "pirueta": "05-pirueta.svg",
+        "arremesso": "08-arremessada.svg",
+        "escalada": "25-escalada-de-janela.svg",
+        "levantar": "27-levantar-do-chao.svg",
+        "perdao": "28-saida-por-perdao.svg",
+        "arrancada_notebook": "30-arrancada-do-notebook.svg",
+    }
+    for acao_nome, svg_esperado in acoes_esperadas.items():
+        st.definir_acao(acao_nome, 1.0)
+        assert resolver_animacao_mia("observando", False, a, st, body) == svg_esperado, f"Ação {acao_nome} falhou"
+    st.acao_temp_ate = 0.0
 
 
 def test_renderizacao_de_todas_as_animacoes_na_janela():
