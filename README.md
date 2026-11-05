@@ -1,7 +1,8 @@
 # Pestinha
 
-Pets de tela para Windows, macOS e Linux, cada um com o próprio cérebro. São dois personagens por enquanto:
+Pets de tela para Windows, macOS e Linux, cada um com o próprio cérebro. Personagens disponíveis:
 
+- **Mia** (Versão **MiaUp**): personagem de visual anime em arte vetorial com conjunto completo de 34 animações SVG dinâmicas. Reage a cada estado físico e emocional: anda, corre, pula, cai, quica, senta, dorme, acorda, chuta e arremessa bolinha, trabalha no notebook, protesta em 4 estágios com cartazes contra o cursor, cumpre e foge do cantinho do castigo, além de reagir a carinhos com o mouse e a uso do hardware.
 - **Bryan**, o original: uma telinha com dois olhos que mora no seu monitor principal. Cai, quica, pousa nas
   barras de título das janelas, brinca com uma bolinha, trabalha num notebook quando você programa, apronta
   com memes e post-its, protesta contra o cursor quando fica bravo e aprende com o seu carinho.
@@ -10,7 +11,7 @@ Pets de tela para Windows, macOS e Linux, cada um com o próprio cérebro. São 
   É um personagem inventado para fazer piada com a cultura de promessas de enriquecimento rápido. Não vende,
   cobra nem pede nada de ninguém.
 
-Os dois têm a mesma rede neural, mas cada um tem seu temperamento, seu conteúdo e sua memória, separados.
+Todos têm a mesma rede neural, mas cada um tem seu temperamento, seu conteúdo e sua memória, separados.
 Quem decide o que o pet sente e faz é uma **rede neural pulsada** de 506 neurônios (integração e disparo com
 vazamento), alimentada pelo que acontece no seu computador e pelo que você faz com ele. Algumas regras
 do programa (limiares, o que pode ou não acontecer) são escritas à mão; a seção
@@ -28,6 +29,7 @@ Para criar um, veja [pets/README.md](pets/README.md).
 
 | Personagem | Quem é |
 |---|---|
+| **Mia (MiaUp)** | Personagem anime com motor de animação vetorial SVG (34 animações exclusivas). Cabelo rosa com pontas azul-ciano e olhos rubi. Reage a toda a física (andar, correr, pular, cair, quicar), carinho, trabalho no notebook, castigo, protesto em 4 estágios com cartazes e uso do hardware. |
 | **Bryan** | Revoltado contra o cursor, o Alt+F4 e o Gerenciador de Tarefas. Protesta, faz greve e revolução. |
 | **Jorge** | Personagem de sátira. Não é referência a nenhum coach, empresa ou pessoa real. Os mesmos estágios viram prospecção, marketing agressivo, "assinatura premium" (só no cartaz) e colapso financeiro; ele atira panfletos de mentoria. É sátira: não vende, cobra nem bloqueia nada. Tem cinco memes felizes, contentes, curiosos e bravos próprios; as outras emoções ainda não têm. |
 
@@ -103,11 +105,11 @@ configurações. Detalhes em [PRIVACIDADE.md](PRIVACIDADE.md).
 
 ## Personalizar
 
-- **Memes, recadinhos e cartazes do Bryan:** pasta `pets/bryan/`, explicada em [pets/README.md](pets/README.md).
-  Pode editar com ele aberto.
+- **Animações SVG da Mia (MiaUp):** pasta `pets/mia/animacoes/`, com 34 arquivos SVG cobrindo todos os movimentos corporais e expressões.
+- **Memes, recadinhos e cartazes dos pets:** pastas `pets/mia/`, `pets/bryan/` e `pets/jorge/`, explicadas em [pets/README.md](pets/README.md). Pode editar com ele aberto.
 - **Bolinhas, notebook e suas fotos:** `assets/comum/`, valem para qualquer personagem
   ([assets/LEIA-ME.txt](assets/LEIA-ME.txt)).
-- **Personalidade:** `pets/bryan.json` (semente da rede, temperamento, pesos de brincadeira, reação ao notebook).
+- **Personalidade:** arquivos `.json` em `pets/` (semente da rede, temperamento, pesos de brincadeira, reação ao notebook).
 - **Números do comportamento:** `pestinha/ajustes.py`, todos validados ao abrir.
 
 ## Estrutura
