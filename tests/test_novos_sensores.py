@@ -306,3 +306,27 @@ def test_alegria_moderada_durante_digitacao():
         taxas_cheer.append(brain.motor_activity()["CHEER"])
     pico = max(taxas_cheer)
     assert 0.8 <= pico <= 3.0, f"Pico de alegria deveria ficar em torno de 2.0 Hz, deu {pico:.2f} Hz"
+
+
+def test_mouse_speed_dispara_ao_mover_cursor(tmp_path):
+    from PySide6.QtWidgets import QApplication
+    _qapp = QApplication.instance() or QApplication([])
+    """Valida que mover o cursor calcula velocidade e estimula o canal MOUSE_SPEED."""
+    from pestinha.app import PestinhaApp
+    from pestinha.settings_store import SettingsStore
+    from pestinha.paths import Paths
+    from unittest.mock import patch
+
+    paths = Paths(root=tmp_path)
+    store = SettingsStore(paths)
+    app = PestinhaApp(store, paths)
+    try:
+        app.last_cursor = (100, 100)
+        # Simula cursor pulando para (300, 300) em um dt de 0.1s
+        with patch("pestinha.app.cursor_pos", return_value=(300, 300)):
+            app.think()
+        # O canal sensorial MOUSE_SPEED deve ser maior que zero
+        assert app.intensities.get("MOUSE_SPEED", 0.0) > 0.005, "MOUSE_SPEED deveria ter disparado"
+    finally:
+        app.mesa.fechar()
+        app.pet.close()

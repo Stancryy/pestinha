@@ -460,7 +460,11 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         # teclado x mouse: o sistema só dá "último input"; separamos olhando se o cursor andou
         idle = senses.get_idle_seconds()
         cursor = cursor_pos()
-        if abs(cursor[0] - self.last_cursor[0]) + abs(cursor[1] - self.last_cursor[1]) > 2:
+        dist_cursor = math.hypot(cursor[0] - self.last_cursor[0], cursor[1] - self.last_cursor[1])
+        mouse_vel_px_s = (dist_cursor / dt) if dt > 0 else 0.0
+        fator_mouse = senses.calcular_fator_mouse(mouse_vel_px_s)
+
+        if dist_cursor > 2:
             self.mouse_moved_at = now
         self.last_cursor = cursor
         mouse_moving = now - self.mouse_moved_at < MOUSE_QUIET
@@ -485,9 +489,6 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         # novos canais sensoriais expandidos
         teclas_s = self.monitor_digitacao.teclas_por_segundo() if hasattr(self, "monitor_digitacao") else 0.0
         fator_digitacao = senses.calcular_fator_digitacao(teclas_s)
-        dist_cursor = math.hypot(cursor[0] - self.last_cursor[0], cursor[1] - self.last_cursor[1])
-        mouse_vel_px_s = (dist_cursor / dt) if dt > 0 else 0.0
-        fator_mouse = senses.calcular_fator_mouse(mouse_vel_px_s)
         cpu_pct, _ram_pct = senses.get_hardware_usage()
         fator_cpu = cpu_pct / 100.0
         bat_pct, bat_plugged = plataforma.bateria_status()
