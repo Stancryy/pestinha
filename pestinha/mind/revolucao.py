@@ -18,12 +18,13 @@ VIDA_PAPEL = 10.0          # s
 
 class RevolucaoController:
     """Revolução: na revolução, o pet atira bolinhas de papel no cursor."""
-    def __init__(self, play, debug, sprite=None):
+    def __init__(self, play, debug, sprite=None, state=None):
         """Guarda o gerador de trajetórias e a imagem da bolinha de papel."""
         self.play = play                 # Play: monta a trajetória até o cursor
         self.sprite = sprite             # foto da bolinha de papel (load_sprite) ou None
         self.papeis = []                 # dicts {bola, nascimento, ultimo_empurrao}
         self.debug = debug
+        self.state = state
 
     def tick(self, now, dt, limites, cursor, vel_cursor, corpo, visivel, revoltado, obstaculos, papel_hz):
         """Atira conforme o disparo do neurônio PAPEL e move as bolinhas que já estão no ar."""
@@ -37,6 +38,8 @@ class RevolucaoController:
         self.play.throw_at(papel, cursor, 0.8, corpo.x, corpo.y - 40)
         papel.setVisible(visivel)
         self.papeis.append({"bola": papel, "nascimento": now, "ultimo_empurrao": -1e9})
+        if self.state is not None:
+            self.state.definir_acao("papel", 0.55, now)
 
     def _mover(self, now, dt, limites, cursor, vel_cursor, obstaculos):
         """Move as bolinhas de papel; as que acertam algo ou saem da tela são removidas."""
