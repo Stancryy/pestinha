@@ -284,7 +284,8 @@ class ComputerSenses:
 
     def kick(self, channel, amount):
         """Dá um pulso num canal sensorial (ele volta ao normal aos poucos)."""
-        self.pulse[channel] = min(1.0, self.pulse[channel] + amount)
+        if channel in self.pulse:
+            self.pulse[channel] = min(1.0, self.pulse[channel] + amount)
 
     def on_events(self, events):
         """Transforma eventos do computador em pulsos: trocar de programa mexe nele; voltar ao teclado é novidade."""
