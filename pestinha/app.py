@@ -519,7 +519,7 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         # condicionamento: o cursor vindo rápido para ele, ou o botão apertado em cima, antecipam
         dist = math.hypot(cursor[0] - body.x, cursor[1] - body.y)
         if fator_mouse >= 0.8 and dist < 220:
-            self.senses.kick("ALERT", 0.4)
+            self.senses.kick("MOTION", 0.4)
         approaching = (self.prev_pet_dist is not None and dist < 220
                        and dt > 0 and (self.prev_pet_dist - dist) / dt > 500)
         self.prev_pet_dist = dist
