@@ -117,6 +117,9 @@ def test_mapeamento_de_estados_para_animacoes():
 
     st.corujao = True
     assert resolver_animacao_mia("observando", False, a, st, body) == "32-corujao-da-madrugada.svg"
+    body.vx = 80.0
+    assert resolver_animacao_mia("observando", False, a, st, body) == "02-andar.svg"
+    body.vx = 0.0
     st.corujao = False
 
     # Sono e choro
