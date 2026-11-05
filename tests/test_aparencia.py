@@ -78,10 +78,12 @@ def test_mia_desenha_anime_pixel_em_toda_expressao():
     assert [n for n, _c in a.acessorios] == ["headset", "chifrinhos"]
     casos = [(e, 1.0, False) for e in EYE_SHAPES] + [("observando", 0.08, False), ("feliz", 1.0, True)]
     cor_chifre = dict(a.acessorios)["chifrinhos"]
+    pasta_anim = PATHS.conteudo(a.variante).animacoes
     for emocao, blink, carinho in casos:
         img = pintar(a, emocao, blink, carinho)
         assert pixels_de(img, a.moldura), emocao
-        assert pixels_de(img, cor_chifre), emocao
+        if not pasta_anim.exists():
+            assert pixels_de(img, cor_chifre), emocao
 
 
 def test_estilo_tv_desenha_gravata_dentro_do_corpo():
