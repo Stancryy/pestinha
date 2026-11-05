@@ -48,6 +48,7 @@ class PetState:
         self.torcendo = False       # digitação rápida / euforia produtiva
         self.bateria_baixa = False  # bateria crítica sem tomada
         self.corujao = False        # madrugada / período noturno profundo
+        self.fuga = False           # fugindo do cantinho do castigo
 
     def mark_caress(self, now=None):
         """Marca que ele está recebendo carinho agora (dura um instante)."""
