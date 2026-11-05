@@ -42,7 +42,8 @@ def test_notebook_escondido_persiste_e_bloqueia_trabalho(qapp, tmp_path):
     assert app2.mesa.caderno.isHidden() is True
 
     # 3. Usuário abre app de trabalho (ex: VS Code)
-    with patch.object(senses, "get_active_app", return_value="code"):
+    with patch.object(senses, "get_active_app", return_value="code"), \
+         patch.object(senses, "get_idle_seconds", return_value=0.0):
         for _ in range(30):
             app2.sense()
             app2.think()

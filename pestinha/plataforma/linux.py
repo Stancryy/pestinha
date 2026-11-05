@@ -101,6 +101,10 @@ def sem_foco_nativo(janela_id):
     """O X11 não tem um jeito padrão de pedir isso: a janela do pet usa só as flags do Qt."""
 
 
+def garantir_topo(janela_id):
+    """No X11 o gerenciador de janelas controla o topo via flags do Qt."""
+
+
 def iniciar_atalho(callback, atalho="Ctrl+Alt+Shift+B"):
     """Registra Ctrl+Alt+Shift+B pelo pynput; devolve True se conseguiu."""
     return atalho_pynput(callback, atalho=atalho)

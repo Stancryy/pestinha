@@ -420,12 +420,16 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
             self.timeline.observe(
                 self.activity, self.idle_seconds, events, self.tracker.session_seconds, self.keyboard_active
             )
-        if "APP_CHANGED" in events:
+        if "APP_CHANGED" in events or "ACTIVITY_CHANGED" in events:
             dpr = QGuiApplication.primaryScreen().devicePixelRatio()
             rect = senses.foreground_rect(dpr)
             if rect:
                 lx, ly, lr, lb = self._retangulo_logico(rect)
                 self.behavior.look_at((lx + lr) / 2, (ly + lb) / 2, time.monotonic())
+            self.pet.manter_no_topo()
+        elif agora_s - getattr(self, "_ultimo_reforco_topo", 0.0) >= 1.5:
+            self._ultimo_reforco_topo = agora_s
+            self.pet.manter_no_topo()
 
 
         fullscreen = senses.is_fullscreen()

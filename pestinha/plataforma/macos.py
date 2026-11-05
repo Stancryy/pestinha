@@ -149,6 +149,10 @@ def sem_foco_nativo(janela_id):
     """No macOS o pet já é uma janela sem foco (Qt.WA_ShowWithoutActivating); nada a fazer aqui."""
 
 
+def garantir_topo(janela_id):
+    """No macOS as flags do Qt já controlam o nível da janela."""
+
+
 def iniciar_atalho(callback, atalho="Ctrl+Alt+Shift+B"):
     """Registra Ctrl+Alt+Shift+B pelo QuickMacHotKey; devolve True se conseguiu."""
     global _hotkey

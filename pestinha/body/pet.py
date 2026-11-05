@@ -103,10 +103,17 @@ class PetWindow(QWidget):
         if reversals >= RUB_REVERSALS and travel >= RUB_MIN_TRAVEL:
             self.state.mark_caress(now)
 
+    def manter_no_topo(self):
+        """Garante que a janela do pet continue visível acima de navegadores e outros apps."""
+        if self.isVisible():
+            self.raise_()
+            plataforma.garantir_topo(int(self.winId()))
+
     def showEvent(self, event):
         """Ao aparecer, a janela já é marcada para não roubar o foco do programa que você está usando."""
         super().showEvent(event)
         set_no_activate(self)
+        self.manter_no_topo()
 
     # ---------------- animação ----------------
 

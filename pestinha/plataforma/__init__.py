@@ -45,6 +45,7 @@ retangulo_ativo = _backend.retangulo_ativo
 tela_cheia = _backend.tela_cheia
 janelas_visiveis = _backend.janelas_visiveis
 sem_foco_nativo = _backend.sem_foco_nativo
+garantir_topo = _backend.garantir_topo
 iniciar_atalho = _backend.iniciar_atalho
 
 __all__ = [
@@ -55,6 +56,7 @@ __all__ = [
     "caminho_atalho_inicializar",
     "configurar_iniciar_com_windows",
     "formatar_atalho",
+    "garantir_topo",
     "iniciar_atalho",
     "iniciar_com_windows_ativo",
     "janelas_visiveis",

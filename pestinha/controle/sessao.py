@@ -80,6 +80,10 @@ class SessaoMixin:
                 self.behavior.drop_carried()
                 self.pet.cancel_interaction()        # escondido ou desligado no meio do arraste
                 self.senses.set_dragging(False)
+            else:
+                self.pet.manter_no_topo()
+        elif visible:
+            self.pet.manter_no_topo()
         self.mischief.set_visible(visible)
         if not self.perms["travessuras"] and self.mischief.things:
             self.clear_things()                      # travessuras desligadas: o que estava na tela sai

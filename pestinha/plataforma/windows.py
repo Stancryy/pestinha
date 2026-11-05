@@ -127,7 +127,11 @@ def janelas_visiveis(excluir, escala=1.0):
     try:
         win32gui.EnumWindows(callback, None)
     except Exception as error:
-        log(f"[senses] não deu para listar janelas: {error}")
+        try:
+            c_callback = ctypes.WINFUNCTYPE(ctypes.wintypes.BOOL, ctypes.wintypes.HWND, ctypes.wintypes.LPARAM)(callback)
+            user32.EnumWindows(c_callback, 0)
+        except Exception:
+            log(f"[senses] não deu para listar janelas: {error}")
     return found
 
 
@@ -151,12 +155,20 @@ def sem_foco_nativo(janela_id):
         style |= win32con.WS_EX_NOACTIVATE | win32con.WS_EX_TOOLWINDOW
         style |= win32con.WS_EX_TOPMOST
         win32gui.SetWindowLong(janela_id, win32con.GWL_EXSTYLE, style)
+        garantir_topo(janela_id)
+    except Exception:
+        pass    # sem janela nativa (ex.: teste offscreen)
+
+
+def garantir_topo(janela_id):
+    """Reforça que a janela fica sempre no topo (HWND_TOPMOST) sem roubar o foco do usuário."""
+    try:
         ctypes.windll.user32.SetWindowPos(
             wintypes.HWND(janela_id), -1, 0, 0, 0, 0,
             win32con.SWP_NOMOVE | win32con.SWP_NOSIZE | win32con.SWP_NOACTIVATE,
         )
     except Exception:
-        pass    # sem janela nativa (ex.: teste offscreen)
+        pass
 
 
 def _vk_de_tecla(tecla):
