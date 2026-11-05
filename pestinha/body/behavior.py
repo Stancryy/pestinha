@@ -101,6 +101,7 @@ class Behavior:
             if thing in self.mischief.things:
                 self.mischief.release(thing)
         self.mission = None
+        self.state.delivering = False
 
     def tick(self, dt, now, cursor, bounds, prof, platforms=()):
         """Um passo do comportamento: anda, mexe na bolinha e reage ao cursor, respeitando as plataformas."""
@@ -146,9 +147,11 @@ class Behavior:
 
         # objeto carregado acompanha (e solta se o pet cair/voar)
         if self.mission and self.mission[0] == "deliver":
+            st.delivering = True
             thing = self.mission[1]
             if thing not in self.mischief.things:
                 self.mission = None
+                st.delivering = False
             elif not body.grounded and abs(body.vy) > 600:
                 self.drop_carried()
             else:
@@ -160,6 +163,8 @@ class Behavior:
                     body.y + ey - thing.height() / 2,
                     dt,
                 )
+        else:
+            st.delivering = False
 
         if not body.grounded:
             return
@@ -199,6 +204,7 @@ class Behavior:
             if self.tipped_since is None:
                 self.tipped_since = now
             if self.emotion != "triste" and now - self.tipped_since > prof["righting_after"]:
+                st.definir_acao("levantar", 0.5, now)
                 turn = -wrap_angle(body.angle)
                 body.jump(0.0, -650.0, turn * 1.6)
                 self.tipped_since = None
@@ -241,8 +247,15 @@ class Behavior:
 
         # brincar com a bolinha (chutar ou arremessar, conforme o estilo do pet)
         if self.play is not None and self.ball is not None and self.emotion not in STILL and not st.at_desk:
-            if self.play.tick(now, body, self.ball, cursor, self.emotion, self.play_pull):
-                body.jump(0.0, -180.0)              # pulinho de quem acabou de chutar
+            acao_play = self.play.tick(now, body, self.ball, cursor, self.emotion, self.play_pull)
+            if acao_play == "kick":
+                st.definir_acao("chute", 0.45, now)
+                body.jump(0.0, -180.0)
+            elif acao_play == "throw":
+                st.definir_acao("papel", 0.55, now)
+                body.jump(0.0, -180.0)
+            elif acao_play:
+                body.jump(0.0, -180.0)
 
         # passeio: a emoção escolhe o destino, o tom motor escolhe o jeito
         tone = self.tone
@@ -255,6 +268,7 @@ class Behavior:
                 self.target_x is not None and not (left + 80 <= self.target_x <= right - 80)
             )
             if platforms and random.random() < tone.climb_chance() and self._jump_to_window(platforms):
+                st.definir_acao("escalada", 0.6, now)
                 return
             if random.random() < tone.hop_chance():
                 spin = random.choice((-1, 1)) * 720.0 if random.random() < tone.spin_chance() else 0.0
