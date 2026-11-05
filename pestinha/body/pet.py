@@ -157,6 +157,14 @@ class PetWindow(QWidget):
         if self.body.grounded and st.emotion != "dormindo":
             if not is_anime:
                 sway = st.tone.sway() * math.sin(time.monotonic() * 2.2)
+            else:
+                vx_abs = abs(self.body.vx)
+                if vx_abs > 8.0:
+                    cadencia = min(20.0, max(8.0, vx_abs * 0.12))
+                    jitter_y -= abs(math.sin(time.monotonic() * cadencia)) * 2.4
+                    sway = math.sin(time.monotonic() * cadencia) * 1.8
+                elif not getattr(st, "at_desk", False) and not getattr(st, "castigo", False):
+                    jitter_y += 0.7 * math.sin(time.monotonic() * 1.8)
             if getattr(st, "dancando", False):
                 sway += 6.5 * math.sin(time.monotonic() * 8.0)
                 jitter_y -= 2.5 * abs(math.sin(time.monotonic() * 8.0))
