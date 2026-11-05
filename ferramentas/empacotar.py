@@ -134,6 +134,10 @@ def empacotar_onedir():
         str(icone),
         "--version-file",
         str(arq_versao),
+        "--hidden-import",
+        "win32timezone",
+        "--hidden-import",
+        "PySide6.QtSvg",
         str(ROOT / "main.py"),
     ]
     subprocess.run(cmd, cwd=str(ROOT), check=True)
