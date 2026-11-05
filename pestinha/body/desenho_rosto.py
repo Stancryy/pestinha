@@ -270,7 +270,15 @@ def resolver_animacao_mia(emotion: str, carinho: bool, a: Aparencia, estado=None
         elif stage == 4:
             return "19-revolucao-neon.svg"
 
-    # 8. Reações Especiais de Ambiente / Hardware
+    # 8. Locomoção no chão (prioridade máxima de movimento quando há deslocamento)
+    if corpo is not None and getattr(corpo, "grounded", False):
+        vx = abs(getattr(corpo, "vx", 0.0))
+        if vx > 140.0:
+            return "06-fuga-em-disparada.svg"
+        elif vx > 8.0:
+            return "02-andar.svg"
+
+    # 9. Reações Especiais de Ambiente / Hardware em repouso (somente quando parada)
     if estado is not None:
         if getattr(estado, "dancando", False):
             return "16-dancando.svg"
@@ -290,17 +298,9 @@ def resolver_animacao_mia(emotion: str, carinho: bool, a: Aparencia, estado=None
     if getattr(a, "apertado", False):
         return "31-ram-alta-comprimida.svg"
 
-    # 9. Sono
+    # 10. Sono
     if emotion == "dormindo":
         return "13-dormindo.svg"
-
-    # 10. Locomoção no chão (sempre prioriza andar quando há velocidade)
-    if corpo is not None and getattr(corpo, "grounded", False):
-        vx = abs(getattr(corpo, "vx", 0.0))
-        if vx > 140.0:
-            return "06-fuga-em-disparada.svg"
-        elif vx > 10.0:
-            return "02-andar.svg"
 
     # 11. Expressões em repouso parado no chão (nunca pula parado)
     if emotion == "triste":
