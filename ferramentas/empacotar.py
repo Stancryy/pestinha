@@ -1,4 +1,4 @@
-"""Gera o ícone `.ico` da Mia, os metadados de versão e empacota o executável `--onedir` em `executáveis/Pestinha/`."""
+"""Gera o ícone `.ico` da Mia, os metadados de versão e empacota os executáveis em `executáveis/Pestinha/`, raiz e `executáveis/windows/`."""
 
 import os
 from pathlib import Path
@@ -107,7 +107,7 @@ def _sincronizar_pasta(origem: Path, destino: Path):
 def empacotar_onedir():
     """Compila `Pestinha.exe` no modo `--onedir` com ícone e metadados de versão e copia `assets/` e `pets/`."""
     icone = gerar_icone()
-    pasta_build = ROOT / "executáveis" / "_build_tmp"
+    pasta_build = ROOT / "executáveis" / "_build_tmp_onedir"
     pasta_dist_tmp = pasta_build / "dist"
     pasta_app = ROOT / "executáveis" / "Pestinha"
     pasta_build.mkdir(parents=True, exist_ok=True)
@@ -150,6 +150,68 @@ def empacotar_onedir():
     return pasta_app / "Pestinha.exe"
 
 
+def empacotar_onefile():
+    """Compila `Pestinha.exe` no modo `--onefile` com ícone e copia para raiz e `executáveis/windows/`."""
+    icone = gerar_icone()
+    pasta_build = ROOT / "executáveis" / "_build_tmp_onefile"
+    pasta_dist_tmp = pasta_build / "dist"
+    pasta_build.mkdir(parents=True, exist_ok=True)
+    arq_versao = pasta_build / "version_info.txt"
+    arq_versao.write_text(VERSION_INFO_TEMPLATE, encoding="utf-8")
+
+    cmd = [
+        sys.executable,
+        "-m",
+        "PyInstaller",
+        "--noconfirm",
+        "--clean",
+        "--onefile",
+        "--noconsole",
+        "--name",
+        "Pestinha",
+        "--distpath",
+        str(pasta_dist_tmp),
+        "--workpath",
+        str(pasta_build / "work"),
+        "--specpath",
+        str(pasta_build),
+        "--icon",
+        str(icone),
+        "--version-file",
+        str(arq_versao),
+        "--hidden-import",
+        "win32timezone",
+        "--hidden-import",
+        "PySide6.QtSvg",
+        str(ROOT / "main.py"),
+    ]
+    subprocess.run(cmd, cwd=str(ROOT), check=True)
+    exe_gerado = pasta_dist_tmp / "Pestinha.exe"
+
+    for destino_exe in (ROOT / "Pestinha.exe", ROOT / "executáveis" / "windows" / "Pestinha.exe"):
+        destino_exe.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            if destino_exe.exists():
+                old_temp = destino_exe.with_suffix(".old.exe")
+                try:
+                    if old_temp.exists():
+                        old_temp.unlink()
+                    os.replace(destino_exe, old_temp)
+                except OSError:
+                    pass
+            shutil.copy2(exe_gerado, destino_exe)
+        except OSError:
+            pass
+
+    for nome_pasta in ("assets", "pets"):
+        _sincronizar_pasta(ROOT / nome_pasta, ROOT / "executáveis" / "windows" / nome_pasta)
+
+    shutil.rmtree(pasta_build, ignore_errors=True)
+    return ROOT / "Pestinha.exe"
+
+
 if __name__ == "__main__":
-    exe = empacotar_onedir()
-    print(f"Build concluído com sucesso: {exe}")
+    exe_dir = empacotar_onedir()
+    print(f"Build onedir concluído: {exe_dir}")
+    exe_file = empacotar_onefile()
+    print(f"Build onefile concluído: {exe_file}")
