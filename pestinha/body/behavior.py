@@ -166,11 +166,15 @@ class Behavior:
 
         # fugindo do cantinho: o destino da fuga vale até ele chegar (nada sobrescreve a direção)
         if self.fuga_alvo is not None:
+            st.fuga = True
             if abs(body.x - self.fuga_alvo) < 20:
                 self.fuga_alvo = None
+                st.fuga = False
             else:
                 self._slide_to(self.fuga_alvo, 160.0)
                 return
+        else:
+            st.fuga = False
 
         # no cantinho do castigo: parado; missões pendentes são canceladas e protesto não move
         if st.castigo:
