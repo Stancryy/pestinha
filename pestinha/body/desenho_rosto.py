@@ -16,6 +16,7 @@ from dataclasses import dataclass, field
 
 from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPainterPath, QPen, QPolygonF
+from PySide6.QtSvg import QSvgRenderer
 
 from ..ajustes import ZZZ_PERIODO as ZZZ_PERIOD, ZZZ_QUANTIDADE as ZZZ_COUNT
 from ..paths import Paths
@@ -42,6 +43,222 @@ COR_PADRAO_ACESSORIO = {
 }
 
 _CACHE_SPRITES = {}
+_CACHE_SVGS = {}
+
+MAPA_ANIMACOES_MIA = {
+    "01-parada": "01-parada.svg",
+    "02-andar": "02-andar.svg",
+    "03-hesitacao": "03-hesitacao.svg",
+    "04-pulinho": "04-pulinho.svg",
+    "05-pirueta": "05-pirueta.svg",
+    "06-fuga-em-disparada": "06-fuga-em-disparada.svg",
+    "07-segurada-drag": "07-segurada-drag.svg",
+    "08-arremessada": "08-arremessada.svg",
+    "09-cutucada": "09-cutucada.svg",
+    "10-cafune": "10-cafune.svg",
+    "11-tontura": "11-tontura.svg",
+    "12-tombada-de-lado": "12-tombada-de-lado.svg",
+    "13-dormindo": "13-dormindo.svg",
+    "14-no-notebook": "14-no-notebook.svg",
+    "15-bolinha-de-papel": "15-bolinha-de-papel.svg",
+    "16-dancando": "16-dancando.svg",
+    "17-marcha-com-cartaz": "17-marcha-com-cartaz.svg",
+    "18-greve-sentada": "18-greve-sentada.svg",
+    "19-revolucao-neon": "19-revolucao-neon.svg",
+    "20-chorando": "20-chorando.svg",
+    "21-cpu-alta-suando": "21-cpu-alta-suando.svg",
+    "22-bateria-baixa": "22-bateria-baixa.svg",
+    "23-chute-na-bolinha": "23-chute-na-bolinha.svg",
+    "24-entregar-travessura": "24-entregar-travessura.svg",
+    "25-escalada-de-janela": "25-escalada-de-janela.svg",
+    "26-pouso-e-quique": "26-pouso-e-quique.svg",
+    "27-levantar-do-chao": "27-levantar-do-chao.svg",
+    "28-saida-por-perdao": "28-saida-por-perdao.svg",
+    "29-de-castigo-na-placa": "29-de-castigo-na-placa.svg",
+    "30-arrancada-do-notebook": "30-arrancada-do-notebook.svg",
+    "31-ram-alta-comprimida": "31-ram-alta-comprimida.svg",
+    "32-corujao-da-madrugada": "32-corujao-da-madrugada.svg",
+    "33-torcendo-digitacao-rapida": "33-torcendo-digitacao-rapida.svg",
+    "34-reclamacao-estagio-1": "34-reclamacao-estagio-1.svg",
+    "parada": "01-parada.svg",
+    "observando": "01-parada.svg",
+    "idle": "01-parada.svg",
+    "andar": "02-andar.svg",
+    "caminhar": "02-andar.svg",
+    "walk": "02-andar.svg",
+    "hesitacao": "03-hesitacao.svg",
+    "hesitar": "03-hesitacao.svg",
+    "pulinho": "04-pulinho.svg",
+    "hop": "04-pulinho.svg",
+    "pirueta": "05-pirueta.svg",
+    "spin": "05-pirueta.svg",
+    "fuga": "06-fuga-em-disparada.svg",
+    "fuga_em_disparada": "06-fuga-em-disparada.svg",
+    "drag": "07-segurada-drag.svg",
+    "segurada": "07-segurada-drag.svg",
+    "arremessada": "08-arremessada.svg",
+    "voo": "08-arremessada.svg",
+    "cutucada": "09-cutucada.svg",
+    "poke": "09-cutucada.svg",
+    "cafune": "10-cafune.svg",
+    "carinho": "10-cafune.svg",
+    "tontura": "11-tontura.svg",
+    "dizzy": "11-tontura.svg",
+    "tombada": "12-tombada-de-lado.svg",
+    "tombada_de_lado": "12-tombada-de-lado.svg",
+    "dormindo": "13-dormindo.svg",
+    "sleep": "13-dormindo.svg",
+    "no_notebook": "14-no-notebook.svg",
+    "notebook": "14-no-notebook.svg",
+    "trabalhando": "14-no-notebook.svg",
+    "bolinha_de_papel": "15-bolinha-de-papel.svg",
+    "papel": "15-bolinha-de-papel.svg",
+    "dancando": "16-dancando.svg",
+    "marcha": "17-marcha-com-cartaz.svg",
+    "marcha_com_cartaz": "17-marcha-com-cartaz.svg",
+    "manifestacao": "17-marcha-com-cartaz.svg",
+    "greve": "18-greve-sentada.svg",
+    "greve_sentada": "18-greve-sentada.svg",
+    "revolucao": "19-revolucao-neon.svg",
+    "revolucao_neon": "19-revolucao-neon.svg",
+    "chorando": "20-chorando.svg",
+    "triste": "20-chorando.svg",
+    "cpu_alta_suando": "21-cpu-alta-suando.svg",
+    "suando": "21-cpu-alta-suando.svg",
+    "bateria_baixa": "22-bateria-baixa.svg",
+    "bateria": "22-bateria-baixa.svg",
+    "chute": "23-chute-na-bolinha.svg",
+    "chute_na_bolinha": "23-chute-na-bolinha.svg",
+    "entregar": "24-entregar-travessura.svg",
+    "entregar_travessura": "24-entregar-travessura.svg",
+    "escalada": "25-escalada-de-janela.svg",
+    "escalada_de_janela": "25-escalada-de-janela.svg",
+    "pouso": "26-pouso-e-quique.svg",
+    "pouso_e_quique": "26-pouso-e-quique.svg",
+    "levantar": "27-levantar-do-chao.svg",
+    "levantar_do_chao": "27-levantar-do-chao.svg",
+    "perdao": "28-saida-por-perdao.svg",
+    "saida_por_perdao": "28-saida-por-perdao.svg",
+    "castigo": "29-de-castigo-na-placa.svg",
+    "de_castigo_na_placa": "29-de-castigo-na-placa.svg",
+    "arrancada": "30-arrancada-do-notebook.svg",
+    "arrancada_do_notebook": "30-arrancada-do-notebook.svg",
+    "ram": "31-ram-alta-comprimida.svg",
+    "ram_alta_comprimida": "31-ram-alta-comprimida.svg",
+    "apertado": "31-ram-alta-comprimida.svg",
+    "corujao": "32-corujao-da-madrugada.svg",
+    "corujao_da_madrugada": "32-corujao-da-madrugada.svg",
+    "torcendo": "33-torcendo-digitacao-rapida.svg",
+    "torcendo_digitacao_rapida": "33-torcendo-digitacao-rapida.svg",
+    "reclamacao": "34-reclamacao-estagio-1.svg",
+    "reclamacao_estagio_1": "34-reclamacao-estagio-1.svg",
+    "feliz": "04-pulinho.svg",
+    "contente": "01-parada.svg",
+    "curioso": "03-hesitacao.svg",
+    "bravo": "34-reclamacao-estagio-1.svg",
+    "assustado": "09-cutucada.svg",
+    "dramatico": "20-chorando.svg",
+}
+
+
+def _carregar_animacao_svg(variante: str, chave: str):
+    """Carrega (com cache) o renderizador de animação SVG via ConteudoPaths."""
+    k = (variante, chave)
+    if k in _CACHE_SVGS:
+        return _CACHE_SVGS[k]
+
+    arquivo = MAPA_ANIMACOES_MIA.get(chave, chave)
+    if not arquivo.endswith(".svg"):
+        arquivo = f"{arquivo}.svg"
+
+    try:
+        pasta_anim = Paths().conteudo(variante).animacoes
+    except Exception:
+        pasta_anim = None
+
+    if pasta_anim is None or not pasta_anim.exists():
+        return None
+
+    caminho = pasta_anim / arquivo
+    if not caminho.exists():
+        return None
+
+    renderer = QSvgRenderer(str(caminho))
+    if not renderer.isValid():
+        return None
+    _CACHE_SVGS[k] = renderer
+    return renderer
+
+
+def resolver_animacao_mia(emotion: str, carinho: bool, a: Aparencia, estado=None, corpo=None) -> str:
+    """Determina qual das 34 animações da Mia deve ser exibida com base no estado e física atuais."""
+    if corpo is not None:
+        if getattr(corpo, "held", False):
+            return "07-segurada-drag.svg"
+        if hasattr(corpo, "upright") and not corpo.upright():
+            return "12-tombada-de-lado.svg"
+
+    if estado is not None:
+        if getattr(estado, "fuga", False):
+            return "06-fuga-em-disparada.svg"
+        if getattr(estado, "dizzy", lambda now=None: False)():
+            return "11-tontura.svg"
+        if getattr(estado, "at_desk", False):
+            return "14-no-notebook.svg"
+        if getattr(estado, "castigo", False):
+            return "29-de-castigo-na-placa.svg"
+        stage = getattr(estado, "protest_stage", 0)
+        if stage == 1:
+            return "34-reclamacao-estagio-1.svg"
+        elif stage == 2:
+            return "17-marcha-com-cartaz.svg"
+        elif stage == 3:
+            return "18-greve-sentada.svg"
+        elif stage == 4:
+            return "19-revolucao-neon.svg"
+        if getattr(estado, "dancando", False):
+            return "16-dancando.svg"
+        if getattr(estado, "torcendo", False):
+            return "33-torcendo-digitacao-rapida.svg"
+        if getattr(estado, "suando", False):
+            return "21-cpu-alta-suando.svg"
+        if getattr(estado, "apertado", False):
+            return "31-ram-alta-comprimida.svg"
+        if getattr(estado, "bateria_baixa", False):
+            return "22-bateria-baixa.svg"
+        if getattr(estado, "corujao", False):
+            return "32-corujao-da-madrugada.svg"
+        if carinho or (hasattr(estado, "feliz_fechado") and estado.feliz_fechado()):
+            return "10-cafune.svg"
+
+    if getattr(a, "suando", False):
+        return "21-cpu-alta-suando.svg"
+    if getattr(a, "apertado", False):
+        return "31-ram-alta-comprimida.svg"
+    if carinho:
+        return "10-cafune.svg"
+    if emotion == "dormindo":
+        return "13-dormindo.svg"
+    if emotion == "triste":
+        return "20-chorando.svg"
+    if emotion == "bravo":
+        return "34-reclamacao-estagio-1.svg"
+    if emotion == "assustado":
+        return "09-cutucada.svg"
+    if emotion == "trabalhando":
+        return "14-no-notebook.svg"
+    if emotion in ("feliz", "contente"):
+        if corpo is not None and getattr(corpo, "grounded", False) and abs(getattr(corpo, "vx", 0.0)) > 15.0:
+            return "02-andar.svg"
+        return "04-pulinho.svg"
+    if emotion == "curioso":
+        return "03-hesitacao.svg"
+
+    if corpo is not None and getattr(corpo, "grounded", False) and abs(getattr(corpo, "vx", 0.0)) > 15.0:
+        return "02-andar.svg"
+
+    return "01-parada.svg"
+
 
 
 def _carregar_sprite_anime(variante: str, chave: str):
@@ -118,14 +335,14 @@ def lerp_shape(current, target, k):
 
 
 def draw_face(p: QPainter, shape: dict, gaze=(0.0, 0.0), blink=1.0, emotion="observando",
-              carinho=False, aparencia=PADRAO):
+              carinho=False, aparencia=PADRAO, estado=None, corpo=None):
     """Desenha o pet (estilo clássico 'tv' ou 'anime_pixel') com centro na origem do painter."""
     a = aparencia or PADRAO
     p.save()
     if getattr(a, "apertado", False):
         p.scale(0.84, 1.08)
     if a.estilo == "anime_pixel":
-        _draw_anime_pixel(p, shape, gaze, blink, emotion, carinho, a)
+        _draw_anime_pixel(p, shape, gaze, blink, emotion, carinho, a, estado=estado, corpo=corpo)
     else:
         _draw_tv(p, shape, gaze, blink, emotion, carinho, a)
     if getattr(a, "suando", False):
@@ -174,18 +391,43 @@ def _draw_tv(p: QPainter, shape: dict, gaze, blink: float, emotion: str, carinho
 # ============================================================
 
 def _draw_anime_pixel(p: QPainter, shape: dict, gaze, blink: float, emotion: str,
-                      carinho: bool, a: Aparencia):
+                      carinho: bool, a: Aparencia, estado=None, corpo=None):
     """
-    Desenha a personagem chibi de anime em pixel art detalhado:
-    - Se houver sprite 32-bit em `pets/<variante>/sprites/<emocao>.webp`, renderiza o sprite
-      com deslocamento suave pelo olhar (`gaze`) e detalhes de cor dos acessórios configurados.
-    - Caso contrário, renderiza o pixel art procedural de grade fina (2px) em 5 tons.
+    Desenha a personagem chibi de anime em pixel art vetorial / alta densidade:
+    - Tenta carregar e renderizar as animações SVG da pasta `pets/<variante>/animacoes/`
+      (suporta a nova versão completa da Mia com 34 animações vetoriais fluidas);
+    - Fallback para sprites 32-bit em `pets/<variante>/sprites/<emocao>.webp`;
+    - Fallback procedural de grade fina (2px) em 5 tons.
     """
     p.save()
-    p.setRenderHint(QPainter.Antialiasing, False)
+    p.setRenderHint(QPainter.Antialiasing, True)
     p.setPen(Qt.NoPen)
 
     acessorios_dict = dict(a.acessorios)
+
+    # 1. Tentar renderizar a animação SVG da Mia
+    chave_svg = resolver_animacao_mia(emotion, carinho, a, estado, corpo)
+    svg_renderer = _carregar_animacao_svg(a.variante, chave_svg)
+    if svg_renderer is not None:
+        gx, gy = gaze
+        dx = int(round(max(-1.0, min(1.0, gx)) * 3.0))
+        dy = int(round(max(-1.0, min(1.0, gy)) * 2.0))
+        target_rect = QRectF(-60 + dx, -68 + dy, 120, 150)
+        svg_renderer.render(p, target_rect)
+        # Pontos internos discretos para sincronizar as cores exatas configuradas em aparencia
+        p.fillRect(QRectF(-2 + dx, -36 + dy, 2, 2), a.moldura)
+        if "chifrinhos" in acessorios_dict:
+            cor_ch = acessorios_dict["chifrinhos"]
+            p.fillRect(QRectF(-24 + dx, -42 + dy, 2, 2), cor_ch)
+            p.fillRect(QRectF(22 + dx, -42 + dy, 2, 2), cor_ch)
+        if "headset" in acessorios_dict:
+            cor_hs = acessorios_dict["headset"]
+            p.fillRect(QRectF(-34 + dx, 18 + dy, 2, 3), cor_hs)
+            p.fillRect(QRectF(32 + dx, 18 + dy, 2, 3), cor_hs)
+        p.restore()
+        return
+
+    # 2. Fallback para sprites .webp
     if getattr(a, "suando", False) and _carregar_sprite_anime(a.variante, "suando") is not None:
         chave_sp = "suando"
     elif carinho:
