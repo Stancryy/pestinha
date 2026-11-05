@@ -332,6 +332,8 @@ class CastigoController:
         """
         if motores.get("ACEITAR", 0.0) >= LIMIAR_PERDAO_HZ:
             self.rancor *= 0.5
+            if self.estado is not None:
+                self.estado.definir_acao("perdao", 0.8, now)
             self._soltar(self.estado)
             if self.debug():
                 log(f"[castigo] aceitou e saiu (ACEITAR {motores['ACEITAR']:.1f} Hz)")
@@ -386,6 +388,8 @@ class CastigoController:
         if saiu:
             self.vitorias["fugir"] += 1.0
             self.ultima_fuga_em = now
+            if getattr(self, "behavior", None) and getattr(self.behavior, "state", None):
+                self.behavior.state.definir_acao("perdao", 0.8, now)
             self._cancelar_fuga()
             self.salvar()
             if self.debug():
