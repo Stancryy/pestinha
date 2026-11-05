@@ -143,8 +143,9 @@ class PetWindow(QWidget):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
         st = self.state
-        if st.desk_top is not None:
-            # sentado: o corpo some atrás da tampa do notebook (corta no nível dela, não depende da ordem das janelas)
+        is_anime = getattr(self.aparencia, "estilo", "") == "anime_pixel"
+        if st.desk_top is not None and not is_anime:
+            # sentado: o corpo some atrás da tampa do notebook (apenas para TV; anime SVG já inclui o desk)
             corte = int(st.desk_top - self.y())
             p.setClipRect(QRect(0, 0, self.width(), max(0, min(self.height(), corte))))
         shake = st.shake
@@ -154,7 +155,8 @@ class PetWindow(QWidget):
         # SETTLE: balança devagarinho, de boa; a amplitude é a atividade da população
         sway = 0.0
         if self.body.grounded and st.emotion != "dormindo":
-            sway = st.tone.sway() * math.sin(time.monotonic() * 2.2)
+            if not is_anime:
+                sway = st.tone.sway() * math.sin(time.monotonic() * 2.2)
             if getattr(st, "dancando", False):
                 sway += 6.5 * math.sin(time.monotonic() * 8.0)
                 jitter_y -= 2.5 * abs(math.sin(time.monotonic() * 8.0))
@@ -170,7 +172,11 @@ class PetWindow(QWidget):
 
         p.save()
         p.translate(CX + jitter_x, CY + jitter_y)
-        p.rotate(self.body.angle + sway)
+        # Para anime pixel, mantém os pés no chão sem rotação exagerada no pivô do peito
+        ang = self.body.angle
+        if is_anime and self.body.grounded and abs(ang) < 30.0:
+            ang = 0.0
+        p.rotate(ang + sway)
         blink = 0.08 if time.monotonic() < st.blink_until else 1.0
         ap_atual = self.aparencia
         if getattr(st, "suando", False) or getattr(st, "apertado", False):
@@ -270,8 +276,10 @@ class PetWindow(QWidget):
             self.drag_ended.emit()
             speed = math.hypot(self.body.vx, self.body.vy)
             if speed >= THROW_MIN_SPEED:
+                self.state.definir_acao("arremesso", 0.75)
                 self.thrown.emit(speed)
         elif held_ms <= POKE_MAX_MS and self.state.allow_poke:
+            self.state.definir_acao("cutucada", 0.45)
             self.poked.emit()
         self._press = None
         self._dragging = False
@@ -289,6 +297,7 @@ class PetWindow(QWidget):
             self._held_angle += step
         else:
             self.body.omega += step * 12.0
+            self.state.definir_acao("pirueta", 0.5)
             if self.body.grounded:
                 self.body.jump(0.0, -250.0)
 
