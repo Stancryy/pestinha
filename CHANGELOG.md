@@ -1,5 +1,22 @@
 # Histórico de versões
 
+## MiaUp — Animações Vetoriais SVG da Mia
+
+### Motor de Animações Vetoriais SVG (34 animações)
+- Integração de `QSvgRenderer` em `pestinha/body/desenho_rosto.py` com renderização vetorial nítida em alta definição e cache em memória.
+- Mapeamento determinístico de todos os 34 arquivos SVG em `pets/mia/animacoes/` via `resolver_animacao_mia`:
+  - **Física e locomoção:** `parada.svg`, `andando.svg`, `correndo.svg`, `pulo.svg`, `queda.svg`, `quicando.svg`, `tombada.svg`, `arrastada.svg`, `flutuando.svg`.
+  - **Interações e carinho:** `carinho.svg`, `chute_bolinha.svg`, `arremesso_bolinha.svg`.
+  - **Foco e trabalho:** `no_notebook.svg`, `trabalhando.svg`.
+  - **Descanso e castigo:** `dormindo.svg`, `acordando.svg`, `de_castigo.svg`, `fugindo_castigo.svg`.
+  - **Protesto graduado em 4 estágios:** `protesto_1_reclamacao.svg`, `protesto_2_manifestacao.svg`, `protesto_3_greve.svg`, `protesto_4_revolucao.svg`.
+  - **Expressões emocionais:** `feliz.svg`, `contente.svg`, `curiosa.svg`, `observando.svg`, `brava.svg`, `triste.svg`, `assustada.svg`, `dramatica.svg`.
+  - **Reações dinâmicas e de hardware:** `suando_cpu.svg`, `apertada_ram.svg`, `comemorando.svg`, `dancando.svg`.
+- Resolução e priorização de animação em tempo real com respeito a carinho, arrasto, gravidade, notebook, castigo, protesto e reações de hardware.
+- Fallback gracioso automático para sprites WebP e renderização procedural.
+- Novo conjunto de testes unitários automatizados em `tests/test_mia_animacoes_svg.py` validando os 34 SVGs, o mapeamento de estados e a renderização offscreen.
+
+
 ## 0.8.0 — Versão Personalizada (Mia)
 
 ### Limpeza e base (Etapa 1)
